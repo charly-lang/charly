@@ -1,18 +1,20 @@
 require_relative "Lexer.rb"
 require_relative "Grammar.rb"
 require_relative "Helper.rb"
-require_relative "Sanitizer.rb"
+require_relative "Optimizer.rb"
 
 class Parser
 
-  attr_reader :tokens
-  attr_reader :tree
+  attr_reader :tokens, :tree
+  attr_accessor :should_sanitize
 
   def initialize
     @grammar = Grammar.new
     @tree = Program.new
     @node = @tree
     @next = NIL
+
+    @should_sanitize = false
   end
 
   def parse(input)
@@ -22,19 +24,21 @@ class Parser
     @tokens = lexer.analyse input
     @next = 0
 
-    # Remove whitespace from the tokens
+    # Remove whitespace and comments from the tokens
     @tokens = @tokens.select {|token|
       token.token != :WHITESPACE && token.token != :COMMENT
     }
 
-    # Generate the abstract syntax tree
+    # Generate the abstract syntax tree, starting with an expression
     E()
 
-    # Create a tree sanitizer
-    sanitizer = Sanitizer.new
-    sanitizer.sanitize_program @tree
+    # Sanitize the tree if wanted
+    if @should_sanitize
+      sanitizer = Sanitizer.new
+      sanitizer.sanitize_program @tree
+    end
 
-    puts @tree
+    @tree
   end
 
   # Grammar Implementatino
