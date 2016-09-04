@@ -6,15 +6,12 @@ require_relative "Optimizer.rb"
 class Parser
 
   attr_reader :tokens, :tree
-  attr_accessor :should_optimize
 
   def initialize
     @grammar = Grammar.new
     @tree = Program.new
     @node = @tree
     @next = NIL
-
-    @should_sanitize = false
   end
 
   def parse(input)
@@ -33,10 +30,8 @@ class Parser
     E()
 
     # Optimize the tree if wanted
-    if @should_optimize
-      optimizer = Optimizer.new
-      optimizer.optimize_program @tree
-    end
+    optimizer = Optimizer.new
+    optimizer.optimize_program @tree
 
     @tree
   end
@@ -125,7 +120,7 @@ class Parser
 
   def T
     save = @node
-    @node = Structure.new(@node)
+    @node = Term.new(@node)
     match = check_each([:T3, :T2, :T1])
     if match
       save << @node
@@ -207,14 +202,11 @@ class Program < ASTNode
   end
 end
 
-class Expression < ASTNode
-end
+class Expression < ASTNode; end
 
-class Structure < ASTNode
-end
+class Term < ASTNode; end
 
-class Temporary < ASTNode
-end
+class Temporary < ASTNode; end
 
 class Terminal < ASTNode
   attr_reader :token, :value

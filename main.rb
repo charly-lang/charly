@@ -10,7 +10,6 @@ content = File.open(ARGV[0], "r").read
 
 # Create the parser
 parser = Parser.new
-parser.should_optimize = ARGV.include? '-o'
 
 puts "\n# SYNTAX TREE"
 puts parser.parse content

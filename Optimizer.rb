@@ -16,7 +16,7 @@ class Optimizer
     end
 
     while !@finished
-      @sanitized = true
+      @finished = true
       optimize program
     end
 
@@ -32,13 +32,13 @@ class Optimizer
     # Call the entry handler
     node = entry node
 
-    # Correct the parent pointer
-    node.parent = parent_save
-
     # Return if the node returned NIL
     if node == NIL
       return NIL
     end
+
+    # Correct the parent pointer
+    node.parent = parent_save
 
     # Optimize all children and remove nil values afterwards
     node.children.collect! do |child|
@@ -61,7 +61,7 @@ class Optimizer
 
     # Structure nodes that only have 1 terminal child,
     # should be replaced by that child
-    if node.instance_of? Structure
+    if node.instance_of? Term
       if node.children.length == 1
         child = node.children[0]
         if child.instance_of? Terminal
@@ -97,7 +97,7 @@ class Optimizer
 
     # Structure nodes that only have 1 Expression child,
     # should be replaced by that child
-    if node.instance_of? Structure
+    if node.instance_of? Term
       if node.children.length == 1
         child = node.children[0]
         if child.instance_of? Expression
