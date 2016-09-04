@@ -10,11 +10,19 @@ content = File.open(ARGV[0], "r").read
 
 # Create the parser
 parser = Parser.new
+parser.debug = true
 
-puts "\n# SYNTAX TREE"
-puts parser.parse content
-puts "# SYNTAX TREE"
+program = parser.parse content
 
-puts "\n# FOUND #{parser.tokens.length} TOKENS"
-puts parser.tokens
-puts "# TOKENS"
+if ARGV.include? '--ast'
+  puts "\n------"
+  puts parser.tree
+  puts "------"
+end
+
+if ARGV.include? '--tokens'
+  puts "\n--- #{parser.tokens.length} TOKENS ---"
+  puts parser.tokens
+  puts "------"
+end
+

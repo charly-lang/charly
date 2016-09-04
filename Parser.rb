@@ -6,20 +6,25 @@ require_relative "Optimizer.rb"
 class Parser
 
   attr_reader :tokens, :tree
+  attr_accessor :debug
 
   def initialize
     @grammar = Grammar.new
     @tree = Program.new
     @node = @tree
     @next = NIL
+    @debug = false
   end
 
   def parse(input)
+    st = Time.now.to_ms
 
     # Get a list of tokens from the lexer
+    puts "|#{Time.now.to_ms - st}| Starting lexical analysis" if @debug
     lexer = Lexer.new
     @tokens = lexer.analyse input
     @next = 0
+    puts "|#{Time.now.to_ms - st}| Finished lexical analysis" if @debug
 
     # Remove whitespace and comments from the tokens
     @tokens = @tokens.select {|token|
@@ -27,11 +32,15 @@ class Parser
     }
 
     # Generate the abstract syntax tree, starting with an expression
+    puts "|#{Time.now.to_ms - st}| Generating abstract syntax tree" if @debug
     E()
+    puts "|#{Time.now.to_ms - st}| Finished generating abstract syntax tree" if @debug
 
     # Optimize the tree if wanted
+    puts "|#{Time.now.to_ms - st}| Optimizing program" if @debug
     optimizer = Optimizer.new
     optimizer.optimize_program @tree
+    puts "|#{Time.now.to_ms - st}| Finished optimizing program" if @debug
 
     @tree
   end
@@ -50,7 +59,24 @@ class Parser
     match = @tokens[@next - 1].token == token
 
     if match
-      @node << Terminal.new(token, @tokens[@next - 1].value, @node)
+      case token
+      when :NUMERICAL
+        @node << NumericalLiteral.new(@tokens[@next - 1].value, @node)
+      when :IDENTIFIER
+        @node << IdentifierLiteral.new(@tokens[@next - 1].value, @node)
+      when :LEFT_PAREN
+        @node << LeftParenLiteral.new(@tokens[@next - 1].value, @node)
+      when :RIGHT_PAREN
+        @node << RightParenLiteral.new(@tokens[@next - 1].value, @node)
+      when :PLUS
+        @node << PlusOperator.new(@tokens[@next - 1].value, @node)
+      when :MINUS
+        @node << MinusOperator.new(@tokens[@next - 1].value, @node)
+      when :MULT
+        @node << MultOperator.new(@tokens[@next - 1].value, @node)
+      when :DIVD
+        @node << DivdOperator.new(@tokens[@next - 1].value, @node)
+      end
     end
 
     match
@@ -165,6 +191,16 @@ class ASTNode
     item
   end
 
+  def is(*types)
+    match = false
+    types.each do |type|
+      if !match
+        match = self.kind_of? type
+      end
+    end
+    match
+  end
+
   def meta
     ""
   end
@@ -173,10 +209,10 @@ class ASTNode
     string = "#: #{self.class.name}"
 
     if meta.length > 0
-      string += " - #{meta}\n"
-    else
-      string += "\n"
+      string += " - #{meta}"
     end
+
+    string += "\n"
 
     @children.each do |child|
       lines = child.to_s.each_line.entries
@@ -201,23 +237,51 @@ class Program < ASTNode
     super(self)
   end
 end
-
-class Expression < ASTNode; end
-
-class Term < ASTNode; end
-
 class Temporary < ASTNode; end
 
+# Grammar Nodes
+class Expression < ASTNode; end
+class Term < ASTNode; end
 class Terminal < ASTNode
-  attr_reader :token, :value
+  attr_reader :value
 
-  def initialize(token, value, parent)
+  def initialize(value, parent)
     super(parent)
-    @token = token
     @value = value
   end
 
   def meta
-    "#{@token} - #{@value}"
+    @value
+  end
+end
+
+# Numericals and identifier
+class NumericalLiteral < Terminal; end
+class IdentifierLiteral < Terminal; end
+
+# Structural
+class LeftParenLiteral < Terminal; end
+class RightParenLiteral < Terminal; end
+
+# Operators
+class OperatorLiteral < Terminal; end
+class PlusOperator < OperatorLiteral; end
+class MinusOperator < OperatorLiteral; end
+class MultOperator < OperatorLiteral; end
+class DivdOperator < OperatorLiteral; end
+
+# Expression statements
+class BinaryExpression < Expression
+  attr_reader :operator, :left, :right
+
+  def initialize(operator, left, right, parent)
+    super(parent)
+    @operator = operator
+    @left = left
+    @right = right
+  end
+
+  def meta
+    "#{@left}\n#{@operator}\n#{@right}"
   end
 end

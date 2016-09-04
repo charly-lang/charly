@@ -6,31 +6,37 @@ require_relative "Parser.rb"
 class Optimizer
 
   def initialize
-    @finished = false
+    @structure_finished = false
+    @grouping_finished = false
   end
 
   # Optimize a program
   def optimize_program(program)
-    if !program.instance_of? Program
+    if !program.is Program
       raise "Not a Program instance"
     end
 
-    while !@finished
-      @finished = true
-      optimize program
+    while !@structure_finished
+      @structure_finished = true
+      optimize_structure program
+    end
+
+    while !@grouping_finished
+      @grouping_finished = true
+      # optimize_group program
     end
 
     program
   end
 
-  # Optimize a single node in the program
-  def optimize(node)
+  # Optimize the structure of a node and all children
+  def optimize_structure(node)
 
     # Backup the parent
     parent_save = node.parent
 
     # Call the entry handler
-    node = entry node
+    node = optimize_structure_entry node
 
     # Return if the node returned NIL
     if node == NIL
@@ -42,30 +48,22 @@ class Optimizer
 
     # Optimize all children and remove nil values afterwards
     node.children.collect! do |child|
-      optimize child
+      optimize_structure child
     end
     node.children = node.children.compact
-
-    # Call the leave handler
-    node = leave node
-
-    # Correct the parent pointer
-    node.parent = parent_save
-
-    # Return
     node
   end
 
-  # Called right after the optimizer enters a node
-  def entry(node)
+  # Optimize the structure of a node
+  def optimize_structure_entry(node)
 
-    # Structure nodes that only have 1 terminal child,
+    # Term nodes that only have 1 terminal child,
     # should be replaced by that child
-    if node.instance_of? Term
+    if node.is Term
       if node.children.length == 1
         child = node.children[0]
-        if child.instance_of? Terminal
-          @finished = false
+        if child.is Terminal
+          @structure_finished = false
           return child
         end
       end
@@ -73,11 +71,11 @@ class Optimizer
 
     # Expression nodes that only have 1 terminal child,
     # should be replaced by that child
-    if node.instance_of? Expression
+    if node.is Expression
       if node.children.length == 1
         child = node.children[0]
-        if child.instance_of? Terminal
-          @finished = false
+        if child.is Terminal
+          @structure_finished = false
           return child
         end
       end
@@ -85,41 +83,52 @@ class Optimizer
 
     # Expression nodes that only have 1 Expression child,
     # should be replaced by that child
-    if node.instance_of? Expression
+    if node.is Expression
       if node.children.length == 1
         child = node.children[0]
-        if child.instance_of? Expression
-          @finished = false
+        if child.is Expression
+          @structure_finished = false
           return child
         end
       end
     end
 
-    # Structure nodes that only have 1 Expression child,
+    # Term nodes that only have 1 Expression child,
     # should be replaced by that child
-    if node.instance_of? Term
+    if node.is Term
       if node.children.length == 1
         child = node.children[0]
-        if child.instance_of? Expression
-          @finished = false
+        if child.is Expression
+          @structure_finished = false
           return child
         end
       end
     end
 
     # Remove LEFT_PAREN and RIGHT_PAREN nodes
-    if node.instance_of? Terminal
-      if node.token == :LEFT_PAREN || node.token == :RIGHT_PAREN
-        @finished = false
-        return NIL
+    if node.is LeftParenLiteral, RightParenLiteral
+      @structure_finished = false
+      return NIL
+    end
+
+    # Group arithmetic operations together
+    if node.is(Expression) && node.children.length == 3
+      child1 = node.children[0]
+      child2 = node.children[1]
+      child3 = node.children[2]
+
+      # Check if child 2 is an operator
+      if child2.is OperatorLiteral
+
+        # Typecheck child1 and child2
+        if child1.is(NumericalLiteral, IdentifierLiteral, Expression) &&
+          child3.is(NumericalLiteral, IdentifierLiteral, Expression)
+
+          puts "found pattern"
+        end
       end
     end
 
-    node
-  end
-
-  # Called just before the optimizer leaves a node
-  def leave(node)
     node
   end
 end
