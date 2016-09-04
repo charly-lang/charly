@@ -6,7 +6,7 @@ require_relative "Optimizer.rb"
 class Parser
 
   attr_reader :tokens, :tree
-  attr_accessor :should_sanitize
+  attr_accessor :should_optimize
 
   def initialize
     @grammar = Grammar.new
@@ -32,10 +32,10 @@ class Parser
     # Generate the abstract syntax tree, starting with an expression
     E()
 
-    # Sanitize the tree if wanted
-    if @should_sanitize
-      sanitizer = Sanitizer.new
-      sanitizer.sanitize_program @tree
+    # Optimize the tree if wanted
+    if @should_optimize
+      optimizer = Optimizer.new
+      optimizer.optimize_program @tree
     end
 
     @tree

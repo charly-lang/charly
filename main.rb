@@ -1,10 +1,16 @@
 require_relative "Parser.rb"
 
-content = File.open("./input.txt", "r").read
-parser = Parser.new
+# Check if a filename was passed
+if ARGV.length == 0
+  raise "No filename passed!"
+end
 
-# check if the parser should sanitize
-parser.should_sanitize = ARGV.include? '-sanitize'
+# Read the contents of the file
+content = File.open(ARGV[0], "r").read
+
+# Create the parser
+parser = Parser.new
+parser.should_optimize = ARGV.include? '-o'
 
 puts "\n# SYNTAX TREE"
 puts parser.parse content
