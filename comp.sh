@@ -1,0 +1,2 @@
+clear
+ruby main.rb
