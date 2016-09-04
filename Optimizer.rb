@@ -16,46 +16,85 @@ class Optimizer
       raise "Not a Program instance"
     end
 
+    dlog "- Optimizing program structure"
     while !@structure_finished
       @structure_finished = true
-      optimize_structure program
+      optimize :structure, program
     end
+    dlog "- Finished optimizing program structure"
 
+    dlog "- Generating abstract syntax tree groupings"
     while !@grouping_finished
       @grouping_finished = true
-      # optimize_group program
+      optimize :group, program, true
     end
+    dlog "- Finished generating abstract syntax tree groupings"
 
     program
   end
 
-  # Optimize the structure of a node and all children
-  def optimize_structure(node)
+  # Optimize a node with a given flow
+  # options are:
+  # - structure
+  # - group
+  def optimize(flow, node, after = false)
 
-    # Backup the parent
+    # Backup the parent
     parent_save = node.parent
 
     # Call the entry handler
-    node = optimize_structure_entry node
+    unless after
+      case flow
+      when :structure
+        node = flow_structure node
+      when :group
+        node = flow_group node
+      end
 
-    # Return if the node returned NIL
-    if node == NIL
-      return NIL
+      # Return if the node returned NIL
+      if node == NIL
+        return NIL
+      end
+
+      # Correct the parent pointer
+      node.parent = parent_save
     end
 
-    # Correct the parent pointer
-    node.parent = parent_save
 
     # Optimize all children and remove nil values afterwards
     node.children.collect! do |child|
-      optimize_structure child
+      case flow
+      when :structure
+        optimize :structure, child, after
+      when :group
+        optimize :group, child, after
+      end
     end
     node.children = node.children.compact
+
+    # Call the leave handler
+    if after
+      case flow
+      when :structure
+        node = flow_structure node
+      when :group
+        node = flow_group node
+      end
+
+      # Return if the node returned NIL
+      if node == NIL
+        return NIL
+      end
+
+      # Correct the parent pointer
+      node.parent = parent_save
+    end
+
     node
   end
 
   # Optimize the structure of a node
-  def optimize_structure_entry(node)
+  def flow_structure(node)
 
     # Term nodes that only have 1 terminal child,
     # should be replaced by that child
@@ -111,6 +150,12 @@ class Optimizer
       return NIL
     end
 
+    node
+  end
+
+  # Optimize the groupings of the node
+  def flow_group(node)
+
     # Group arithmetic operations together
     if node.is(Expression) && node.children.length == 3
       child1 = node.children[0]
@@ -124,7 +169,9 @@ class Optimizer
         if child1.is(NumericalLiteral, IdentifierLiteral, Expression) &&
           child3.is(NumericalLiteral, IdentifierLiteral, Expression)
 
-          puts "found pattern"
+          expression = BinaryExpression.new(child2, child1, child3, node.parent)
+          @grouping_finished = false
+          return expression
         end
       end
     end

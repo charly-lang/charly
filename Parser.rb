@@ -20,11 +20,11 @@ class Parser
     st = Time.now.to_ms
 
     # Get a list of tokens from the lexer
-    puts "|#{Time.now.to_ms - st}| Starting lexical analysis" if @debug
+    dlog "Starting lexical analysis"
     lexer = Lexer.new
     @tokens = lexer.analyse input
     @next = 0
-    puts "|#{Time.now.to_ms - st}| Finished lexical analysis" if @debug
+    dlog "Finished lexical analysis"
 
     # Remove whitespace and comments from the tokens
     @tokens = @tokens.select {|token|
@@ -32,15 +32,15 @@ class Parser
     }
 
     # Generate the abstract syntax tree, starting with an expression
-    puts "|#{Time.now.to_ms - st}| Generating abstract syntax tree" if @debug
+    dlog "Generating abstract syntax tree"
     E()
-    puts "|#{Time.now.to_ms - st}| Finished generating abstract syntax tree" if @debug
+    dlog "Finished generating abstract syntax tree"
 
     # Optimize the tree if wanted
-    puts "|#{Time.now.to_ms - st}| Optimizing program" if @debug
+    dlog "Optimizing program"
     optimizer = Optimizer.new
     optimizer.optimize_program @tree
-    puts "|#{Time.now.to_ms - st}| Finished optimizing program" if @debug
+    dlog "Finished optimizing program"
 
     @tree
   end
@@ -205,6 +205,10 @@ class ASTNode
     ""
   end
 
+  def children_string
+    @children
+  end
+
   def to_s
     string = "#: #{self.class.name}"
 
@@ -214,17 +218,17 @@ class ASTNode
 
     string += "\n"
 
-    @children.each do |child|
+    children_string.each do |child|
       lines = child.to_s.each_line.entries
       lines.each {|line|
         if line[0] == "#"
-          if @children.length == 1 && child.children.length < 2
+          if children_string.length == 1 && child.children.length < 2
             string += line.indent(1, "└╴");
           else
             string += line.indent(1, "├╴")
           end
-        else
-          string += line.indent(1, "│  ")
+        elsif line.length > 1
+          string += line.indent(1, "│ ")
         end
       }
     end
@@ -282,6 +286,10 @@ class BinaryExpression < Expression
   end
 
   def meta
-    "#{@left}\n#{@operator}\n#{@right}"
+    ""
+  end
+
+  def children_string
+    [@left, @operator, @right]
   end
 end
