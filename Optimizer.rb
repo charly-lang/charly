@@ -176,6 +176,18 @@ class Optimizer
       end
     end
 
+    # Group Variable Assignments together
+    if node.is(Statement) && node.children.length == 4
+      if node.children[2].is AssignmentOperator
+        identifier = node.children[1]
+        expression = node.children[3]
+
+        assignment = VariableAssignment.new(identifier, expression, node.parent)
+        @grouping_finished = false
+        return assignment
+      end
+    end
+
     node
   end
 end

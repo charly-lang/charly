@@ -4,7 +4,7 @@ class Lexer
   def initialize
     @rules = [
       [:COMMENT,      /\A#.*\Z/],
-      [:KEYWORD,      /\A(let)\Z/],
+      [:KEYWORD,      /\A(let|print)\Z/],
       [:NUMERICAL,    /\A\d+(\.)?(\d+)?\Z/],
       [:ASSIGNMENT,   /\A\=\Z/],
       [:PLUS,         /\A\+\Z/],
