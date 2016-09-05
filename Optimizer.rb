@@ -1,5 +1,6 @@
 require_relative "Helper.rb"
 require_relative "Parser.rb"
+require_relative "AST.rb"
 
 # Optimizes a program to be more efficient
 # Doesn't always produce the "perfect" program
@@ -166,8 +167,8 @@ class Optimizer
       if child2.is OperatorLiteral
 
         # Typecheck child1 and child2
-        if child1.is(NumericalLiteral, IdentifierLiteral, Expression) &&
-          child3.is(NumericalLiteral, IdentifierLiteral, Expression)
+        if child1.is(NumericLiteral, IdentifierLiteral, Expression) &&
+          child3.is(NumericLiteral, IdentifierLiteral, Expression)
 
           expression = BinaryExpression.new(child2, child1, child3, node.parent)
           @grouping_finished = false

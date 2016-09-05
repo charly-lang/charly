@@ -1,6 +1,7 @@
 require_relative "Lexer.rb"
 require_relative "Helper.rb"
 require_relative "Optimizer.rb"
+require_relative "AST.rb"
 
 class Parser
 
@@ -65,7 +66,7 @@ class Parser
     if match
       case token
       when :NUMERICAL
-        @node << NumericalLiteral.new(@tokens[@next].value, @node)
+        @node << NumericLiteral.new(@tokens[@next].value, @node)
       when :IDENTIFIER
         @node << IdentifierLiteral.new(@tokens[@next].value, @node)
       when :LEFT_PAREN
@@ -227,139 +228,5 @@ class Parser
 
   def T3
     term(:IDENTIFIER)
-  end
-end
-
-class ASTNode
-  attr_accessor :children, :parent
-
-  def initialize(parent)
-    @children = []
-    @parent = parent
-  end
-
-  def <<(item)
-    @children << item
-    item
-  end
-
-  def is(*types)
-    match = false
-    types.each do |type|
-      if !match
-        match = self.kind_of? type
-      end
-    end
-    match
-  end
-
-  def meta
-    ""
-  end
-
-  def children_string
-    @children
-  end
-
-  def to_s
-    string = "#: #{self.class.name}"
-
-    if meta.length > 0
-      string += " - #{meta}"
-    end
-
-    string += "\n"
-
-    children_string.each do |child|
-      lines = child.to_s.each_line.entries
-      lines.each {|line|
-        if line[0] == "#"
-          if children_string.length == 1 && child.children.length < 2
-            string += line.indent(1, "└╴");
-          else
-            string += line.indent(1, "├╴")
-          end
-        elsif line.length > 1
-          string += line.indent(1, "│ ")
-        end
-      }
-    end
-    string
-  end
-end
-
-class Program < ASTNode
-  def initialize
-    super(self)
-  end
-end
-class Temporary < ASTNode; end
-
-# Grammar Nodes
-class Block < ASTNode; end
-class Statement < ASTNode; end
-class Expression < ASTNode; end
-class Term < ASTNode; end
-class ArgumentList < ASTNode; end
-class Terminal < ASTNode
-  attr_reader :value
-
-  def initialize(value, parent)
-    super(parent)
-    @value = value
-  end
-
-  def meta
-    "'#{@value}'"
-  end
-end
-
-# Numericals and identifier
-class NumericalLiteral < Terminal; end
-class IdentifierLiteral < Terminal; end
-class KeywordLiteral < Terminal; end
-
-# Structural
-class LeftParenLiteral < Terminal; end
-class RightParenLiteral < Terminal; end
-class SemicolonLiteral < Terminal; end
-class CommaLiteral < Terminal; end
-
-# Operators
-class OperatorLiteral < Terminal; end
-class PlusOperator < OperatorLiteral; end
-class MinusOperator < OperatorLiteral; end
-class MultOperator < OperatorLiteral; end
-class DivdOperator < OperatorLiteral; end
-class AssignmentOperator < OperatorLiteral; end
-
-# Expression statements
-class BinaryExpression < Expression
-  attr_reader :operator, :left, :right
-
-  def initialize(operator, left, right, parent)
-    super(parent)
-    @operator = operator
-    @left = left
-    @right = right
-  end
-
-  def children_string
-    [@left, @operator, @right]
-  end
-end
-
-# Variable Assignments
-class VariableAssignment < Expression
-  attr_reader :identifier, :expression
-
-  def initialize(identifier, expression, parent)
-    super(parent)
-    @identifier = identifier
-    @expression = expression
-  end
-
-  def children_string
-    [@identifier, @expression]
   end
 end
