@@ -143,7 +143,7 @@ class Parser
   def S
     save = @node
     @node = Statement.new(@node)
-    match = check_each([:S1])
+    match = check_each([:S1, :S2])
     if match
       save << @node
     end
@@ -153,6 +153,10 @@ class Parser
 
   def S1
     E() && term(:TERMINAL)
+  end
+
+  def S2
+    E()
   end
 
   def E
