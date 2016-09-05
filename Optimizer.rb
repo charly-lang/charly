@@ -145,7 +145,7 @@ class Optimizer
     end
 
     # Remove LEFT_PAREN, RIGHT_PAREN, SEMICOLON nodes
-    if node.is LeftParenLiteral, RightParenLiteral, SemicolonLiteral
+    if node.is LeftParenLiteral, RightParenLiteral, SemicolonLiteral, CommaLiteral
       @structure_finished = false
       return NIL
     end
