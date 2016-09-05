@@ -1,3 +1,5 @@
+require_relative "Helper.rb"
+
 # Performs Lexical Analysis
 class Lexer
 
@@ -6,6 +8,7 @@ class Lexer
       [:COMMENT,      /\A#.*\Z/],
       [:KEYWORD,      /\A(let)\Z/],
       [:NUMERICAL,    /\A-?\d+(\.)?(\d+)?\Z/],
+      [:STRING,       /\A"(?:[^"\\]|\\.)*"\Z/],
       [:ASSIGNMENT,   /\A\=\Z/],
       [:PLUS,         /\A\+\Z/],
       [:MINUS,        /\A\-\Z/],
@@ -70,6 +73,12 @@ class Lexer
   def identify(input)
     @rules.each do |r|
       if input =~ r[1]
+
+        # Strip whitespace from tokens where whitespace can be ignored
+        if r[0] != :WHITESPACE
+          input.strip!
+        end
+
         return Token.new(r[0], input)
       end
     end
@@ -98,6 +107,6 @@ class Token
   end
 
   def to_s
-    "#{'%-11.11s' % @token} │ #{@value}"
+    "#{'%-11.11s' % @token} │ (#{@value})"
   end
 end
