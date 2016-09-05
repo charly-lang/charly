@@ -84,6 +84,10 @@ class Parser
         @node << DivdOperator.new(@tokens[@next].value, @node)
       when :TERMINAL
         @node << SemicolonLiteral.new(@tokens[@next].value, @node)
+      when :KEYWORD
+        @node << KeywordLiteral.new(@tokens[@next].value, @node)
+      when :ASSIGNMENT
+        @node << AssignmentOperator.new(@tokens[@next].value, @node)
       end
     end
 
@@ -126,7 +130,7 @@ class Parser
   def B
     save = @node
     @node = Block.new(@node)
-    match = check_each([:B1, :B2])
+    match = check_each([:B1])
     if match
       save << @node
     end
@@ -135,11 +139,21 @@ class Parser
   end
 
   def B1
-    S() && S()
+    S() && BPRIME()
   end
 
-  def B2
-    S()
+  # Fixes a left-recursion problem
+  # with multiple statements written after each other
+  def BPRIME
+    check_each([:BP1, :BP2])
+  end
+
+  def BP1
+    S() && BPRIME()
+  end
+
+  def BP2
+    true
   end
 
   def S
@@ -154,11 +168,11 @@ class Parser
   end
 
   def S1
-    E() && term(:TERMINAL)
+    term(:KEYWORD) && term(:IDENTIFIER) && term(:ASSIGNMENT) && E() && term(:TERMINAL)
   end
 
   def S2
-    E()
+    E() && term(:TERMINAL)
   end
 
   def E
@@ -302,6 +316,7 @@ end
 # Numericals and identifier
 class NumericalLiteral < Terminal; end
 class IdentifierLiteral < Terminal; end
+class KeywordLiteral < Terminal; end
 
 # Structural
 class LeftParenLiteral < Terminal; end
@@ -314,6 +329,7 @@ class PlusOperator < OperatorLiteral; end
 class MinusOperator < OperatorLiteral; end
 class MultOperator < OperatorLiteral; end
 class DivdOperator < OperatorLiteral; end
+class AssignmentOperator < OperatorLiteral; end
 
 # Expression statements
 class BinaryExpression < Expression
