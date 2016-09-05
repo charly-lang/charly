@@ -170,9 +170,8 @@ class Optimizer
         if child1.is(NumericLiteral, IdentifierLiteral, Expression) &&
           child3.is(NumericLiteral, IdentifierLiteral, Expression)
 
-          expression = BinaryExpression.new(child2, child1, child3, node.parent)
           @grouping_finished = false
-          return expression
+          return BinaryExpression.new(child2, child1, child3, node.parent)
         end
       end
     end
@@ -183,9 +182,21 @@ class Optimizer
         identifier = node.children[1]
         expression = node.children[3]
 
-        assignment = VariableAssignment.new(identifier, expression, node.parent)
         @grouping_finished = false
-        return assignment
+        return VariableAssignment.new(identifier, expression, node.parent)
+      end
+    end
+
+    # Group call expressions together
+    if node.is(Statement) && node.children.length == 2
+      child1 = node.children[0]
+      child2 = node.children[1]
+
+      # Check if it's a valid call expression
+      if child1.is(IdentifierLiteral) && child2.is(ArgumentList)
+
+        @grouping_finished = false
+        return CallExpression.new(child1, child2, node.parent)
       end
     end
 

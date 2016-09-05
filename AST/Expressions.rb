@@ -31,3 +31,20 @@ class VariableAssignment < Expression
     [@identifier, @expression]
   end
 end
+
+# A single call expression
+#
+# consists of a identifier and an argumentlist
+class CallExpression < Expression
+  attr_reader :identifier, :argumentlist
+
+  def initialize(identifier, argumentlist, parent)
+    super(parent)
+    @identifier = identifier
+    @argumentlist = argumentlist
+  end
+
+  def children_string
+    [@identifier, @argumentlist]
+  end
+end
