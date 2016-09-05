@@ -18,7 +18,6 @@ class Parser
   end
 
   def parse(input)
-    st = Time.now.to_ms
 
     # Get a list of tokens from the lexer
     dlog "Starting lexical analysis"
