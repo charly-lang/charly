@@ -308,7 +308,7 @@ class Terminal < ASTNode
   end
 
   def meta
-    @value
+    "'#{@value}'"
   end
 end
 
