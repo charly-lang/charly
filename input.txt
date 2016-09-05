@@ -1,3 +1,1 @@
-let a = 1 + (5 * 5);
-let b = a + 2;
-print b;
+print(2, 2, (2 + 3));

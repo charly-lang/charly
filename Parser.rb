@@ -1,5 +1,4 @@
 require_relative "Lexer.rb"
-require_relative "Grammar.rb"
 require_relative "Helper.rb"
 require_relative "Optimizer.rb"
 
@@ -9,7 +8,6 @@ class Parser
   attr_accessor :debug, :output_intermediate_tree
 
   def initialize
-    @grammar = Grammar.new
     @tree = Program.new
     @node = @tree
     @next = NIL
@@ -127,15 +125,17 @@ class Parser
     match
   end
 
-  def B
+  def node_production(node_class, *productions)
     save = @node
-    @node = Block.new(@node)
-    match = check_each([:B1])
-    if match
-      save << @node
-    end
+    @node = node_class.new @node
+    match = check_each(productions)
+    save << @node if match
     @node = save
     match
+  end
+
+  def B
+    node_production Block, :B1
   end
 
   def B1
@@ -151,20 +151,10 @@ class Parser
   def BP1
     S() && BPRIME()
   end
-
-  def BP2
-    true
-  end
+  def BP2; true end
 
   def S
-    save = @node
-    @node = Statement.new(@node)
-    match = check_each([:S1, :S2])
-    if match
-      save << @node
-    end
-    @node = save
-    match
+    node_production Statement, :S1, :S2, :S3
   end
 
   def S1
@@ -172,61 +162,69 @@ class Parser
   end
 
   def S2
+    term(:IDENTIFIER) && term(:LEFT_PAREN) && A() && term(:RIGHT_PAREN) && term(:TERMINAL)
+  end
+
+  def S3
     E() && term(:TERMINAL)
   end
 
+  # Argument list
+  def A
+    node_production ArgumentList, :A1
+  end
+
+  def A1
+    E() && APRIME()
+  end
+
+  def APRIME
+    check_each([:AP1, :AP2])
+  end
+
+  def AP1
+    term(:COMMA) && E() && APRIME()
+  end
+  def AP2; true end
+
   def E
-    save = @node
-    @node = Expression.new(@node)
-    match = check_each([:E5, :E4, :E3, :E2, :E1])
-    if match
-      save << @node
-    end
-    @node = save
-    match
+    node_production Expression, :E1, :E2, :E3, :E4, :E5
   end
 
   def E1
-    T()
-  end
-
-  def E2
     T() && term(:MULT) && E()
   end
 
-  def E3
+  def E2
     T() && term(:DIVD) && E()
   end
 
-  def E4
+  def E3
     T() && term(:PLUS) && E()
   end
 
-  def E5
+  def E4
     T() && term(:MINUS) && E()
   end
 
+  def E5
+    T()
+  end
+
   def T
-    save = @node
-    @node = Term.new(@node)
-    match = check_each([:T3, :T2, :T1])
-    if match
-      save << @node
-    end
-    @node = save
-    match
+    node_production Term, :T1, :T2, :T3
   end
 
   def T1
-    term(:NUMERICAL)
+    term(:LEFT_PAREN) && E() && term(:RIGHT_PAREN)
   end
 
   def T2
-    term(:IDENTIFIER)
+    term(:NUMERICAL)
   end
 
   def T3
-    term(:LEFT_PAREN) && E() && term(:RIGHT_PAREN)
+    term(:IDENTIFIER)
   end
 end
 
@@ -300,6 +298,7 @@ class Block < ASTNode; end
 class Statement < ASTNode; end
 class Expression < ASTNode; end
 class Term < ASTNode; end
+class ArgumentList < ASTNode; end
 class Terminal < ASTNode
   attr_reader :value
 
