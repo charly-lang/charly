@@ -6,7 +6,7 @@ require_relative "Optimizer.rb"
 class Parser
 
   attr_reader :tokens, :tree
-  attr_accessor :debug
+  attr_accessor :debug, :output_intermediate_tree
 
   def initialize
     @grammar = Grammar.new
@@ -14,6 +14,7 @@ class Parser
     @node = @tree
     @next = NIL
     @debug = false
+    @output_intermediate_tree = false
   end
 
   def parse(input)
@@ -31,10 +32,16 @@ class Parser
       token.token != :WHITESPACE && token.token != :COMMENT
     }
 
-    # Generate the abstract syntax tree, starting with an expression
+    # Generate the abstract syntax tree, starting with a statement
     dlog "Generating abstract syntax tree"
-    E()
+    B()
     dlog "Finished generating abstract syntax tree"
+
+    if @output_intermediate_tree
+      puts "------"
+      puts @tree
+      puts "------"
+    end
 
     # Optimize the tree if wanted
     dlog "Optimizing program"
@@ -76,6 +83,8 @@ class Parser
         @node << MultOperator.new(@tokens[@next - 1].value, @node)
       when :DIVD
         @node << DivdOperator.new(@tokens[@next - 1].value, @node)
+      when :TERMINAL
+        @node << SemicolonLiteral.new(@tokens[@next - 1].value, @node)
       end
     end
 
@@ -111,6 +120,40 @@ class Parser
       end
     end
     match
+  end
+
+  def B
+    save = @node
+    @node = Block.new(@node)
+    match = check_each([:B1, :B2])
+    if match
+      save << @node
+    end
+    @node = save
+    match
+  end
+
+  def B1
+    S() && S()
+  end
+
+  def B2
+    S()
+  end
+
+  def S
+    save = @node
+    @node = Statement.new(@node)
+    match = check_each([:S1])
+    if match
+      save << @node
+    end
+    @node = save
+    match
+  end
+
+  def S1
+    E() && term(:TERMINAL)
   end
 
   def E
@@ -176,16 +219,6 @@ class ASTNode
     @parent = parent
   end
 
-  def dump
-
-    # If we reached the program node
-    if @parent == self || @parent == NIL
-      puts self
-    else
-      @parent.dump
-    end
-  end
-
   def <<(item)
     @children << item
     item
@@ -244,6 +277,8 @@ end
 class Temporary < ASTNode; end
 
 # Grammar Nodes
+class Block < ASTNode; end
+class Statement < ASTNode; end
 class Expression < ASTNode; end
 class Term < ASTNode; end
 class Terminal < ASTNode
@@ -266,6 +301,7 @@ class IdentifierLiteral < Terminal; end
 # Structural
 class LeftParenLiteral < Terminal; end
 class RightParenLiteral < Terminal; end
+class SemicolonLiteral < Terminal; end
 
 # Operators
 class OperatorLiteral < Terminal; end

@@ -10,6 +10,7 @@ content = File.open(ARGV[0], "r").read
 
 # Create the parser
 parser = Parser.new
+parser.output_intermediate_tree = ARGV.include? '--intermediate'
 $debug = ARGV.include? '--log'
 
 program = parser.parse content
