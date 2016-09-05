@@ -86,6 +86,8 @@ class Parser
         @node << KeywordLiteral.new(@tokens[@next].value, @node)
       when :ASSIGNMENT
         @node << AssignmentOperator.new(@tokens[@next].value, @node)
+      when :COMMA
+        @node << CommaLiteral.new(@tokens[@next].value, @node)
       end
     end
 
@@ -321,6 +323,7 @@ class KeywordLiteral < Terminal; end
 class LeftParenLiteral < Terminal; end
 class RightParenLiteral < Terminal; end
 class SemicolonLiteral < Terminal; end
+class CommaLiteral < Terminal; end
 
 # Operators
 class OperatorLiteral < Terminal; end
