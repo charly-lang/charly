@@ -8,7 +8,7 @@ class Lexer
       [:COMMENT,      /\A#.*\Z/],
       [:KEYWORD,      /\A(let)\Z/],
       [:NUMERICAL,    /\A-?\d+(\.)?(\d+)?\Z/],
-      [:STRING,       /\A"(?:[^"\\]|\\.)*"\Z/],
+      [:STRING,       /\A"(?:[^"\\]|\\.)*"?\Z/],
       [:ASSIGNMENT,   /\A\=\Z/],
       [:PLUS,         /\A\+\Z/],
       [:MINUS,        /\A\-\Z/],
@@ -107,6 +107,6 @@ class Token
   end
 
   def to_s
-    "#{'%-11.11s' % @token} │ (#{@value})"
+    "#{'%-11.11s' % @token} │#{@value}│"
   end
 end
