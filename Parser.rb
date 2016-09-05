@@ -26,11 +26,6 @@ class Parser
     @next = 0
     dlog "Finished lexical analysis"
 
-    # Remove whitespace and comments from the tokens
-    @tokens = @tokens.select {|token|
-      token.token != :WHITESPACE && token.token != :COMMENT
-    }
-
     # Generate the abstract syntax tree, starting with a statement
     dlog "Generating abstract syntax tree"
     B()
@@ -61,31 +56,38 @@ class Parser
       return false
     end
 
-    @next += 1
-    match = @tokens[@next - 1].token == token
+    # Skip whitespace and comments
+    while @tokens[@next].token == :COMMENT ||
+          @tokens[@next].token == :WHITESPACE do
+      @next += 1
+    end
+
+    match = @tokens[@next].token == token
 
     if match
       case token
       when :NUMERICAL
-        @node << NumericalLiteral.new(@tokens[@next - 1].value, @node)
+        @node << NumericalLiteral.new(@tokens[@next].value, @node)
       when :IDENTIFIER
-        @node << IdentifierLiteral.new(@tokens[@next - 1].value, @node)
+        @node << IdentifierLiteral.new(@tokens[@next].value, @node)
       when :LEFT_PAREN
-        @node << LeftParenLiteral.new(@tokens[@next - 1].value, @node)
+        @node << LeftParenLiteral.new(@tokens[@next].value, @node)
       when :RIGHT_PAREN
-        @node << RightParenLiteral.new(@tokens[@next - 1].value, @node)
+        @node << RightParenLiteral.new(@tokens[@next].value, @node)
       when :PLUS
-        @node << PlusOperator.new(@tokens[@next - 1].value, @node)
+        @node << PlusOperator.new(@tokens[@next].value, @node)
       when :MINUS
-        @node << MinusOperator.new(@tokens[@next - 1].value, @node)
+        @node << MinusOperator.new(@tokens[@next].value, @node)
       when :MULT
-        @node << MultOperator.new(@tokens[@next - 1].value, @node)
+        @node << MultOperator.new(@tokens[@next].value, @node)
       when :DIVD
-        @node << DivdOperator.new(@tokens[@next - 1].value, @node)
+        @node << DivdOperator.new(@tokens[@next].value, @node)
       when :TERMINAL
-        @node << SemicolonLiteral.new(@tokens[@next - 1].value, @node)
+        @node << SemicolonLiteral.new(@tokens[@next].value, @node)
       end
     end
+
+    @next += 1
 
     match
   end
