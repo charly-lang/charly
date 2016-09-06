@@ -8,7 +8,7 @@ class Lexer
       [:COMMENT,      /\A#.*\Z/],
       [:KEYWORD,      /\A(let)\Z/],
       [:NUMERICAL,    /\A-?\d+(\.)?(\d+)?\Z/],
-      [:STRING,       /\A"(?:[^"\\]|\\.)*"?\Z/],
+      [:STRING,       /\A"(""|[^"])*"?\Z/],
       [:ASSIGNMENT,   /\A\=\Z/],
       [:PLUS,         /\A\+\Z/],
       [:MINUS,        /\A\-\Z/],

@@ -167,8 +167,8 @@ class Optimizer
       if child2.is OperatorLiteral
 
         # Typecheck child1 and child2
-        if child1.is(NumericLiteral, IdentifierLiteral, Expression) &&
-          child3.is(NumericLiteral, IdentifierLiteral, Expression)
+        if child1.is(ExpressionLiteral, Expression) &&
+          child3.is(ExpressionLiteral, Expression)
 
           @grouping_finished = false
           return BinaryExpression.new(child2, child1, child3, node.parent)

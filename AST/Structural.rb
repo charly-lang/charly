@@ -16,3 +16,9 @@ end
 # A single comma
 class CommaLiteral < Terminal
 end
+
+# A keyword reserved by the language
+#
+# let
+class KeywordLiteral < Terminal
+end

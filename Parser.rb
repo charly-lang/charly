@@ -89,6 +89,8 @@ class Parser
         @node << AssignmentOperator.new(@tokens[@next].value, @node)
       when :COMMA
         @node << CommaLiteral.new(@tokens[@next].value, @node)
+      when :STRING
+        @node << StringLiteral.new(@tokens[@next].value, @node)
       end
     end
 
@@ -215,7 +217,7 @@ class Parser
   end
 
   def T
-    node_production Term, :T1, :T2, :T3
+    node_production Term, :T1, :T2, :T3, :T4
   end
 
   def T1
@@ -228,5 +230,9 @@ class Parser
 
   def T3
     term(:IDENTIFIER)
+  end
+
+  def T4
+    term(:STRING)
   end
 end
