@@ -79,6 +79,13 @@ class Lexer
           input.strip!
         end
 
+        # Strip quotes from parsed strings
+        # Also replace escaped double quotes
+        if r[0] == :STRING
+          input = input[1..-2]
+          input.split()
+        end
+
         return Token.new(r[0], input)
       end
     end

@@ -8,8 +8,8 @@ class Parser
   attr_reader :tokens, :tree
   attr_accessor :debug, :output_intermediate_tree
 
-  def initialize(filename)
-    @tree = Program.new filename
+  def initialize
+    @tree = Program.new
     @node = @tree
     @next = NIL
     @debug = false
@@ -23,12 +23,10 @@ class Parser
     lexer = Lexer.new
     @tokens = lexer.analyse input
     @next = 0
-    dlog "Finished lexical analysis"
 
     # Generate the abstract syntax tree, starting with a statement
     dlog "Generating abstract syntax tree"
     B()
-    dlog "Finished generating abstract syntax tree"
 
     if @output_intermediate_tree
       puts "------"
@@ -40,7 +38,6 @@ class Parser
     dlog "Optimizing program"
     optimizer = Optimizer.new
     optimizer.optimize_program @tree
-    dlog "Finished optimizing program"
 
     @tree
   end

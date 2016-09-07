@@ -22,14 +22,12 @@ class Optimizer
       @structure_finished = true
       optimize :structure, program
     end
-    dlog "- Finished optimizing program structure"
 
     dlog "- Generating abstract syntax tree groupings"
     while !@grouping_finished
       @grouping_finished = true
       optimize :group, program, true
     end
-    dlog "- Finished generating abstract syntax tree groupings"
 
     program
   end

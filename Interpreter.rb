@@ -14,9 +14,8 @@ class Interpreter
   def execute
     last_result = NIL
     @programs.each do |program|
-      dlog "Executing #{program.filename}"
+      dlog "Executing program"
       last_result = run_program program
-      dlog "Finished executing #{program.filename}"
     end
     last_result
   end
@@ -76,6 +75,8 @@ class Interpreter
     when IdentifierLiteral
       return @symbols[expression.value]
     when NumericLiteral
+      return expression.value
+    when StringLiteral
       return expression.value
     end
   end

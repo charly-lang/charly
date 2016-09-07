@@ -1,5 +1,5 @@
 # Todos
-1. Rewrite grammar on paper
+## Rewrite grammar on paper
     - Statements???
     - Functions should be treated as expressions
     - Remove confusion about expressions and terms
@@ -10,13 +10,26 @@
         - BinaryExpression
         - AssignmentExpression
         - etc ...
-2. Fix comments
-3. Syntax to define own functions
+
+## Have a file class
+  - filename
+  - file content
+  - metadata???
+
+## Make sure the parser can work with multiple files.
+  - I don't want to initiate a new parser every time a new file get's parsed
+  - Provide class method to merge arbitrary amounts of syntax trees
+  - Implement Deep Copy method (Helper.rb ???)
+
+## Fix comments
+
+## Syntax to define own functions
     - return vs last expression
         - return and last expression can be used
         - return should be treated as a function call inside a block
         - return get's then picked up by the interpreter
         - if return is never called, the last expression
             of the block will be used as the return value
-4. Interface to allow calling native interpreter methods
+
+## Interface to allow calling native interpreter methods
     - native("stdout", "hellloooooo")

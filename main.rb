@@ -1,4 +1,11 @@
+$debug = ARGV.include? '--log'
+require_relative "Helper.rb"
+dlog "Starting up!"
+
+dlog "Loading Parser"
 require_relative "Parser.rb"
+
+dlog "Loading Interpreter"
 require_relative "Interpreter.rb"
 
 # Check if a filename was passed
@@ -7,35 +14,39 @@ if ARGV.length == 0
 end
 
 # Read the contents of the file
+dlog "Reading contents of source file"
 filename = ARGV[0]
 content = File.open(filename, "r").read
 
 if ARGV.include? '--fdump'
-  puts "------"
+  puts "--- #{filename} ---"
   puts content
+  puts "------"
 end
 
 # Create the parser
-parser = Parser.new filename
+dlog "Instantiating Parser"
+parser = Parser.new
 parser.output_intermediate_tree = ARGV.include? '--intermediate'
-$debug = ARGV.include? '--log'
-if $debug
-  puts "------"
-end
 
+# Parse the program
 program = parser.parse content
 
-interpreter = Interpreter.new([
-  program
-])
-puts "=> #{interpreter.execute}"
-
 if ARGV.include? '--ast'
-  puts "------"
+  puts "--- abstract syntax tree ---"
   puts parser.tree
+  puts "------"
 end
 
 if ARGV.include? '--tokens'
-  puts "--- #{parser.tokens.length} TOKENS ---"
+  puts "--- #{parser.tokens.length} tokens ---"
   puts parser.tokens
+  puts "------"
 end
+
+dlog "Instantiating Interpreter"
+interpreter = Interpreter.new([
+  # parser.parse(File.open("testing/prelude.txt", "r").read),
+  program
+])
+interpreter.execute
