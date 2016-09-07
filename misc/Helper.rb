@@ -16,7 +16,11 @@ end
 
 # Colored output
 def colorize(text, color_code)
-  "\e[#{color_code}m#{text}\e[0m"
+  if !ARGV.include? "--nocolor"
+    "\e[#{color_code}m#{text}\e[0m"
+  else
+    text
+  end
 end
 def grey(text); colorize(text, 30) end
 def red(text); colorize(text, 31) end
@@ -29,7 +33,7 @@ def white(text); colorize(text, 37) end
 
 $starttime = Time.now.to_ms
 def dlog(message)
-  time = colorize('%-4.4s' % (Time.now.to_ms - $starttime), 32)
+  time = colorize('%04s' % (Time.now.to_ms - $starttime), 32)
   puts "|#{time}| #{message}" if $debug
 end
 dlog "Starting up!"

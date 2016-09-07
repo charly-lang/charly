@@ -9,11 +9,16 @@ if ARGV.length == 0
 end
 
 # Create a new file for the input file
-input_file = VirtualFile.new ARGV[0]
+# parse the program afterwards
+begin
+  input_file = VirtualFile.new ARGV[0]
+  input_program = Parser.parse input_file
+rescue Exception => e
+  dlog red("Parse Failure: #{e.message}")
+  exit 1
+end
 
-# Parse the program
-input_program = Parser.parse input_file
-
+# Show the generated abstract syntax tree if the needed cli flag is passed
 if ARGV.include? '--ast'
   puts "--- abstract syntax tree ---"
   puts input_program.tree
