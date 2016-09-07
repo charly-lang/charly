@@ -11,13 +11,7 @@
         - AssignmentExpression
         - etc ...
 
-## Have a file class
-  - filename
-  - file content
-  - metadata???
-
 ## Make sure the parser can work with multiple files.
-  - I don't want to initiate a new parser every time a new file get's parsed
   - Provide class method to merge arbitrary amounts of syntax trees
   - Implement Deep Copy method (Helper.rb ???)
 
