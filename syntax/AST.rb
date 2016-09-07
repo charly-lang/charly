@@ -110,7 +110,7 @@ end
 # no:
 # let a = 2;
 # let myvar = "hello";
-class VariableDeclaration < ASTNode
+class VariableDeclaration < Statement
   attr_reader :identifier, :expression
 
   def initialize(identifier, parent)
@@ -132,7 +132,7 @@ end
 # no:
 # let a;
 # let myvar;
-class VariableInitialisation < ASTNode
+class VariableInitialisation < Statement
   attr_reader :identifier, :expression
 
   def initialize(identifier, expression, parent)

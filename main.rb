@@ -10,19 +10,12 @@ end
 
 # Create a new file for the input file
 # parse the program afterwards
-begin
   input_file = VirtualFile.new ARGV[0]
   input_program = Parser.parse input_file
+begin
 rescue Exception => e
   dlog red("Parse Failure: #{e.message}")
   exit 1
-end
-
-# Show the generated abstract syntax tree if the needed cli flag is passed
-if ARGV.include? '--ast'
-  puts "--- abstract syntax tree ---"
-  puts input_program.tree
-  puts "------"
 end
 
 dlog "Instantiating Interpreter"

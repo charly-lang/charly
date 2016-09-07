@@ -15,6 +15,8 @@ class Lexer
       [:MINUS,        /\A\-\Z/],
       [:MULT,         /\A\*\Z/],
       [:DIVD,         /\A\/\Z/],
+      [:MODULUS,      /\A\%\Z/],
+      [:POW,          /\A\*\*\Z/],
       [:TERMINAL,     /\A;\Z/],
       [:COMMA,        /\A,\Z/],
       [:IDENTIFIER,   /\A\w+\Z/],

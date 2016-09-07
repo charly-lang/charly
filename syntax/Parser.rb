@@ -39,17 +39,29 @@ class Parser
     dlog "Generating abstract syntax tree"
     B()
 
-    # Optimize the tree if wanted
-    dlog "Optimizing program"
-    optimizer = Optimizer.new
-    optimizer.optimize_program @tree
+    # Output the abstract syntax tree if the CLI flag was passed
+    if ARGV.include? "--ast"
+      puts "--- #{file.filename} : Abstract Syntax Tree ---"
+      puts @tree
+      puts "------"
+    end
+
+
+    # Disable the optimizer if the respective CLI flag was passed
+    unless ARGV.include? "--noopt"
+      dlog "Optimizing program"
+      optimizer = Optimizer.new
+      optimizer.optimize_program @tree
+    end
+
+    @tree
   end
 
   # Grammar Implementatino
 
   # Check if the next token is equal to *token*
   # Changes the @next pointer to point to the next token
-  def term(token)
+  def term(token, string = "")
 
     if @next >= @tokens.size
       return false
@@ -58,44 +70,62 @@ class Parser
     # Skip whitespace and comments
     while @tokens[@next].token == :COMMENT ||
           @tokens[@next].token == :WHITESPACE do
+
+      # We reached the end of the file
+      if @next + 1 > (@tokens.length - 1)
+        return false
+      end
+
+      # Increment the pointer
       @next += 1
     end
 
-    match = @tokens[@next].token == token
+    if string != ""
+      match = @tokens[@next].token == token && @tokens[@next].value == string
+    else
+      match = @tokens[@next].token == token
+    end
+
+    def new(node_type)
+      node_type.new(@tokens[@next].value, @node)
+    end
 
     if match
       case token
       when :NUMERICAL
-        @node << NumericLiteral.new(@tokens[@next].value, @node)
+        @node << new(NumericLiteral)
       when :IDENTIFIER
-        @node << IdentifierLiteral.new(@tokens[@next].value, @node)
+        @node << new(IdentifierLiteral)
       when :LEFT_PAREN
-        @node << LeftParenLiteral.new(@tokens[@next].value, @node)
+        @node << new(LeftParenLiteral)
       when :RIGHT_PAREN
-        @node << RightParenLiteral.new(@tokens[@next].value, @node)
+        @node << new(RightParenLiteral)
+      when :LEFT_CURLY
+        @node << new(LeftCurlyLiteral)
+      when :RIGHT_CURLY
+        @node << new(RightCurlyLiteral)
       when :PLUS
-        @node << PlusOperator.new(@tokens[@next].value, @node)
+        @node << new(PlusOperator)
       when :MINUS
-        @node << MinusOperator.new(@tokens[@next].value, @node)
+        @node << new(MinusOperator)
       when :MULT
-        @node << MultOperator.new(@tokens[@next].value, @node)
+        @node << new(MultOperator)
       when :DIVD
-        @node << DivdOperator.new(@tokens[@next].value, @node)
+        @node << new(DivdOperator)
       when :TERMINAL
-        @node << SemicolonLiteral.new(@tokens[@next].value, @node)
+        @node << new(SemicolonLiteral)
       when :KEYWORD
-        @node << KeywordLiteral.new(@tokens[@next].value, @node)
+        @node << new(KeywordLiteral)
       when :ASSIGNMENT
-        @node << AssignmentOperator.new(@tokens[@next].value, @node)
+        @node << new(AssignmentOperator)
       when :COMMA
-        @node << CommaLiteral.new(@tokens[@next].value, @node)
+        @node << new(CommaLiteral)
       when :STRING
-        @node << StringLiteral.new(@tokens[@next].value, @node)
+        @node << new(StringLiteral)
       end
     end
 
     @next += 1
-
     match
   end
 
@@ -139,6 +169,9 @@ class Parser
     match
   end
 
+
+
+
   def B
     node_production Block, :B1
   end
@@ -158,25 +191,35 @@ class Parser
   end
   def BP2; true end
 
+
+
+
   def S
-    node_production Statement, :S1, :S2, :S3
+    node_production Statement, :S1, :S2, :S3, :S4
   end
 
   def S1
-    term(:KEYWORD) && term(:IDENTIFIER) && term(:ASSIGNMENT) && E() && term(:TERMINAL)
+    term(:KEYWORD, "let") && term(:IDENTIFIER) && term(:ASSIGNMENT) && E() && term(:TERMINAL)
   end
 
   def S2
-    term(:IDENTIFIER) && term(:LEFT_PAREN) && A() && term(:RIGHT_PAREN) && term(:TERMINAL)
+    term(:KEYWORD, "let") && term(:IDENTIFIER) && term(:TERMINAL)
   end
 
   def S3
+    term(:IDENTIFIER) && term(:LEFT_PAREN) && A() && term(:RIGHT_PAREN) && term(:TERMINAL)
+  end
+
+  def S4
     E() && term(:TERMINAL)
   end
 
+
+
+
   # Argument list
   def A
-    node_production ArgumentList, :A1
+    node_production ExpressionList, :A1
   end
 
   def A1
@@ -192,8 +235,11 @@ class Parser
   end
   def AP2; true end
 
+
+
+
   def E
-    node_production Expression, :E1, :E2, :E3, :E4, :E5
+    node_production Expression, :E1, :E2, :E3, :E4, :E5, :E6, :E7, :E8, :E9
   end
 
   def E1
@@ -213,11 +259,30 @@ class Parser
   end
 
   def E5
+    T() && term(:MODULUS) && E()
+  end
+
+  def E6
+    T() && term(:POW) && E()
+  end
+
+  def E7
+    term(:IDENTIFIER) && term(:ASSIGNMENT) && E()
+  end
+
+  def E8
+    term(:IDENTIFIER) && term(:LEFT_PAREN) && A() && term(:RIGHT_PAREN) && term(:TERMINAL)
+  end
+
+  def E9
     T()
   end
 
+
+
+
   def T
-    node_production Term, :T1, :T2, :T3, :T4
+    node_production Expression, :T1, :T2, :T3, :T4
   end
 
   def T1
