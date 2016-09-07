@@ -1,5 +1,5 @@
-require_relative "AST.rb"
-require_relative "Helper.rb"
+require_relative "syntax/AST.rb"
+require_relative "misc/Helper.rb"
 
 # Runs a given program
 class Interpreter

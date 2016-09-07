@@ -67,8 +67,11 @@ end
 
 # A single program with no parent nodes
 class Program < Block
-  def initialize
+  attr_reader :file
+
+  def initialize(file)
     super(NIL)
+    @file = file
   end
 end
 
@@ -108,7 +111,7 @@ end
 # let a = 2;
 # let myvar = "hello";
 class VariableDeclaration < ASTNode
-  attr_reader :identifier, expression
+  attr_reader :identifier, :expression
 
   def initialize(identifier, parent)
     super(parent)

@@ -3,8 +3,8 @@ require_relative "../misc/Helper.rb"
 # Performs Lexical Analysis
 class Lexer
 
-  def initialize
-    @rules = [
+  def self.rules
+    [
       [:COMMENT,      /\A#.*\Z/],
       [:KEYWORD,      /\A(let)\Z/],
       [:NUMERICAL,    /\A-?\d+(\.)?(\d+)?\Z/],
@@ -25,8 +25,10 @@ class Lexer
     ]
   end
 
-  # Returns *string* as a list of tokens
-  def analyse(input)
+  # Returns all tokens inside "file"
+  def self.analyse(file)
+
+    input = file.content
 
     tokens = []
 
@@ -72,8 +74,8 @@ class Lexer
     tokens
   end
 
-  def identify(input)
-    @rules.each do |r|
+  def self.identify(input)
+    rules.each do |r|
       if input =~ r[1]
 
         # Strip whitespace from tokens where whitespace can be ignored
@@ -95,8 +97,8 @@ class Lexer
     nil
   end
 
-  def identifiable?(input)
-    @rules.each do |r|
+  def self.identifiable?(input)
+    rules.each do |r|
       if input =~ r[1]
         return true
       end

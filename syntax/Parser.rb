@@ -3,43 +3,39 @@ require_relative "../misc/Helper.rb"
 require_relative "Optimizer.rb"
 require_relative "AST.rb"
 
+# Parser
 class Parser
 
   attr_reader :tokens, :tree
-  attr_accessor :debug, :output_intermediate_tree
+  attr_accessor :debug
 
-  def initialize
-    @tree = Program.new
+  # Initialize a new parser for a given file
+  def initialize(file)
+    @tree = Program.new file
     @node = @tree
-    @next = NIL
-    @debug = false
-    @output_intermediate_tree = false
+    @next = 0
   end
 
-  def parse(input)
+  def self.parse(file)
+    parser = self.new file
+    parser.parse file
+  end
+
+  def parse(file)
 
     # Get a list of tokens from the lexer
     dlog "Starting lexical analysis"
-    lexer = Lexer.new
-    @tokens = lexer.analyse input
+    @tokens = Lexer.analyse file
     @next = 0
 
     # Generate the abstract syntax tree, starting with a statement
     dlog "Generating abstract syntax tree"
     B()
 
-    if @output_intermediate_tree
-      puts "------"
-      puts @tree
-      puts "------"
-    end
-
     # Optimize the tree if wanted
     dlog "Optimizing program"
     optimizer = Optimizer.new
     optimizer.optimize_program @tree
-
-    @tree
   end
 
   # Grammar Implementatino
