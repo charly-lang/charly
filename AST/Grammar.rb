@@ -19,7 +19,7 @@ end
 # A terminal node mapping directly to a token
 # returned by the lexical analysis
 class Terminal < ASTNode
-  attr_reader :value
+  attr_accessor :value
 
   def initialize(value, parent)
     super(parent)

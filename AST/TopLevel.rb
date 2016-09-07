@@ -2,8 +2,11 @@ require_relative "ASTNode.rb"
 
 # Contains a program
 class Program < ASTNode
-  def initialize
+  attr_reader :filename
+
+  def initialize(filename)
     super(self)
+    @filename = filename
   end
 end
 

@@ -10,12 +10,13 @@
         - BinaryExpression
         - AssignmentExpression
         - etc ...
-2. Syntax to define own functions
+2. Fix comments
+3. Syntax to define own functions
     - return vs last expression
         - return and last expression can be used
         - return should be treated as a function call inside a block
         - return get's then picked up by the interpreter
         - if return is never called, the last expression
             of the block will be used as the return value
-3. Interface to allow calling native interpreter methods
+4. Interface to allow calling native interpreter methods
     - native("stdout", "hellloooooo")

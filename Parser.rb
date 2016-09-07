@@ -8,8 +8,8 @@ class Parser
   attr_reader :tokens, :tree
   attr_accessor :debug, :output_intermediate_tree
 
-  def initialize
-    @tree = Program.new
+  def initialize(filename)
+    @tree = Program.new filename
     @node = @tree
     @next = NIL
     @debug = false

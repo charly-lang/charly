@@ -151,6 +151,13 @@ class Optimizer
       return NIL
     end
 
+    # NumericLiterals value property should be an actual INT
+    if node.is(NumericLiteral) && node.value.is_a?(String)
+      node.value = node.value.to_f
+      @structure_finished = false
+      return node
+    end
+
     node
   end
 

@@ -1,4 +1,5 @@
 require_relative "Parser.rb"
+require_relative "Interpreter.rb"
 
 # Check if a filename was passed
 if ARGV.length == 0
@@ -6,14 +7,20 @@ if ARGV.length == 0
 end
 
 # Read the contents of the file
-content = File.open(ARGV[0], "r").read
+filename = ARGV[0]
+content = File.open(filename, "r").read
 
 # Create the parser
-parser = Parser.new
+parser = Parser.new filename
 parser.output_intermediate_tree = ARGV.include? '--intermediate'
 $debug = ARGV.include? '--log'
 
 program = parser.parse content
+
+interpreter = Interpreter.new([
+  program
+])
+puts "=> #{interpreter.execute}"
 
 if ARGV.include? '--ast'
   puts "------"
@@ -24,4 +31,3 @@ if ARGV.include? '--tokens'
   puts "--- #{parser.tokens.length} TOKENS ---"
   puts parser.tokens
 end
-
