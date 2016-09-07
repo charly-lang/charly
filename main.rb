@@ -10,10 +10,18 @@ end
 filename = ARGV[0]
 content = File.open(filename, "r").read
 
+if ARGV.include? '--fdump'
+  puts "------"
+  puts content
+end
+
 # Create the parser
 parser = Parser.new filename
 parser.output_intermediate_tree = ARGV.include? '--intermediate'
 $debug = ARGV.include? '--log'
+if $debug
+  puts "------"
+end
 
 program = parser.parse content
 
