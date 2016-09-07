@@ -1,7 +1,0 @@
-require_relative "AST/ASTNode.rb"
-require_relative "AST/Grammar.rb"
-require_relative "AST/Expressions.rb"
-require_relative "AST/Identifier.rb"
-require_relative "AST/Operators.rb"
-require_relative "AST/Structural.rb"
-require_relative "AST/TopLevel.rb"
