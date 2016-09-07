@@ -11,24 +11,12 @@ end
 # Create a new file for the input file
 input_file = VirtualFile.new ARGV[0]
 
-if ARGV.include? '--fdump'
-  puts "--- #{input_file.filename} ---"
-  puts input_file
-  puts "------"
-end
-
 # Parse the program
 input_program = Parser.parse input_file
 
 if ARGV.include? '--ast'
   puts "--- abstract syntax tree ---"
   puts input_program.tree
-  puts "------"
-end
-
-if ARGV.include? '--tokens'
-  puts "--- #{input_program.tokens.length} tokens ---"
-  puts input_program.tokens
   puts "------"
 end
 

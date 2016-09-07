@@ -28,6 +28,13 @@ class Parser
     @tokens = Lexer.analyse file
     @next = 0
 
+    # Output a list of tokens if the respective CLI flag was passed
+    if ARGV.include? "--tokens"
+      puts "--- found #{@tokens.length} tokens in #{file.filename} ---"
+      puts @tokens
+      puts "------"
+    end
+
     # Generate the abstract syntax tree, starting with a statement
     dlog "Generating abstract syntax tree"
     B()
