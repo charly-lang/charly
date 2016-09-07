@@ -171,6 +171,19 @@ class Optimizer
       end
     end
 
+    # Declarations
+    if node.is(Statement) && node.children.length == 3
+
+      # Check for the let keyword
+      if node.children[0].value == "let"
+        if node.children[1].is(IdentifierLiteral)
+
+          @finished = false
+          return VariableDeclaration.new(node.children[1], node.parent)
+        end
+      end
+    end
+
     node
   end
 end

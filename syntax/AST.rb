@@ -111,7 +111,7 @@ end
 # let a = 2;
 # let myvar = "hello";
 class VariableDeclaration < Statement
-  attr_reader :identifier, :expression
+  attr_reader :identifier
 
   def initialize(identifier, parent)
     super(parent)
