@@ -15,7 +15,9 @@
   - Provide class method to merge arbitrary amounts of syntax trees
   - Implement Deep Copy method (Helper.rb ???)
 
-## Fix comments
+## Fix weird lexing errors
+  - "2-2" -> :NUM :NUM
+  - comments???
 
 ## Syntax to define own functions
   - return vs last expression
