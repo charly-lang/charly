@@ -41,4 +41,8 @@ class VirtualFile
       yield line
     end
   end
+
+  def to_s
+    @content
+  end
 end
