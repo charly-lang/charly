@@ -234,15 +234,16 @@ end
 class KeywordLiteral < Terminal
 end
 
-# Abstract operator class
-class OperatorLiteral < Terminal
-end
+# Abstract operator classes
+class ComparisonOperatorLiteral < Terminal; end
+class BinaryOperatorLiteral < Terminal; end
+class MiscOperatorLiteral < Terminal; end
 
 # Different arithmetic operators
-class PlusOperator < OperatorLiteral; end
-class MinusOperator < OperatorLiteral; end
-class MultOperator < OperatorLiteral; end
-class DivdOperator < OperatorLiteral; end
-class ModOperator < OperatorLiteral; end
-class PowOperator < OperatorLiteral; end
-class AssignmentOperator < OperatorLiteral; end
+class PlusOperator < BinaryOperatorLiteral; end
+class MinusOperator < BinaryOperatorLiteral; end
+class MultOperator < BinaryOperatorLiteral; end
+class DivdOperator < BinaryOperatorLiteral; end
+class ModOperator < BinaryOperatorLiteral; end
+class PowOperator < BinaryOperatorLiteral; end
+class AssignmentOperator < MiscOperatorLiteral; end
