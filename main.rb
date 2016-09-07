@@ -1,26 +1,20 @@
-$debug = ARGV.include? '--log'
-require_relative "Helper.rb"
-dlog "Starting up!"
-
-dlog "Loading Parser"
-require_relative "Parser.rb"
-
-dlog "Loading Interpreter"
-require_relative "Interpreter.rb"
+require_relative "misc/Helper.rb"
+require_relative "misc/File.rb"
+require_relative "syntax/Parser.rb"
+require_relative "syntax/Interpreter.rb"
 
 # Check if a filename was passed
 if ARGV.length == 0
   raise "No filename passed!"
 end
 
-# Read the contents of the file
-dlog "Reading contents of source file"
-filename = ARGV[0]
-content = File.open(filename, "r").read
+# Create a new file for the input file
+dlog "Reading source file"
+input_file = VirtualFile.new_from_path ARGV[0]
 
 if ARGV.include? '--fdump'
   puts "--- #{filename} ---"
-  puts content
+  puts input_file.content
   puts "------"
 end
 
@@ -30,7 +24,7 @@ parser = Parser.new
 parser.output_intermediate_tree = ARGV.include? '--intermediate'
 
 # Parse the program
-program = parser.parse content
+program = parser.parse input_file.content
 
 if ARGV.include? '--ast'
   puts "--- abstract syntax tree ---"

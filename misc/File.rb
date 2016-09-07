@@ -1,5 +1,5 @@
 # Represents a single file
-class File
+class VirtualFile
   attr_reader :filename,
               :fullpath,
               :directory,

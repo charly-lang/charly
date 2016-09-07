@@ -1,4 +1,4 @@
-require_relative "Helper.rb"
+require_relative "../misc/Helper.rb"
 require_relative "Parser.rb"
 require_relative "AST.rb"
 
