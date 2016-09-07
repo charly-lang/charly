@@ -188,6 +188,10 @@ class Terminal < ASTNode
     super(parent)
     @value = value
   end
+
+  def meta
+    "#{@value}"
+  end
 end
 
 # Parantheses

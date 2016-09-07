@@ -39,19 +39,18 @@ class Parser
     dlog "Generating abstract syntax tree"
     B()
 
-    # Output the abstract syntax tree if the CLI flag was passed
-    if ARGV.include? "--ast"
-      puts "--- #{file.filename} : Abstract Syntax Tree ---"
-      puts @tree
-      puts "------"
-    end
-
-
     # Disable the optimizer if the respective CLI flag was passed
     unless ARGV.include? "--noopt"
       dlog "Optimizing program"
       optimizer = Optimizer.new
       optimizer.optimize_program @tree
+    end
+
+    # Output the abstract syntax tree if the CLI flag was passed
+    if ARGV.include? "--ast"
+      puts "--- #{file.filename} : Abstract Syntax Tree ---"
+      puts @tree
+      puts "------"
     end
 
     @tree

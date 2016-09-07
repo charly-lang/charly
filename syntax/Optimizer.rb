@@ -7,8 +7,7 @@ require_relative "AST.rb"
 class Optimizer
 
   def initialize
-    @structure_finished = false
-    @grouping_finished = false
+    @finished = false
   end
 
   # Optimize a program
@@ -18,14 +17,17 @@ class Optimizer
     end
 
     dlog "- Optimizing program structure"
-    while !@structure_finished
-      @structure_finished = true
+    while !@finished
+      @finished = true
       optimize :structure, program
     end
 
+    # Reset @finished
+    @finished = false
+
     dlog "- Generating abstract syntax tree groupings"
-    while !@grouping_finished
-      @grouping_finished = true
+    while !@finished
+      @finished = true
       optimize :group, program, true
     end
 
@@ -95,65 +97,30 @@ class Optimizer
   # Optimize the structure of a node
   def flow_structure(node)
 
-    # Term nodes that only have 1 terminal child,
-    # should be replaced by that child
-    if node.is Term
-      if node.children.length == 1
-        child = node.children[0]
-        if child.is Terminal
-          @structure_finished = false
-          return child
-        end
-      end
-    end
-
-    # Expression nodes that only have 1 terminal child,
-    # should be replaced by that child
-    if node.is Expression
-      if node.children.length == 1
-        child = node.children[0]
-        if child.is Terminal
-          @structure_finished = false
-          return child
-        end
-      end
-    end
-
-    # Expression nodes that only have 1 Expression child,
-    # should be replaced by that child
-    if node.is Expression
-      if node.children.length == 1
-        child = node.children[0]
-        if child.is Expression
-          @structure_finished = false
-          return child
-        end
-      end
-    end
-
-    # Term nodes that only have 1 Expression child,
-    # should be replaced by that child
-    if node.is Term
-      if node.children.length == 1
-        child = node.children[0]
-        if child.is Expression
-          @structure_finished = false
-          return child
-        end
-      end
-    end
-
-    # Remove LEFT_PAREN, RIGHT_PAREN, SEMICOLON nodes
-    if node.is LeftParenLiteral, RightParenLiteral, SemicolonLiteral, CommaLiteral
-      @structure_finished = false
-      return NIL
-    end
-
     # NumericLiterals value property should be an actual INT
     if node.is(NumericLiteral) && node.value.is_a?(String)
       node.value = node.value.to_f
-      @structure_finished = false
+      @finished = false
       return node
+    end
+
+    # Expressions that only contain 1 other expression
+    # should be replaced by that expression
+    if node.is(Expression) && node.children.length == 1
+      if node.children[0].is(Expression)
+        @finished = false
+        return node.children[0]
+      end
+    end
+
+    # Expression that only contain terminal nodes
+    # that can be treated as expressions
+    # should be replaced by that nodes
+    if node.is(Expression) && node.children.length == 1
+      if node.children[0].is NumericLiteral, StringLiteral, IdentifierLiteral
+        @finished = false
+        return node.children[0]
+      end
     end
 
     node
@@ -162,48 +129,8 @@ class Optimizer
   # Optimize the groupings of the node
   def flow_group(node)
 
-    # Group arithmetic operations together
-    if node.is(Expression) && node.children.length == 3
-      child1 = node.children[0]
-      child2 = node.children[1]
-      child3 = node.children[2]
+    # Airthmetic expressions involving an operator
 
-      # Check if child 2 is an operator
-      if child2.is OperatorLiteral
-
-        # Typecheck child1 and child2
-        if child1.is(ExpressionLiteral, Expression) &&
-          child3.is(ExpressionLiteral, Expression)
-
-          @grouping_finished = false
-          return BinaryExpression.new(child2, child1, child3, node.parent)
-        end
-      end
-    end
-
-    # Group Variable Assignments together
-    if node.is(Statement) && node.children.length == 4
-      if node.children[2].is AssignmentOperator
-        identifier = node.children[1]
-        expression = node.children[3]
-
-        @grouping_finished = false
-        return VariableAssignment.new(identifier, expression, node.parent)
-      end
-    end
-
-    # Group call expressions together
-    if node.is(Statement) && node.children.length == 2
-      child1 = node.children[0]
-      child2 = node.children[1]
-
-      # Check if it's a valid call expression
-      if child1.is(IdentifierLiteral) && child2.is(ArgumentList)
-
-        @grouping_finished = false
-        return CallExpression.new(child1, child2, node.parent)
-      end
-    end
 
     node
   end
