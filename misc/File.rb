@@ -16,7 +16,7 @@ class VirtualFile
     @directory = File.dirname path
     @size = File.size path
 
-    dlog "Reading source file: #{path}"
+    dlog "Reading source file: #{yellow(path)}"
     @content = File.open(path, "r").read
   end
 

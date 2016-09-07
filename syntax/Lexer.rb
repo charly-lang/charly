@@ -1,4 +1,5 @@
 require_relative "../misc/Helper.rb"
+require_relative "../misc/Location.rb"
 
 # Performs Lexical Analysis
 class Lexer
@@ -36,6 +37,7 @@ class Lexer
     cursor = 0
     forward = 1
     tokens = []
+    line = 1
     while cursor < input.length do
 
       # Don't scan outside the bounds of the string
@@ -45,10 +47,17 @@ class Lexer
 
       # Once a token doesn't match anymore
       if !identifiable?(input[cursor, forward])
-        token = identify(input[cursor, forward - 1])
+
+        # Increment line number if a newline is recognized
+        if input[[cursor - 1, 0].max, 1] == "\n" || input[[cursor - 2, 0].max, 2] == "\r\n"
+          line += 1
+        end
+
+        substring = input[cursor, forward - 1]
+        token = identify(substring, line, file)
 
         if token.nil?
-          raise "Could not parse input: (#{input[cursor, forward - 1]})"
+          raise "Could not parse input: (#{substring})"
         end
 
         tokens << token
@@ -60,7 +69,7 @@ class Lexer
 
       # If identifiable and we reached the end of the file
       if identifiable?(input[cursor, forward]) && (cursor + forward + 1) > input.length
-        token = identify(input[cursor, forward])
+        token = identify(input[cursor, forward], line, file)
         tokens << token
 
         cursor = cursor + forward + 1
@@ -74,7 +83,7 @@ class Lexer
     tokens
   end
 
-  def self.identify(input)
+  def self.identify(input, line, file)
     rules.each do |r|
       if input =~ r[1]
 
@@ -90,7 +99,7 @@ class Lexer
           input.split()
         end
 
-        return Token.new(r[0], input)
+        return Token.new(r[0], input, Location.new(file, line))
       end
     end
 
@@ -110,14 +119,15 @@ end
 
 # A single token returned by the Lexer
 class Token
-  attr_reader :token, :value
+  attr_reader :token, :value, :location
 
-  def initialize(token, value)
+  def initialize(token, value, location)
     @token = token
     @value = value
+    @location = location
   end
 
   def to_s
-    "#{'%-11.11s' % @token} │#{@value}│"
+    "(#{location}) #{'%-11.11s' % @token} │#{@value}│"
   end
 end

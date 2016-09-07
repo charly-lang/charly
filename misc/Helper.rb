@@ -14,8 +14,22 @@ class String
   end
 end
 
+# Colored output
+def colorize(text, color_code)
+  "\e[#{color_code}m#{text}\e[0m"
+end
+def grey(text); colorize(text, 30) end
+def red(text); colorize(text, 31) end
+def green(text); colorize(text, 32) end
+def yellow(text); colorize(text, 33) end
+def blue(text); colorize(text, 34) end
+def violet(text); colorize(text, 35) end
+def cyan(text); colorize(text, 36) end
+def white(text); colorize(text, 37) end
+
 $starttime = Time.now.to_ms
 def dlog(message)
-  puts "|#{Time.now.to_ms - $starttime}| #{message}" if $debug
+  time = colorize('%-4.4s' % (Time.now.to_ms - $starttime), 32)
+  puts "|#{time}| #{message}" if $debug
 end
 dlog "Starting up!"

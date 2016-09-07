@@ -12,7 +12,7 @@ end
 input_file = VirtualFile.new ARGV[0]
 
 if ARGV.include? '--fdump'
-  puts "--- #{filename} ---"
+  puts "--- #{input_file.filename} ---"
   puts input_file
   puts "------"
 end
