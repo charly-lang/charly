@@ -150,6 +150,27 @@ class Optimizer
       end
     end
 
+    # Assignment operator
+    if node.is(Expression) && node.children.length == 3
+
+      # Check for the operator
+      if node.children[1].is(AssignmentOperator)
+
+        # Typecheck left and right argument
+        identifier = node.children[0]
+        expression = node.children[2]
+        operator = node.children[1]
+
+        if identifier.is IdentifierLiteral
+          if expression.is Expression, NumericLiteral, StringLiteral, IdentifierLiteral
+
+            @finished = false
+            return VariableAssignment.new(identifier, expression, node.parent)
+          end
+        end
+      end
+    end
+
     node
   end
 end
