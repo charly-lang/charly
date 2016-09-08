@@ -16,7 +16,7 @@ class Optimizer
       raise "Not a Program instance"
     end
 
-    dlog "- Optimizing program structure"
+    dlog "Optimizing program structure"
     while !@finished
       @finished = true
       optimize :structure, program
@@ -25,7 +25,7 @@ class Optimizer
     # Reset @finished
     @finished = false
 
-    dlog "- Generating abstract syntax tree groupings"
+    dlog "Generating abstract syntax tree groupings"
     while !@finished
       @finished = true
       optimize :group, program, true

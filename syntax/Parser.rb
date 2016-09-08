@@ -41,7 +41,6 @@ class Parser
 
     # Disable the optimizer if the respective CLI flag was passed
     unless ARGV.include? "--noopt"
-      dlog "Optimizing program"
       optimizer = Optimizer.new
       optimizer.optimize_program @tree
     end
