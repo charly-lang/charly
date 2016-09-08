@@ -7,7 +7,7 @@ class Lexer
   def self.rules
     [
       [:COMMENT,      /\A#.*\Z/],
-      [:KEYWORD,      /\A(let)\Z/],
+      [:KEYWORD,      /\A(let|func)\Z/],
       [:NUMERICAL,    /\A-?\d+(\.)?(\d+)?\Z/],
       [:STRING,       /\A"(""|[^"])*"?\Z/],
       [:ASSIGNMENT,   /\A\=\Z/],

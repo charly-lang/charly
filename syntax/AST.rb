@@ -184,6 +184,15 @@ class ExpressionList < ASTNode
   end
 end
 
+# A list of identifiers seperated by commas
+class ArgumentList < ASTNode
+  def each
+    @children.each do |child|
+      yield child
+    end
+  end
+end
+
 # A terminal node mapping directly to a token
 # returned by the lexical analysis
 class Terminal < ASTNode

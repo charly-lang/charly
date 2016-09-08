@@ -197,7 +197,7 @@ class Parser
 
 
   def S
-    node_production Statement, :S1, :S2, :S3, :S4
+    node_production Statement, :S1, :S2, :S3
   end
 
   def S1
@@ -209,10 +209,6 @@ class Parser
   end
 
   def S3
-    E8() && term(:TERMINAL)
-  end
-
-  def S4
     E() && term(:TERMINAL)
   end
 
@@ -220,28 +216,49 @@ class Parser
 
 
   # Argument list
-  def A
-    node_production ExpressionList, :A1
+  def EL
+    node_production ExpressionList, :EL1
   end
 
-  def A1
-    E() && APRIME()
+  def EL1
+    E() && ELPRIME()
   end
 
-  def APRIME
-    check_each([:AP1, :AP2])
+  def ELPRIME
+    check_each([:ELP1, :ELP2])
   end
 
-  def AP1
-    term(:COMMA) && E() && APRIME()
+  def ELP1
+    term(:COMMA) && E() && ELPRIME()
   end
-  def AP2; true end
+  def ELP2; true end
 
+
+
+  def AL
+    node_production ArgumentList, :AL1
+  end
+
+  def AL1
+    term(:IDENTIFIER) && ALPRIME()
+  end
+
+  def ALPRIME
+    check_each([:ALP1, :ALP2])
+  end
+
+  def ALP1
+    term(:COMMA) && term(:IDENTIFIER) && ALPRIME()
+  end
+
+  def ALP2
+    true
+  end
 
 
 
   def E
-    node_production Expression, :E1, :E2, :E3, :E4, :E5, :E6, :E7, :E8, :E9, :E10
+    node_production Expression, :E1, :E2, :E3, :E4, :E5, :E6, :E7, :E8, :E9, :E10, :E11
   end
 
   def E1
@@ -249,57 +266,63 @@ class Parser
   end
 
   def E2
-    term(:IDENTIFIER) && term(:LEFT_PAREN) && A() && term(:RIGHT_PAREN)
+    term(:IDENTIFIER) && term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
   end
 
   def E3
-    T() && term(:MULT) && E()
+    term(:KEYWORD, "func") && term(:IDENTIFIER) && term(:LEFT_PAREN) && AL() && term(:RIGHT_PAREN) && term(:LEFT_CURLY) && B() && term(:RIGHT_CURLY)
   end
 
   def E4
-    T() && term(:DIVD) && E()
+    T() && term(:MULT) && E()
   end
 
   def E5
-    T() && term(:PLUS) && E()
+    T() && term(:DIVD) && E()
   end
 
   def E6
-    T() && term(:MINUS) && E()
+    T() && term(:PLUS) && E()
   end
 
   def E7
-    T() && term(:MODULUS) && E()
+    T() && term(:MINUS) && E()
   end
 
   def E8
-    T() && term(:POW) && E()
+    T() && term(:MODULUS) && E()
   end
 
   def E9
-    term(:IDENTIFIER) && term(:ASSIGNMENT) && E()
+    T() && term(:POW) && E()
   end
 
   def E10
+    term(:IDENTIFIER) && term(:ASSIGNMENT) && E()
+  end
+
+  def E11
     T()
   end
 
 
-
-
   def T
-    node_production Expression, :T1, :T2, :T3
+    node_production Expression, :T1, :T2, :T3, :T4
   end
 
   def T1
-    term(:NUMERICAL)
+    term(:LEFT_PAREN) && E() && term(:RIGHT_PAREN)
   end
 
   def T2
-    term(:IDENTIFIER)
+    term(:NUMERICAL)
   end
 
   def T3
+    term(:IDENTIFIER)
+  end
+
+  def T4
     term(:STRING)
   end
 end
