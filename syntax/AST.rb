@@ -177,6 +177,11 @@ end
 
 # A list of expressions seperated by commas
 class ExpressionList < ASTNode
+  def each
+    @children.each do |child|
+      yield child
+    end
+  end
 end
 
 # A terminal node mapping directly to a token

@@ -97,7 +97,7 @@ class Optimizer
   # Optimize the structure of a node
   def flow_structure(node)
 
-    # NumericLiterals value property should be an actual INT
+    # NumericLiterals value property should be an actual float value
     if node.is(NumericLiteral) && node.value.is_a?(String)
       node.value = node.value.to_f
       @finished = false
@@ -110,6 +110,16 @@ class Optimizer
       if node.children[0].is(Expression)
         @finished = false
         return node.children[0]
+      end
+    end
+
+    # Expressions containing 3 children and last and first ones are parens
+    if node.is(Expression) && node.children.length == 3
+      if node.children[0].is(LeftParenLiteral) && node.children[2].is(RightParenLiteral)
+        if node.children[1].is(Expression)
+          @finished = false
+          return node.children[1]
+        end
       end
     end
 

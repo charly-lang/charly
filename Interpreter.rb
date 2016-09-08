@@ -3,6 +3,7 @@ require_relative "misc/Helper.rb"
 
 # Runs a given program
 class Interpreter
+  attr_reader :symbols
 
   # Initialize the interpreter and insert all required programs
   def initialize(programs)
@@ -23,8 +24,14 @@ class Interpreter
   # Executes a single program
   def run_program(program)
 
-    # The first node in the tree is always a block
-    run_block program.children[0]
+    # Check if the program contains a block
+    if program.children.length == 1
+
+      # The first node in the tree is always a block
+      return run_block program.children[0]
+    end
+
+    NIL
   end
 
   # Runs all expressions inside a given block
@@ -40,44 +47,69 @@ class Interpreter
   end
 
   # Executes a single expression and returns it's value
-  def run_expression(expression)
+  def run_expression(node)
 
-    # Different types of expressions
-    #
-    # - VariableAssignment
-    # - BinaryExpression
-    # - CallExpression
-    case expression
-    when VariableAssignment
-      value = run_expression expression.expression
-      @symbols[expression.identifier.value] = value
+    # VariableInitialisation
+    if node.is(VariableInitialisation)
+      value = run_expression node.expression
+      @symbols[node.identifier.value] = value
       return value
-    when BinaryExpression
-      lhs = run_expression expression.left
-      rhs = run_expression expression.right
+    end
 
-      case expression.operator.value
-      when "+"
-        return lhs + rhs
-      when "-"
-        return lhs - rhs
-      when "*"
-        return lhs * rhs
-      when "/"
-        return lhs / rhs
+    # VariableDeclaration
+    if node.is(VariableDeclaration)
+      @symbols[node.identifier.value] = NIL
+    end
+
+    # BinaryExpression
+    if node.is(BinaryExpression)
+      left = run_expression node.left
+      right = run_expression node.right
+
+      case node.operator
+      when PlusOperator
+        return left + right
+      when MinusOperator
+        return left - right
+      when MultOperator
+        return left * right
+      when DivdOperator
+        return left / right
+      when ModOperator
+        return left % right
+      when PowOperator
+        return left ** right
       end
-    when CallExpression
+    end
+
+    # Call Expressions
+    if node.is(CallExpression)
+
+      # Resolve all arguments first
       arguments = []
-      expression.argumentlist.children.each do |arg|
-        arguments << run_expression(arg)
+      node.argumentlist.each do |argument|
+        arguments << run_expression(argument)
       end
-      return call_internal_function(expression.identifier.value, arguments)
-    when IdentifierLiteral
-      return @symbols[expression.value]
-    when NumericLiteral
-      return expression.value
-    when StringLiteral
-      return expression.value
+
+      call_internal_function node.identifier.value, arguments
+    end
+
+    # Nested expressions inside a statement
+    if node.is(Statement) && node.children.length == 1
+      if node.children[0].is(Expression, NumericLiteral, StringLiteral, IdentifierLiteral)
+        return run_expression node.children[0]
+      end
+    end
+
+    # Literals treated as expressions
+    # NumericLiteral, IdentifierLiteral, StringLiteral
+    if node.is(NumericLiteral, StringLiteral)
+      return node.value
+    end
+
+    # Identifiers
+    if node.is(IdentifierLiteral)
+      return @symbols[node.value]
     end
   end
 

@@ -18,8 +18,10 @@ rescue Exception => e
   exit 1
 end
 
-dlog "Instantiating Interpreter"
-interpreter = Interpreter.new([
-  input_program
-])
-interpreter.execute
+unless ARGV.include? "--noexec"
+  interpreter = Interpreter.new([
+    input_program
+  ])
+  exitValue = interpreter.execute
+  dlog "#{red("Exit:")} #{exitValue}"
+end
