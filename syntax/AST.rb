@@ -175,6 +175,22 @@ class CallExpression < Expression
   end
 end
 
+# A single function definition
+class FunctionDefinitionExpression < Expression
+  attr_reader :identifier, :argumentlist, :block
+
+  def initialize(identifier, argumentlist, block, parent)
+    super(parent)
+    @identifier = identifier
+    @argumentlist = argumentlist
+    @block = block
+  end
+
+  def children_string
+    [@identifier, @argumentlist, @block]
+  end
+end
+
 # A list of expressions seperated by commas
 class ExpressionList < ASTNode
   def each
