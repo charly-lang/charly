@@ -123,6 +123,12 @@ class Optimizer
       end
     end
 
+    # Strip semicolons, commas
+    if node.is(CommaLiteral, SemicolonLiteral)
+      @finished = false
+      return NIL
+    end
+
     node
   end
 
