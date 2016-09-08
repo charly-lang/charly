@@ -199,7 +199,7 @@ class Optimizer
 
       if child1.is(KeywordLiteral) && child1.value == "let"
         if child2.is(IdentifierLiteral) && child3.is(AssignmentOperator)
-          if child4.is(Expression)
+          if child4.is(Expression, NumericLiteral, StringLiteral, IdentifierLiteral)
 
             @finished = false
             return VariableInitialisation.new(child2, child4, node.parent)
