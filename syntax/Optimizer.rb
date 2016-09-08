@@ -208,6 +208,22 @@ class Optimizer
       end
     end
 
+    # Call Expressions
+    if node.is(Statement) && node.children.length == 4
+      child1 = node.children[0]
+      child2 = node.children[1]
+      child3 = node.children[2]
+      child4 = node.children[3]
+
+      if child1.is(IdentifierLiteral) && child3.is(ExpressionList)
+        if child2.is(LeftParenLiteral) && child4.is(RightParenLiteral)
+
+          @finished = false
+          return CallExpression.new(child1, child3, node.parent)
+        end
+      end
+    end
+
     node
   end
 end
