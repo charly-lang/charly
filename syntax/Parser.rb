@@ -205,7 +205,7 @@ class Parser
   end
 
   def S3
-    term(:IDENTIFIER) && term(:LEFT_PAREN) && A() && term(:RIGHT_PAREN) && term(:TERMINAL)
+    E8() && term(:TERMINAL)
   end
 
   def S4
@@ -269,7 +269,7 @@ class Parser
   end
 
   def E8
-    term(:IDENTIFIER) && term(:LEFT_PAREN) && A() && term(:RIGHT_PAREN) && term(:TERMINAL)
+    term(:IDENTIFIER) && term(:LEFT_PAREN) && A() && term(:RIGHT_PAREN)
   end
 
   def E9

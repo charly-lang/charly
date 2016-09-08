@@ -209,7 +209,7 @@ class Optimizer
     end
 
     # Call Expressions
-    if node.is(Statement) && node.children.length == 4
+    if node.is(Statement, Expression) && node.children.length == 4
       child1 = node.children[0]
       child2 = node.children[1]
       child3 = node.children[2]
