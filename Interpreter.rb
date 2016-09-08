@@ -51,14 +51,21 @@ class Interpreter
 
     # VariableInitialisation
     if node.is(VariableInitialisation)
-      value = run_expression node.expression
-      @symbols[node.identifier.value] = value
-      return value
+      @symbols[node.identifier.value] = run_expression node.expression
+      return NIL
     end
 
     # VariableDeclaration
     if node.is(VariableDeclaration)
       @symbols[node.identifier.value] = NIL
+      return NIL
+    end
+
+    # VariableAssignment
+    if node.is(VariableAssignment)
+      value = run_expression node.expression
+      @symbols[node.identifier.value] = value
+      return value
     end
 
     # BinaryExpression
