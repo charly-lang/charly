@@ -110,6 +110,10 @@ class Parser
         @node << new(MultOperator)
       when :DIVD
         @node << new(DivdOperator)
+      when :MODULUS
+        @node << new(ModOperator)
+      when :POW
+        @node << new(PowOperator)
       when :TERMINAL
         @node << new(SemicolonLiteral)
       when :KEYWORD
@@ -237,42 +241,46 @@ class Parser
 
 
   def E
-    node_production Expression, :E1, :E2, :E3, :E4, :E5, :E6, :E7, :E8, :E9
+    node_production Expression, :E1, :E2, :E3, :E4, :E5, :E6, :E7, :E8, :E9, :E10
   end
 
   def E1
-    T() && term(:MULT) && E()
+    term(:LEFT_PAREN) && E() && term(:RIGHT_PAREN)
   end
 
   def E2
-    T() && term(:DIVD) && E()
-  end
-
-  def E3
-    T() && term(:PLUS) && E()
-  end
-
-  def E4
-    T() && term(:MINUS) && E()
-  end
-
-  def E5
-    T() && term(:MODULUS) && E()
-  end
-
-  def E6
-    T() && term(:POW) && E()
-  end
-
-  def E7
-    term(:IDENTIFIER) && term(:ASSIGNMENT) && E()
-  end
-
-  def E8
     term(:IDENTIFIER) && term(:LEFT_PAREN) && A() && term(:RIGHT_PAREN)
   end
 
+  def E3
+    T() && term(:MULT) && E()
+  end
+
+  def E4
+    T() && term(:DIVD) && E()
+  end
+
+  def E5
+    T() && term(:PLUS) && E()
+  end
+
+  def E6
+    T() && term(:MINUS) && E()
+  end
+
+  def E7
+    T() && term(:MODULUS) && E()
+  end
+
+  def E8
+    T() && term(:POW) && E()
+  end
+
   def E9
+    term(:IDENTIFIER) && term(:ASSIGNMENT) && E()
+  end
+
+  def E10
     T()
   end
 
@@ -280,22 +288,18 @@ class Parser
 
 
   def T
-    node_production Expression, :T1, :T2, :T3, :T4
+    node_production Expression, :T1, :T2, :T3
   end
 
   def T1
-    term(:LEFT_PAREN) && E() && term(:RIGHT_PAREN)
-  end
-
-  def T2
     term(:NUMERICAL)
   end
 
-  def T3
+  def T2
     term(:IDENTIFIER)
   end
 
-  def T4
+  def T3
     term(:STRING)
   end
 end
