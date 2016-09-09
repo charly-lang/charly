@@ -57,7 +57,7 @@ class ASTNode
 end
 
 # Temporary node used while parsing and constructing tree nodes
-# Allows to quickly throw aweay failed productions
+# Allows to quickly throw away failed productions
 class Temporary < ASTNode
 end
 
