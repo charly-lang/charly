@@ -175,11 +175,15 @@ class Parser
 
 
   def B
-    node_production Block, :B1
+    node_production Block, :B1, :B2
   end
 
   def B1
     S() && BPRIME()
+  end
+
+  def B2
+      true
   end
 
   # Fixes a left-recursion problem
@@ -236,11 +240,15 @@ class Parser
 
 
   def AL
-    node_production ArgumentList, :AL1
+    node_production ArgumentList, :AL1, :AL2
   end
 
   def AL1
     term(:IDENTIFIER) && ALPRIME()
+  end
+
+  def AL2
+      true
   end
 
   def ALPRIME
