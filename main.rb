@@ -23,4 +23,7 @@ unless ARGV.include? "--noexec"
   ])
   exitValue = interpreter.execute
   dlog "#{red("Exit:")} #{exitValue}"
+
+  # Return for the program
+  exitValue
 end

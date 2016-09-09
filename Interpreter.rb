@@ -44,7 +44,7 @@ class Interpreter
   def execute
     last_result = NIL
     @programs.each do |program|
-      dlog "Executing program"
+      dlog "Executing program: #{yellow(program.file.filename)}"
       last_result = run_program program
     end
     last_result
@@ -173,6 +173,9 @@ class Interpreter
 
   # Execute a given internal function
   def call_internal_function(name, arguments)
+
+    dlog "Internal function #{red(name)} called with #{cyan(arguments.length)} argument(s)";
+
     case name
     when "print"
       arguments.each do |arg|

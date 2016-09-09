@@ -30,9 +30,15 @@ class Parser
 
     # Output a list of tokens if the respective CLI flag was passed
     if ARGV.include? "--tokens"
-      puts "--- found #{@tokens.length} tokens in #{file.filename} ---"
+      puts "--- found #{@tokens.length} tokens in #{yellow(file.filename)} ---"
       puts @tokens
       puts "------"
+    end
+
+    # If no tokens were found, return
+    if @tokens.length == 0
+      dlog "Aborting, no tokens found in: #{yellow(file.filename)}"
+      return @tree
     end
 
     # Generate the abstract syntax tree, starting with a statement
