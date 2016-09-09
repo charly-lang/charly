@@ -1,4 +1,5 @@
 $debug = ARGV.include? '--log'
+$stdout.sync = true
 
 class Time
   def to_ms
