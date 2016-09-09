@@ -125,10 +125,6 @@ class Parser
       end
     end
 
-    if optional && !match
-      return true
-    end
-
     @next += 1
     match
   end

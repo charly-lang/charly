@@ -8,18 +8,17 @@ if ARGV.length == 0
   raise "No filename passed!"
 end
 
-# Create a new file for the input file
-# parse the program afterwards
-  input_file = VirtualFile.new ARGV[0]
-  input_program = Parser.parse input_file
-begin
-rescue Exception => e
-  dlog red("Parse Failure: #{e.message}")
-  exit 1
-end
+# Prelude
+prelude_file = VirtualFile.new "testing/prelude.txt"
+prelude_program = Parser.parse prelude_file
+
+# Input File
+input_file = VirtualFile.new ARGV[0]
+input_program = Parser.parse input_file
 
 unless ARGV.include? "--noexec"
   interpreter = Interpreter.new([
+    prelude_program,
     input_program
   ])
   exitValue = interpreter.execute
