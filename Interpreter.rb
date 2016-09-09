@@ -179,6 +179,18 @@ class Interpreter
         puts arg
       end
       return NIL
+    when "Number"
+      return arguments[0].to_f
+    when "String"
+      return arguments[0].to_s
+    when "gets"
+      input = $stdin.gets
+      return input
+    when "chomp"
+      return arguments[0].chomp
+    when "sleep"
+      sleep(arguments[0])
+      return NIL
     end
   end
 end
