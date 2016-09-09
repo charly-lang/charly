@@ -151,7 +151,7 @@ class Optimizer
   def flow_group(node)
 
     # Arithmetic expressions involving an operator
-    if node.is(Expression) && node.children.length == 3 && node.is(BinaryExpression)
+    if node.is(Expression) && node.children.length == 3 && !node.is(BinaryExpression)
 
       # Check for the operator
       if node.children[1].is(BinaryOperatorLiteral)

@@ -1,6 +1,35 @@
 require_relative "syntax/AST.rb"
 require_relative "misc/Helper.rb"
 
+# Symbol to value container
+class SymbolContainer
+
+  class SingleSymbol
+    attr_accessor :identifier, :value
+
+    def initialize(identifier, value)
+      @identifier = identifier
+      @value = value
+    end
+  end
+
+  attr_accessor :raw_symbols
+
+  def initialize
+    @raw_symbols = {}
+  end
+
+  # Get a specific symbol
+  def [](k)
+    @raw_symbols[k]
+  end
+
+  # Set a specific symbol
+  def []=(k, v)
+    @raw_symbols[k] = v
+  end
+end
+
 # Runs a given program
 class Interpreter
   attr_reader :symbols
@@ -8,7 +37,7 @@ class Interpreter
   # Initialize the interpreter and insert all required programs
   def initialize(programs)
     @programs = programs
-    @symbols = {}
+    @symbols = SymbolContainer.new
   end
 
   # Run all programs starting with the first one in the array
@@ -72,7 +101,6 @@ class Interpreter
     if node.is(BinaryExpression)
       left = run_expression node.left
       right = run_expression node.right
-
       case node.operator
       when PlusOperator
         return left + right
@@ -89,6 +117,13 @@ class Interpreter
       end
     end
 
+    # FunctionDefinitionExpressions
+    if node.is(FunctionDefinitionExpression)
+      function = node.function
+      @symbols[function.identifier.value] = function
+      return NIL
+    end
+
     # Call Expressions
     if node.is(CallExpression)
 
@@ -98,7 +133,12 @@ class Interpreter
         arguments << run_expression(argument)
       end
 
-      call_internal_function node.identifier.value, arguments
+      # Check if the function is defined inside the symbols
+      if @symbols[node.identifier.value] && @symbols[node.identifier.value].is(FunctionLiteral)
+        return call_function(@symbols[node.identifier.value], arguments)
+      else
+        return call_internal_function(node.identifier.value, arguments)
+      end
     end
 
     # Nested expressions inside a statement
@@ -118,6 +158,11 @@ class Interpreter
     if node.is(IdentifierLiteral)
       return @symbols[node.value]
     end
+  end
+
+  # Execute a predefined function and return the last expression inside
+  def call_function(function, arguments)
+    run_block function.block
   end
 
   # Execute a given internal function
