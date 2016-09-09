@@ -55,8 +55,6 @@ class Parser
     @tree
   end
 
-  # Grammar Implementatino
-
   # Check if the next token is equal to *token*
   # Changes the @next pointer to point to the next token
   def term(token, string = "")
@@ -125,6 +123,10 @@ class Parser
       when :STRING
         @node << new(StringLiteral)
       end
+    end
+
+    if optional && !match
+      return true
     end
 
     @next += 1
