@@ -25,10 +25,6 @@ class ASTNode
     ""
   end
 
-  def children_string
-    @children
-  end
-
   def to_s
     string = "#: #{self.class.name} - #{@scope_id}"
 
@@ -38,11 +34,11 @@ class ASTNode
 
     string += "\n"
 
-    children_string.each do |child|
+    children.each do |child|
       lines = child.to_s.each_line.entries
       lines.each {|line|
         if line[0] == "#"
-          if children_string.length == 1 && child.children.length < 2
+          if children.length == 1 && child.children.length < 2
             string += line.indent(1, "└╴");
           else
             string += line.indent(1, "├╴")
@@ -94,10 +90,8 @@ class BinaryExpression < Expression
     @operator = operator
     @left = left
     @right = right
-  end
 
-  def children_string
-    [@left, @operator, @right]
+    @children = [@left, @operator, @right]
   end
 end
 
@@ -116,10 +110,7 @@ class VariableDeclaration < Statement
   def initialize(identifier, parent)
     super(parent)
     @identifier = identifier
-  end
-
-  def children_string
-    [@identifier]
+    @children = [@identifier]
   end
 end
 
@@ -139,10 +130,7 @@ class VariableInitialisation < Statement
     super(parent)
     @identifier = identifier
     @expression = expression
-  end
-
-  def children_string
-    [@identifier, @expression]
+    @children = [@identifier, @expression]
   end
 end
 
@@ -153,10 +141,7 @@ class VariableAssignment < Expression
     super(parent)
     @identifier = identifier
     @expression = expression
-  end
-
-  def children_string
-    [@identifier, @expression]
+    @children = [@identifier, @expression]
   end
 end
 
@@ -168,10 +153,7 @@ class CallExpression < Expression
     super(parent)
     @identifier = identifier
     @argumentlist = argumentlist
-  end
-
-  def children_string
-    [@identifier, @argumentlist]
+    @children = [@identifier, @argumentlist]
   end
 end
 
@@ -182,10 +164,7 @@ class FunctionDefinitionExpression < Expression
   def initialize(function, parent)
     super(parent)
     @function = function
-  end
-
-  def children_string
-    [@function]
+    @children = [@function]
   end
 end
 
@@ -198,10 +177,7 @@ class FunctionLiteral < Expression
         @identifier = identifier
         @argumentlist = argumentlist
         @block = block
-    end
-
-    def children_string
-        [@identifier, @argumentlist, @block]
+        @children = [@identifier, @argumentlist, @block]
     end
 end
 

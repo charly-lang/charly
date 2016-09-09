@@ -151,7 +151,7 @@ class Optimizer
   def flow_group(node)
 
     # Arithmetic expressions involving an operator
-    if node.is(Expression) && node.children.length == 3
+    if node.is(Expression) && node.children.length == 3 && node.is(BinaryExpression)
 
       # Check for the operator
       if node.children[1].is(BinaryOperatorLiteral)
@@ -241,62 +241,61 @@ class Optimizer
 
     # Function literals
     if node.is(Expression) && node.children.length == 8
-        child1 = node.children[0]
-        child2 = node.children[1]
-        child3 = node.children[2]
-        child4 = node.children[3]
-        child5 = node.children[4]
-        child6 = node.children[5]
-        child7 = node.children[6]
-        child8 = node.children[7]
+      child1 = node.children[0]
+      child2 = node.children[1]
+      child3 = node.children[2]
+      child4 = node.children[3]
+      child5 = node.children[4]
+      child6 = node.children[5]
+      child7 = node.children[6]
+      child8 = node.children[7]
 
-        # Check for the func keyword and identifier
-        if child1.value == "func" && child2.is(IdentifierLiteral)
+      # Check for the func keyword and identifier
+      if child1.value == "func" && child2.is(IdentifierLiteral)
 
-            # Check for braces and parens
-            if child3.is(LeftParenLiteral) && child5.is(RightParenLiteral) &&
-                child6.is(LeftCurlyLiteral) && child8.is(RightCurlyLiteral)
+        # Check for braces and parens
+        if child3.is(LeftParenLiteral) && child5.is(RightParenLiteral) &&
+          child6.is(LeftCurlyLiteral) && child8.is(RightCurlyLiteral)
 
-                # Check for the block and the argumentlist
-                if child4.is(ArgumentList) && child7.is(Block)
+          # Check for the block and the argumentlist
+          if child4.is(ArgumentList) && child7.is(Block)
 
-                    @finished = false
-                    return FunctionLiteral.new(child2, child4, child7, node.parent)
-                end
-            end
+            @finished = false
+            return FunctionLiteral.new(child2, child4, child7, node.parent)
+          end
         end
+      end
     end
 
     # Function definitions
     if node.is(Statement) && node.children.length == 1
-        if node.children[0].is(FunctionLiteral)
+      if node.children[0].is(FunctionLiteral)
 
-            @finished = false
-            return FunctionDefinitionExpression.new(node.children[0], node.parent)
-        end
+        @finished = false
+        return FunctionDefinitionExpression.new(node.children[0], node.parent)
+      end
     end
 
     # Assign each block a scope_id
     if node.is(Block) && node.scope_id == NIL
-        node.scope_id = rand(0..1_000_000_000_000)
-
-        @finished = false
-        return node
+      node.scope_id = rand(0..1_000_000_000_000)
+      @finished = false
+      return node
     end
 
     # Assign scope_id's to all nodes
     if !node.is(Block) && node.scope_id == NIL
 
-        # Search the next parent block
-        temp_parent = node.parent
-        while !temp_parent.is(Block) && temp_parent.parent != NIL
-            temp_parent = temp_parent.parent
-        end
+      # Search the next parent block
+      temp_parent = node.parent
+      while !temp_parent.is(Block) && temp_parent.parent != NIL
+        temp_parent = temp_parent.parent
+      end
 
-        # Assign the blocks scope_id to the current node
-        @finished = false
-        node.scope_id = temp_parent.scope_id
-        return node
+      # Assign the blocks scope_id to the current node
+      @finished = false
+      node.scope_id = temp_parent.scope_id
+      return node
     end
 
     node
