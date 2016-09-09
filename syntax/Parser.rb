@@ -173,7 +173,6 @@ class Parser
 
 
 
-
   def B
     node_production Block, :B1, :B2
   end
@@ -199,7 +198,6 @@ class Parser
 
 
 
-
   def S
     node_production Statement, :S1, :S2, :S3
   end
@@ -218,14 +216,17 @@ class Parser
 
 
 
-
-  # Argument list
+  # Expression list
   def EL
-    node_production ExpressionList, :EL1
+    node_production ExpressionList, :EL1, :EL2
   end
 
   def EL1
     E() && ELPRIME()
+  end
+
+  def EL2
+    true
   end
 
   def ELPRIME
@@ -239,6 +240,7 @@ class Parser
 
 
 
+  # Argument List
   def AL
     node_production ArgumentList, :AL1, :AL2
   end
@@ -266,7 +268,7 @@ class Parser
 
 
   def E
-    node_production Expression, :E1, :E2, :E3, :E4, :E5, :E6, :E7, :E8, :E9, :E10, :E11
+    node_production Expression, :E1, :E2, :E3, :E4, :E5, :E6, :E7, :E8, :E9, :E10, :E11, :E12
   end
 
   def E1
@@ -278,40 +280,45 @@ class Parser
   end
 
   def E3
-    term(:KEYWORD, "func") && term(:IDENTIFIER) && term(:LEFT_PAREN) && AL() && term(:RIGHT_PAREN) && term(:LEFT_CURLY) && B() && term(:RIGHT_CURLY)
+    E4() && term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
   end
 
   def E4
-    T() && term(:MULT) && E()
+    term(:KEYWORD, "func") && term(:IDENTIFIER) && term(:LEFT_PAREN) && AL() && term(:RIGHT_PAREN) && term(:LEFT_CURLY) && B() && term(:RIGHT_CURLY)
   end
 
   def E5
-    T() && term(:DIVD) && E()
+    T() && term(:MULT) && E()
   end
 
   def E6
-    T() && term(:PLUS) && E()
+    T() && term(:DIVD) && E()
   end
 
   def E7
-    T() && term(:MINUS) && E()
+    T() && term(:PLUS) && E()
   end
 
   def E8
-    T() && term(:MODULUS) && E()
+    T() && term(:MINUS) && E()
   end
 
   def E9
-    T() && term(:POW) && E()
+    T() && term(:MODULUS) && E()
   end
 
   def E10
-    term(:IDENTIFIER) && term(:ASSIGNMENT) && E()
+    T() && term(:POW) && E()
   end
 
   def E11
+    term(:IDENTIFIER) && term(:ASSIGNMENT) && E()
+  end
+
+  def E12
     T()
   end
+
 
 
   def T
