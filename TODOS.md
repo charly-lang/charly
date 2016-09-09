@@ -12,7 +12,18 @@
   - stacks contain a pointer to their parent stack
   - if a stack doesn't contain a value that is requested, it's checked in the parent
   - function arguments are values that get saved inside a function body block stack
-  - stacks are created, destroyed, handled inside run_block 
+  - stacks are created, destroyed, handled inside run_block
+
+## Boolean types
+  - yes / no
+  - add comparison operators
+    - >
+    - <
+    - <=
+    - >=
+    - == (value is equal, strict)
+    - =T (same type)
+    - ==T (same type and same value, strict)
 
 ## If statements
   - blocks
