@@ -177,18 +177,32 @@ end
 
 # A single function definition
 class FunctionDefinitionExpression < Expression
-  attr_reader :identifier, :argumentlist, :block
+  attr_reader :function
 
-  def initialize(identifier, argumentlist, block, parent)
+  def initialize(function, parent)
     super(parent)
-    @identifier = identifier
-    @argumentlist = argumentlist
-    @block = block
+    @function = function
   end
 
   def children_string
-    [@identifier, @argumentlist, @block]
+    [@function]
   end
+end
+
+# A single function literal
+class FunctionLiteral < Expression
+    attr_reader :identifier, :argumentlist, :block
+
+    def initialize(identifier, argumentlist, block, parent)
+        super(parent)
+        @identifier = identifier
+        @argumentlist = argumentlist
+        @block = block
+    end
+
+    def children_string
+        [@identifier, @argumentlist, @block]
+    end
 end
 
 # A list of expressions seperated by commas

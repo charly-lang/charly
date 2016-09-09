@@ -234,6 +234,43 @@ class Optimizer
       end
     end
 
+    # Function literals
+    if node.is(Expression) && node.children.length == 8
+        child1 = node.children[0]
+        child2 = node.children[1]
+        child3 = node.children[2]
+        child4 = node.children[3]
+        child5 = node.children[4]
+        child6 = node.children[5]
+        child7 = node.children[6]
+        child8 = node.children[7]
+
+        # Check for the func keyword and identifier
+        if child1.value == "func" && child2.is(IdentifierLiteral)
+
+            # Check for braces and parens
+            if child3.is(LeftParenLiteral) && child5.is(RightParenLiteral) &&
+                child6.is(LeftCurlyLiteral) && child8.is(RightCurlyLiteral)
+
+                # Check for the block and the argumentlist
+                if child4.is(ArgumentList) && child7.is(Block)
+
+                    @finished = false
+                    return FunctionLiteral.new(child2, child4, child7, node.parent)
+                end
+            end
+        end
+    end
+
+    # Function definitions
+    if node.is(Statement) && node.children.length == 1
+        if node.children[0].is(FunctionLiteral)
+
+            @finished = false
+            return FunctionDefinitionExpression.new(node.children[0], node.parent)
+        end
+    end
+
     node
   end
 end
