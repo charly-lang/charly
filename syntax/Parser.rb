@@ -187,8 +187,6 @@ class Parser
       true
   end
 
-  # Fixes a left-recursion problem
-  # with multiple statements written after each other
   def BPRIME
     check_each([:BP1, :BP2])
   end
