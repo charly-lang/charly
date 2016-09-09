@@ -154,6 +154,12 @@ class Interpreter
       return node.value
     end
 
+    # Literals treated as expressions
+    # NumericLiteral, IdentifierLiteral, StringLiteral
+    if node.is(FunctionLiteral)
+      return node
+    end
+
     # Identifiers
     if node.is(IdentifierLiteral)
       return @symbols[node.value]

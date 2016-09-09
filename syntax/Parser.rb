@@ -280,43 +280,52 @@ class Parser
   end
 
   def E3
-    E4() && term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
+    F() && term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
   end
 
   def E4
-    term(:KEYWORD, "func") && term(:IDENTIFIER) && term(:LEFT_PAREN) && AL() && term(:RIGHT_PAREN) && term(:LEFT_CURLY) && B() && term(:RIGHT_CURLY)
-  end
-
-  def E5
     T() && term(:MULT) && E()
   end
 
-  def E6
+  def E5
     T() && term(:DIVD) && E()
   end
 
-  def E7
+  def E6
     T() && term(:PLUS) && E()
   end
 
-  def E8
+  def E7
     T() && term(:MINUS) && E()
   end
 
-  def E9
+  def E8
     T() && term(:MODULUS) && E()
   end
 
-  def E10
+  def E9
     T() && term(:POW) && E()
   end
 
-  def E11
+  def E10
     term(:IDENTIFIER) && term(:ASSIGNMENT) && E()
   end
 
-  def E12
+  def E11
     T()
+  end
+
+  def E12
+    F()
+  end
+
+
+  def F
+    node_production Expression, :F1
+  end
+
+  def F1
+    term(:KEYWORD, "func") && term(:IDENTIFIER) && term(:LEFT_PAREN) && AL() && term(:RIGHT_PAREN) && term(:LEFT_CURLY) && B() && term(:RIGHT_CURLY)
   end
 
 
