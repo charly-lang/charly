@@ -8,6 +8,12 @@
     - if return is never called, the last expression
         of the block will be used as the return value
 
+## Implement Stacks, each block gets his own stack
+  - stacks contain a pointer to their parent stack
+  - if a stack doesn't contain a value that is requested, it's checked in the parent
+  - function arguments are values that get saved inside a function body block stack
+  - stacks are created, destroyed, handled inside run_block 
+
 ## If statements
   - blocks
   - else if optional
