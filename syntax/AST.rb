@@ -1,5 +1,5 @@
 class ASTNode
-  attr_accessor :children, :parent
+  attr_accessor :children, :parent, :scope_id
 
   def initialize(parent)
     @children = []
@@ -30,7 +30,7 @@ class ASTNode
   end
 
   def to_s
-    string = "#: #{self.class.name}"
+    string = "#: #{self.class.name} - #{@scope_id}"
 
     if meta.length > 0
       string += " - #{meta}"

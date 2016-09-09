@@ -97,6 +97,11 @@ class Optimizer
   # Optimize the structure of a node
   def flow_structure(node)
 
+    # Correct the parent pointer of all children
+    node.children.each do |child|
+        child.parent = node
+    end
+
     # NumericLiterals value property should be an actual float value
     if node.is(NumericLiteral) && node.value.is_a?(String)
       node.value = node.value.to_f
@@ -269,6 +274,29 @@ class Optimizer
             @finished = false
             return FunctionDefinitionExpression.new(node.children[0], node.parent)
         end
+    end
+
+    # Assign each block a scope_id
+    if node.is(Block) && node.scope_id == NIL
+        node.scope_id = rand(0..1_000_000_000_000)
+
+        @finished = false
+        return node
+    end
+
+    # Assign scope_id's to all nodes
+    if !node.is(Block) && node.scope_id == NIL
+
+        # Search the next parent block
+        temp_parent = node.parent
+        while !temp_parent.is(Block) && temp_parent.parent != NIL
+            temp_parent = temp_parent.parent
+        end
+
+        # Assign the blocks scope_id to the current node
+        @finished = false
+        node.scope_id = temp_parent.scope_id
+        return node
     end
 
     node
