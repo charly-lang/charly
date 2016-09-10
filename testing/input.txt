@@ -1,0 +1,23 @@
+func increment(n) {
+    n + 1;
+};
+
+func greet(name) {
+    "Hello " + name;
+};
+
+func combine(left, right, delimiter) {
+    left + delimiter + right;
+};
+
+print(increment(1)); # 2
+print(greet("Leonard"));
+print(combine("left", "right", "---"));
+
+func test_callback(value, callback) {
+    callback(value);
+};
+
+test_callback("test", func callback(value) {
+    print(value);
+});
