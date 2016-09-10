@@ -128,6 +128,8 @@ class Parser
         @node << new(CommaLiteral)
       when :STRING
         @node << new(StringLiteral)
+      when :BOOLEAN
+        @node << new(BooleanLiteral)
       end
     end
 
@@ -333,7 +335,7 @@ class Parser
 
 
   def T
-    node_production Expression, :T1, :T2, :T3, :T4
+    node_production Expression, :T1, :T2, :T3, :T4, :T5
   end
 
   def T1
@@ -350,5 +352,9 @@ class Parser
 
   def T4
     term(:STRING)
+  end
+
+  def T5
+    term(:BOOLEAN)
   end
 end

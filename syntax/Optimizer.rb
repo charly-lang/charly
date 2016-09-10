@@ -109,6 +109,13 @@ class Optimizer
       return node
     end
 
+    # BooleanLiterals value property should be an actual boolean
+    if node.is(BooleanLiteral) && node.value.is_a?(String)
+      node.value = node.value == "yes"
+      @finished = false
+      return node
+    end
+
     # Expressions that only contain 1 other expression
     # should be replaced by that expression
     if node.is(Expression) && node.children.length == 1
@@ -132,7 +139,7 @@ class Optimizer
     # that can be treated as expressions
     # should be replaced by that nodes
     if node.is(Expression) && node.children.length == 1
-      if node.children[0].is NumericLiteral, StringLiteral, IdentifierLiteral
+      if node.children[0].is LiteralValue
         @finished = false
         return node.children[0]
       end
@@ -161,8 +168,8 @@ class Optimizer
         right = node.children[2]
         operator = node.children[1]
 
-        if left.is Expression, NumericLiteral, StringLiteral, IdentifierLiteral
-          if right.is Expression, NumericLiteral, StringLiteral, IdentifierLiteral
+        if left.is Expression, LiteralValue
+          if right.is Expression, LiteralValue
 
             @finished = false
             return BinaryExpression.new(operator, left, right, node.parent)
@@ -183,7 +190,7 @@ class Optimizer
         operator = node.children[1]
 
         if identifier.is IdentifierLiteral
-          if expression.is Expression, NumericLiteral, StringLiteral, IdentifierLiteral
+          if expression.is Expression, LiteralValue
 
             @finished = false
             return VariableAssignment.new(identifier, expression, node.parent)
@@ -214,7 +221,7 @@ class Optimizer
 
       if child1.is(KeywordLiteral) && child1.value == "let"
         if child2.is(IdentifierLiteral) && child3.is(AssignmentOperator)
-          if child4.is(Expression, NumericLiteral, StringLiteral, IdentifierLiteral)
+          if child4.is(Expression, LiteralValue)
 
             @finished = false
             return VariableInitialisation.new(child2, child4, node.parent)

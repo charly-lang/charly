@@ -77,6 +77,18 @@ end
 class Statement < ASTNode
 end
 
+# A single if statement
+class IfStatement < Statement
+  attr_accessor :test, :consequent, :alternate
+
+  def initialize(test, consequent, alternate, parent)
+    super(parent)
+    @test = test
+    @consequent = consequent
+    @alternate = alternate
+  end
+end
+
 # A single expression, which can be nested indefinitely inside other
 # expressions
 class Expression < ASTNode
@@ -215,6 +227,15 @@ class Terminal < ASTNode
   end
 end
 
+class LiteralValue < Terminal; end;
+
+# A single numeric literal
+class NumericLiteral < LiteralValue; end
+class IdentifierLiteral < LiteralValue; end
+class StringLiteral < LiteralValue; end
+class KeywordLiteral < LiteralValue; end
+class BooleanLiteral < LiteralValue; end
+
 # Parantheses
 class LeftParenLiteral < Terminal; end
 class RightParenLiteral < Terminal; end
@@ -224,36 +245,6 @@ class RightCurlyLiteral < Terminal; end
 # Semicolon and comma
 class SemicolonLiteral < Terminal; end
 class CommaLiteral < Terminal; end
-
-# A single numeric literal
-#
-# 2
-# 2.5
-# -2
-# -2.5
-class NumericLiteral < Terminal
-end
-
-# A single identifier
-#
-# a
-# abc
-# myvar
-class IdentifierLiteral < Terminal
-end
-
-# A single string
-#
-# "test"
-# "wassuuup"
-# ""
-# "my name is ""leonard"" schuetz"
-class StringLiteral < Terminal
-end
-
-# A single keyword
-class KeywordLiteral < Terminal
-end
 
 # Arithmetic operators
 class BinaryOperatorLiteral < Terminal; end

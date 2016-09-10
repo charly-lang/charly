@@ -219,6 +219,11 @@ class Interpreter
     if node.is(IdentifierLiteral)
       return @stack[node.value]
     end
+
+    # Booleans
+    if node.is(BooleanLiteral)
+      return node.value
+    end
   end
 
   # Execute a predefined function and return the last expression inside
