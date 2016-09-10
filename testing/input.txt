@@ -1,21 +1,3 @@
-if (yes) {
-    print("Yes is working");
-};
-
-if (no) {
-    print("This shouldn't execute");
-};
-
-if (no) {
-    print("This shouldn't run");
-} else {
-    print("This should run");
-};
-
-if (no) {
-    print("This shouldn't run");
-} else if (true) {
-    print("This should run");
-} else {
-    print("This shouldn't run");
-};
+if (yes) {};
+if (yes) {} else {};
+if (yes) {} else if (yes) {};

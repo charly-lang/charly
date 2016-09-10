@@ -76,8 +76,10 @@ end
 
 # A statement is a language-specific construct
 # For example, the IF-node would subclass Statement
-class Statement < ASTNode
-end
+class Statement < ASTNode; end
+
+# Pre-grouping IfStatement (Needed until I write a smarter Parser)
+class IfStatementPrimitive < Statement; end
 
 # A single if statement
 class IfStatement < Statement

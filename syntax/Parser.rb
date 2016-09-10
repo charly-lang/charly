@@ -29,7 +29,7 @@ class Parser
     @next = 0
 
     # Output a list of tokens if the respective CLI flag was passed
-    if ARGV.include? "--tokens"
+    if ARGV.include?("--tokens") && file.filename != "prelude.txt"
       puts "--- found #{@tokens.length} tokens in #{yellow(file.filename)} ---"
       puts @tokens
       puts "------"
@@ -53,7 +53,7 @@ class Parser
     end
 
     # Output the abstract syntax tree if the CLI flag was passed
-    if ARGV.include? "--ast"
+    if ARGV.include?("--ast") && file.filename != "prelude.txt"
       puts "--- #{file.filename} : Abstract Syntax Tree ---"
       puts @tree
       puts "------"
@@ -204,7 +204,7 @@ class Parser
 
 
   def S
-    node_production Statement, :S1, :S2, :S3
+    node_production Statement, :S1, :S2, :S3, :S4
   end
 
   def S1
@@ -217,6 +217,34 @@ class Parser
 
   def S3
     E() && term(:TERMINAL)
+  end
+
+  def S4
+    I() && term(:TERMINAL)
+  end
+
+
+
+  def I
+    node_production IfStatementPrimitive, :I1
+  end
+
+  def I1
+    term(:KEYWORD, "if") && term(:LEFT_PAREN) && E() && term(:RIGHT_PAREN) && term(:LEFT_CURLY) && B() && term(:RIGHT_CURLY) && IP()
+  end
+
+  def IP
+    check_each([:IP1, :IP2, :IP3])
+  end
+
+  def IP1
+    term(:KEYWORD, "else") && term(:LEFT_CURLY) && B() && term(:RIGHT_CURLY)
+  end
+  def IP2
+    term(:KEYWORD, "else") && I()
+  end
+  def IP3
+    true
   end
 
 
