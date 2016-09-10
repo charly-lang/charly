@@ -191,6 +191,8 @@ class Interpreter
     when "sleep"
       sleep(arguments[0])
       return NIL
+    when "variable"
+      return @symbols[arguments[0]]
     end
   end
 end
