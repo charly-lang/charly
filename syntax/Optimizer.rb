@@ -64,6 +64,11 @@ class Optimizer
 
     # Optimize all children and remove nil values afterwards
     node.children.collect! do |child|
+
+      if child == NIL
+        next
+      end
+
       case flow
       when :structure
         optimize :structure, child, after
@@ -274,6 +279,39 @@ class Optimizer
       end
     end
 
+    # Statements only containing IfStatementPrimitives or IfStatement, should be replaced by that child
+    if node.is(Statement) && node.children.length == 1
+      if node.children[0].is(IfStatementPrimitive, IfStatement)
+        @finished = false
+        return node.children[0]
+      end
+    end
+
+    # Group IfStatementPrimitives with the signature (if)
+    if node.is(IfStatementPrimitive) && node.children.length == 7
+      if node.children[2].is(Expression, LiteralValue) && node.children[5].is(Block)
+        @finished = false
+        return IfStatement.new(node.children[2], node.children[5], NIL, node.parent)
+      end
+    end
+
+    # Group IfStatementPrimitives with the signature (if else)
+    if node.is(IfStatementPrimitive) && node.children.length == 11
+      if node.children[2].is(Expression, LiteralValue) && node.children[5].is(Block) && node.children[9].is(Block)
+        @finished = false
+        return IfStatement.new(node.children[2], node.children[5], node.children[9], node.parent)
+      end
+    end
+
+    # Group IfStatementPrimitives with the signature (if else)
+    if node.is(IfStatementPrimitive) && node.children.length == 9
+      if node.children[2].is(Expression, LiteralValue) && node.children[5].is(Block) &&
+          node.children[8].is(IfStatement)
+        @finished = false
+        return IfStatement.new(node.children[2], node.children[5], node.children[8], node.parent)
+      end
+    end
+
     # Function definitions
     if node.is(Statement) && node.children.length == 1
       if node.children[0].is(FunctionLiteral)
@@ -281,28 +319,6 @@ class Optimizer
         @finished = false
         return FunctionDefinitionExpression.new(node.children[0], node.parent)
       end
-    end
-
-    # Assign each block a scope_id
-    if node.is(Block) && node.scope_id == NIL
-      node.scope_id = rand(0..1_000_000_000_000)
-      @finished = false
-      return node
-    end
-
-    # Assign scope_id's to all nodes
-    if !node.is(Block) && node.scope_id == NIL
-
-      # Search the next parent block
-      temp_parent = node.parent
-      while !temp_parent.is(Block) && temp_parent.parent != NIL
-        temp_parent = temp_parent.parent
-      end
-
-      # Assign the blocks scope_id to the current node
-      @finished = false
-      node.scope_id = temp_parent.scope_id
-      return node
     end
 
     node
