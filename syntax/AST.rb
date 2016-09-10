@@ -65,10 +65,12 @@ end
 # A single program with no parent nodes
 class Program < Block
   attr_reader :file
+  attr_accessor :should_execute
 
   def initialize(file)
     super(NIL)
     @file = file
+    @should_execute = true
   end
 end
 

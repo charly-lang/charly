@@ -55,6 +55,8 @@ class Stack
     else
       unless @parent == NIL
         @parent[k]
+      else
+        raise "Variable '#{k}' not defined!"
       end
     end
   end
@@ -79,6 +81,12 @@ class Interpreter
   def execute
     last_result = NIL
     @programs.each do |program|
+
+      # Skip programs that are marked as not executable
+      if !program.should_execute
+        return
+      end
+
       dlog "Executing program: #{yellow(program.file.filename)}"
       last_result = run_program program
     end
@@ -99,7 +107,7 @@ class Interpreter
   end
 
   # Runs all expressions inside a given block
-  def run_block(block, force_stack = NIL)
+  def run_block(block, force_stack = NIL, arguments = NIL)
 
     # Backup and update the current stack
     old_stack = @stack
@@ -115,6 +123,13 @@ class Interpreter
     # assign the parent pointer
     if block.parent_stack
       @stack.parent = block.parent_stack
+    end
+
+    # Inject the arguments into the current stack
+    if arguments
+      arguments.each do |key, value|
+        @stack[key, true] = value
+      end
     end
 
     # A block contains a list of expressions
@@ -188,11 +203,32 @@ class Interpreter
         arguments << run_expression(argument)
       end
 
+      # Check for an internal function call
+      if node.identifier.value == "call_internal"
+        return call_internal_function(arguments[0], arguments[1..-1])
+      end
+
       # Check if the function is defined inside the symbols
       if @stack[node.identifier.value] && @stack[node.identifier.value].is(FunctionLiteral)
-        return call_function(@stack[node.identifier.value], arguments)
-      else
-        return call_internal_function(node.identifier.value, arguments)
+
+        # Get the list of arguments the function takes
+        function = @stack[node.identifier.value]
+        argument_ids = function.argumentlist.children.map do |node|
+          node.value
+        end
+
+        # Check if the correct amount of arguments was passed
+        if arguments.length != argument_ids.length
+          raise "Expected #{argument_ids.length} arguments, got #{arguments.length} instead!"
+        end
+
+        # Create a hash for the arguments
+        args = {}
+        argument_ids.each_with_index do |id, index|
+          args[id] = arguments[index]
+        end
+
+        return call_function(@stack[node.identifier.value], args)
       end
     end
 
@@ -228,7 +264,7 @@ class Interpreter
 
   # Execute a predefined function and return the last expression inside
   def call_function(function, arguments)
-    run_block function.block
+    run_block function.block, NIL, arguments
   end
 
   # Execute a given internal function

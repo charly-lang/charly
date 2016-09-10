@@ -38,6 +38,7 @@ class Parser
     # If no tokens were found, return
     if @tokens.length == 0
       dlog "Aborting, no tokens found in: #{yellow(file.filename)}"
+      @tree.should_execute = false
       return @tree
     end
 
