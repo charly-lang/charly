@@ -19,7 +19,7 @@ class Lexer
       [:POW,          /\A\*\*\Z/],
       [:TERMINAL,     /\A;\Z/],
       [:COMMA,        /\A,\Z/],
-      [:IDENTIFIER,   /\A\w+\Z/],
+      [:IDENTIFIER,   /\A(\w|_)+\Z/],
       [:LEFT_PAREN,   /\A\(\Z/],
       [:RIGHT_PAREN,  /\A\)\Z/],
       [:LEFT_CURLY,   /\A\{\Z/],
