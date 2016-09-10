@@ -173,9 +173,6 @@ class Interpreter
 
   # Execute a given internal function
   def call_internal_function(name, arguments)
-
-    dlog "Internal function #{red(name)} called with #{cyan(arguments.length)} argument(s)";
-
     case name
     when "print"
       arguments.each do |arg|
