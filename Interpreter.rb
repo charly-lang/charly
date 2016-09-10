@@ -2,31 +2,61 @@ require_relative "syntax/AST.rb"
 require_relative "misc/Helper.rb"
 
 # Symbol to value container
-class SymbolContainer
+class Stack
+  attr_accessor :parent, :values
 
-  class SingleSymbol
-    attr_accessor :identifier, :value
+  def initialize(parent)
+    @parent = parent
+    @values = {}
+  end
 
-    def initialize(identifier, value)
-      @identifier = identifier
-      @value = value
+  def clear
+    @values = {}
+  end
+
+  def depth(n = 0)
+    if @parent
+      return @parent.depth(n + 1)
+    end
+    return n
+  end
+
+  # Returns the stack for a given identifier
+  def stack_for_key(k)
+    if @values.key? k
+      self
+    else
+      if @parent != NIL
+        @parent.stack_for_key k
+      else
+        NIL
+      end
     end
   end
 
-  attr_accessor :raw_symbols
+  def []=(k, d, v)
+    stack = stack_for_key k
 
-  def initialize
-    @raw_symbols = {}
+    if d
+      @values[k] = v
+      return
+    end
+
+    unless stack == NIL
+      stack.values[k] = v
+    else
+      raise "Variable '#{k}' not defined!"
+    end
   end
 
-  # Get a specific symbol
   def [](k)
-    @raw_symbols[k]
-  end
-
-  # Set a specific symbol
-  def []=(k, v)
-    @raw_symbols[k] = v
+    if @values.key? k
+      @values[k]
+    else
+      unless @parent == NIL
+        @parent[k]
+      end
+    end
   end
 end
 
@@ -37,7 +67,12 @@ class Interpreter
   # Initialize the interpreter and insert all required programs
   def initialize(programs)
     @programs = programs
-    @symbols = SymbolContainer.new
+
+    # Bootstrap all stacks
+    @all_stacks = []
+    main = Stack.new NIL
+    @all_stacks << main
+    @stack = main
   end
 
   # Run all programs starting with the first one in the array
@@ -57,14 +92,30 @@ class Interpreter
     if program.children.length == 1
 
       # The first node in the tree is always a block
-      return run_block program.children[0]
+      return run_block program.children[0], @stack
     end
 
     NIL
   end
 
   # Runs all expressions inside a given block
-  def run_block(block)
+  def run_block(block, force_stack = NIL)
+
+    # Backup and update the current stack
+    old_stack = @stack
+
+    # If a local stack is being forced upon the block
+    if force_stack
+      @stack = force_stack
+    else
+      @stack = Stack.new old_stack
+    end
+
+    # If the block has a predefined parent (functions)
+    # assign the parent pointer
+    if block.parent_stack
+      @stack.parent = block.parent_stack
+    end
 
     # A block contains a list of expressions
     # execute all of them
@@ -72,7 +123,10 @@ class Interpreter
     block.children.each do |expression|
       last_result = run_expression expression
     end
-    last_result
+
+    # Revert to the original stack
+    @stack = old_stack
+    return last_result
   end
 
   # Executes a single expression and returns it's value
@@ -80,20 +134,20 @@ class Interpreter
 
     # VariableInitialisation
     if node.is(VariableInitialisation)
-      @symbols[node.identifier.value] = run_expression node.expression
+      @stack[node.identifier.value, true] = run_expression node.expression
       return NIL
     end
 
     # VariableDeclaration
     if node.is(VariableDeclaration)
-      @symbols[node.identifier.value] = NIL
+      @stack[node.identifier.value, true] = NIL
       return NIL
     end
 
     # VariableAssignment
     if node.is(VariableAssignment)
       value = run_expression node.expression
-      @symbols[node.identifier.value] = value
+      @stack[node.identifier.value, false] = value
       return value
     end
 
@@ -120,7 +174,8 @@ class Interpreter
     # FunctionDefinitionExpressions
     if node.is(FunctionDefinitionExpression)
       function = node.function
-      @symbols[function.identifier.value] = function
+      function.block.parent_stack = @stack
+      @stack[function.identifier.value, true] = function
       return NIL
     end
 
@@ -134,8 +189,8 @@ class Interpreter
       end
 
       # Check if the function is defined inside the symbols
-      if @symbols[node.identifier.value] && @symbols[node.identifier.value].is(FunctionLiteral)
-        return call_function(@symbols[node.identifier.value], arguments)
+      if @stack[node.identifier.value] && @stack[node.identifier.value].is(FunctionLiteral)
+        return call_function(@stack[node.identifier.value], arguments)
       else
         return call_internal_function(node.identifier.value, arguments)
       end
@@ -162,7 +217,7 @@ class Interpreter
 
     # Identifiers
     if node.is(IdentifierLiteral)
-      return @symbols[node.value]
+      return @stack[node.value]
     end
   end
 
@@ -192,7 +247,7 @@ class Interpreter
       sleep(arguments[0])
       return NIL
     when "variable"
-      return @symbols[arguments[0]]
+      return @stack[arguments[0]]
     end
   end
 end

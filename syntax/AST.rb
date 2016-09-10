@@ -59,6 +59,7 @@ end
 
 # A block containing expressions and statements
 class Block < ASTNode
+  attr_accessor :parent_stack
 end
 
 # A single program with no parent nodes
