@@ -26,6 +26,24 @@
   - Even though treated as expression, they shouldn't be allowed where expressions would be allowed (that's just weird)
   - Treat as statements
 
+## While Loops
+  - Treat as statements
+  - Node contains :test, :block
+  - WhileStatement
+
+## For loops (Will be called repeat)
+  - will be implemented inside the prelude as a callback based function
+  - callback receives argument :index
+  - Code-Proposal:
+  ```
+  func repeat(amount, callback) {
+      let i = 0
+      while (i < amount) {
+        callback(i);
+        i = i + 1;
+      };
+  };
+  ```
+
 ## Fix weird lexing errors
   - "2-2" -> :NUM :NUM
-  - comments???
