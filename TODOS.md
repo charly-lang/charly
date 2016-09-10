@@ -21,7 +21,10 @@
   - else if OR elsif
   - parens around expressions are obligatory
   - if statements should be treated as expressions,
-      with the last expression active inside each of their blocks being their return value (just like in ruby)
+      with the last expression active inside each of their blocks,
+      being their return value (just like in ruby)
+  - Even though treated as expression, they shouldn't be allowed where expressions would be allowed (that's just weird)
+  - Treat as statements
 
 ## Fix weird lexing errors
   - "2-2" -> :NUM :NUM
