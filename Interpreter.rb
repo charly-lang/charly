@@ -213,8 +213,8 @@ class Interpreter
 
         # Get the list of arguments the function takes
         function = @stack[node.identifier.value]
-        argument_ids = function.argumentlist.children.map do |node|
-          node.value
+        argument_ids = function.argumentlist.children.map do |argument|
+          argument.value
         end
 
         # Check if the correct amount of arguments was passed
