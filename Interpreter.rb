@@ -231,7 +231,11 @@ class Interpreter
     case name
     when "print"
       arguments.each do |arg|
-        puts arg
+        if arg == NIL
+          puts "NIL"
+        else
+          puts arg
+        end
       end
       return NIL
     when "Number"
