@@ -63,7 +63,7 @@ run(test(20 ! 20, false, "Not Equal than negated"), "test");
 
 # Check binary operators
 run(test(2 + 5, 7, "Addition"), "test");
-run(test(10 - 5, 7, "Subtraction"), "test");
+run(test(10 - 5, 5, "Subtraction"), "test");
 run(test(10 * 5, 50, "Multiplication"), "test");
 run(test(100 / 4, 25, "Division"), "test");
 run(test(10 % 3, 1, "Modulus"), "test");
@@ -72,7 +72,7 @@ run(test(2 ** 5, 32, "Exponential"), "test");
 
 
 # Script exit code
-if (run(0, "result")) {
+if (run(0, "result") == 0) {
     print("Test suite passed!");
 } else {
     print("Test suite failed!");

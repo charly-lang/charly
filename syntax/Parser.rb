@@ -321,63 +321,63 @@ class Parser
   end
 
   def E2
-    term(:IDENTIFIER) && term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
-  end
-
-  def E3
     F() && term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
   end
 
-  def E4
+  def E3
     T() && term(:MULT) && E()
   end
 
-  def E5
+  def E4
     T() && term(:DIVD) && E()
   end
 
-  def E6
+  def E5
     T() && term(:PLUS) && E()
   end
 
-  def E7
+  def E6
     T() && term(:MINUS) && E()
   end
 
-  def E8
+  def E7
     T() && term(:MODULUS) && E()
   end
 
-  def E9
+  def E8
     T() && term(:POW) && E()
   end
 
-  def E10
+  def E9
     T() && term(:GREATER) && E()
   end
 
-  def E11
+  def E10
     T() && term(:LESS) && E()
   end
 
-  def E12
+  def E11
     T() && term(:LESSEQ) && E()
   end
 
-  def E13
+  def E12
     T() && term(:GREATEREQ) && E()
   end
 
-  def E14
+  def E13
     T() && term(:EQ) && E()
   end
 
-  def E15
+  def E14
     T() && term(:NOTEQ) && E()
   end
 
-  def E16
+  def E15
     term(:IDENTIFIER) && term(:ASSIGNMENT) && E()
+  end
+
+  def E16
+    term(:IDENTIFIER) && term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
   end
 
   def E17
@@ -400,7 +400,7 @@ class Parser
 
 
   def T
-    node_production Expression, :T1, :T2, :T3, :T4, :T5
+    node_production Expression, :T1, :T2, :T3, :T4, :T5, :T6
   end
 
   def T1
@@ -408,18 +408,22 @@ class Parser
   end
 
   def T2
-    term(:NUMERICAL)
+    term(:IDENTIFIER) && term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
   end
 
   def T3
-    term(:IDENTIFIER)
+    term(:NUMERICAL)
   end
 
   def T4
-    term(:STRING)
+    term(:IDENTIFIER)
   end
 
   def T5
+    term(:STRING)
+  end
+
+  def T6
     term(:BOOLEAN)
   end
 end
