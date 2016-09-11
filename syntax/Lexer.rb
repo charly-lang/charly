@@ -6,11 +6,17 @@ class Lexer
 
   def self.rules
     [
+      # Language constructs
       [:COMMENT,      /\A#.*\Z/],
       [:KEYWORD,      /\A(let|func|if|else)\Z/],
       [:NUMERICAL,    /\A-?\d+(\.)?(\d+)?\Z/],
       [:STRING,       /\A"(""|[^"])*"?\Z/],
       [:BOOLEAN,      /\A(true|false)\Z/],
+      [:IDENTIFIER,   /\A(\w|_)+\Z/],
+      [:COMMA,        /\A,\Z/],
+      [:TERMINAL,     /\A;\Z/],
+
+      # Operators etc.
       [:ASSIGNMENT,   /\A\=\Z/],
       [:PLUS,         /\A\+\Z/],
       [:MINUS,        /\A\-\Z/],
@@ -18,9 +24,13 @@ class Lexer
       [:DIVD,         /\A\/\Z/],
       [:MODULUS,      /\A\%\Z/],
       [:POW,          /\A\*\*\Z/],
-      [:TERMINAL,     /\A;\Z/],
-      [:COMMA,        /\A,\Z/],
-      [:IDENTIFIER,   /\A(\w|_)+\Z/],
+      [:GREATER,      /\A>\Z/],
+      [:LESS,         /\A<\Z/],
+      [:LESSEQ,       /\A<=\Z/],
+      [:GREATEREQ,    /\A>=\Z/],
+      [:EQ,           /\A==\Z/],
+
+      # Misc.
       [:LEFT_PAREN,   /\A\(\Z/],
       [:RIGHT_PAREN,  /\A\)\Z/],
       [:LEFT_CURLY,   /\A\{\Z/],

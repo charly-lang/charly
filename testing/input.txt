@@ -1,7 +1,5 @@
-if (true) {
-    print("I am being executed!");
-} else {
-    print("I am not being executed!");
-};
-
-print("After if statement");
+2 < 2;
+2 > 2;
+2 <= 2;
+2 >= 2;
+2 == 2;
