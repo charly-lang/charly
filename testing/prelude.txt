@@ -37,3 +37,11 @@ func test(comp1, comp2, title) {
     # Return the result
     result;
 };
+
+func repeat(times, callback) {
+    let i = 0;
+    while (i < times) {
+        callback(i);
+        i = i + 1;
+    };
+};

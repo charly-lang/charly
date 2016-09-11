@@ -71,6 +71,14 @@ run(test(2 ** 5, 32, "Exponential"), "test");
 
 
 
+# Test while statements
+let repeatCount = 0;
+repeat(100, func callback(index) {
+    repeatCount = repeatCount + 1;
+});
+run(test(repeatCount, 100, "While loops"), "test");
+
+
 # Script exit code
 if (run(0, "result") == 0) {
     print("Test suite passed!");

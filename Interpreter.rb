@@ -221,7 +221,7 @@ class Interpreter
 
       # Check if the correct amount of arguments was passed
       if arguments.length != argument_ids.length
-        raise "Expected #{argument_ids.length} arguments, got #{arguments.length} instead!"
+        raise "#{function.identifier.value} expected #{argument_ids.length} arguments, got #{arguments.length} instead!"
       end
 
       # Create a hash for the arguments
