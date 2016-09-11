@@ -233,6 +233,11 @@ class Interpreter
       return call_function(function, args)
     end
 
+    # While statements
+    if node.is(WhileStatement)
+      return run_while_statement node
+    end
+
     # Nested expressions inside a statement
     if node.is(Statement) && node.children.length == 1
       if node.children[0].is(Expression, NumericLiteral, StringLiteral, IdentifierLiteral)
@@ -281,6 +286,15 @@ class Interpreter
     when PowOperator
       return left ** right
     end
+  end
+
+  # Execute a single while statement
+  def run_while_statement(node)
+    last_result = NIL
+    while eval_bool(run_expression(node.test)) do
+      last_result = run_block(node.consequent)
+    end
+    last_result
   end
 
   # Execute a single binary expression
