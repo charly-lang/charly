@@ -142,6 +142,6 @@ class Token
   end
 
   def to_s
-    "(#{location}) #{'%-11.11s' % @token} |#{@value}|"
+    "(#{location}) #{'%-11.11s' % @token} │#{@value}│"
   end
 end

@@ -1,3 +1,6 @@
+#!/bin/env ruby
+# encoding: utf-8
+
 require_relative "misc/Helper.rb"
 require_relative "misc/File.rb"
 require_relative "syntax/Parser.rb"
