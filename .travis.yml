@@ -1,0 +1,3 @@
+language: ruby
+script:
+  - ruby main.rb test/main.txt
