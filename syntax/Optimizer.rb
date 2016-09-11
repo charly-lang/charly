@@ -183,6 +183,27 @@ class Optimizer
       end
     end
 
+    # Comparison expressions involving an operator
+    if node.is(Expression) && node.children.length == 3 && !node.is(ComparisonExpression)
+
+      # Check for the operator
+      if node.children[1].is(ComparisonOperatorLiteral)
+
+        # Typecheck left and right argument
+        left = node.children[0]
+        right = node.children[2]
+        operator = node.children[1]
+
+        if left.is Expression, LiteralValue
+          if right.is Expression, LiteralValue
+
+            @finished = false
+            return ComparisonExpression.new(operator, left, right, node.parent)
+          end
+        end
+      end
+    end
+
     # Assignment operator
     if node.is(Expression) && node.children.length == 3
 
