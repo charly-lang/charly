@@ -168,22 +168,12 @@ class Interpreter
 
     # BinaryExpression
     if node.is(BinaryExpression)
-      left = run_expression node.left
-      right = run_expression node.right
-      case node.operator
-      when PlusOperator
-        return left + right
-      when MinusOperator
-        return left - right
-      when MultOperator
-        return left * right
-      when DivdOperator
-        return left / right
-      when ModOperator
-        return left % right
-      when PowOperator
-        return left ** right
-      end
+      return run_binary_expression(node)
+    end
+
+    # Comparison Expressions
+    if node.is(ComparisonExpression)
+      return run_comparison_expression(node)
     end
 
     # FunctionDefinitionExpressions
@@ -259,6 +249,44 @@ class Interpreter
     # IfStatements
     if node.is(IfStatement)
       return run_if_statement(node)
+    end
+  end
+
+  # Execute a single binary expression
+  def run_binary_expression(node)
+    left = run_expression node.left
+    right = run_expression node.right
+    case node.operator
+    when PlusOperator
+      return left + right
+    when MinusOperator
+      return left - right
+    when MultOperator
+      return left * right
+    when DivdOperator
+      return left / right
+    when ModOperator
+      return left % right
+    when PowOperator
+      return left ** right
+    end
+  end
+
+  # Execute a single binary expression
+  def run_comparison_expression(node)
+    left = run_expression node.left
+    right = run_expression node.right
+    case node.operator
+    when GreaterOperator
+      return left > right
+    when SmallerOperator
+      return left < right
+    when GreaterEqualOperator
+      return left >= right
+    when SmallerEqualOperator
+      return left <= right
+    when EqualOperator
+      return left == right
     end
   end
 
