@@ -21,6 +21,16 @@ class ASTNode
     match
   end
 
+  def is_exact(*types)
+    match = false
+    types.each do |type|
+      if !match
+        match = self.instance_of? type
+      end
+    end
+    match
+  end
+
   def meta
     ""
   end
@@ -280,6 +290,7 @@ class ComparisonOperatorLiteral < Terminal; end
   class SmallerEqualOperator < ComparisonOperatorLiteral; end
   class GreaterEqualOperator < ComparisonOperatorLiteral; end
   class EqualOperator < ComparisonOperatorLiteral; end
+  class NotEqualOperator < ComparisonOperatorLiteral; end
 
 # Other operators
 class AssignmentOperator < Terminal; end

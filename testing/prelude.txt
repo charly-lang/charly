@@ -25,3 +25,15 @@ func sleep(amount) {
 func variable(id) {
     call_internal("variable", id);
 };
+
+func test(comp1, comp2, title) {
+    let result = comp1 == comp2;
+    if (result) {
+        print(title + " passed!");
+    } else {
+        print(title + " failed!");
+    };
+
+    # Return the result
+    result;
+};

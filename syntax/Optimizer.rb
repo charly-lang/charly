@@ -226,7 +226,7 @@ class Optimizer
     end
 
     # Declarations
-    if node.is(Statement) && node.children.length == 3
+    if node.is_exact(Statement) && node.children.length == 3
 
       # Check for the let keyword
       if node.children[0].value == "let"

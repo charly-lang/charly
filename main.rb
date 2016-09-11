@@ -25,5 +25,9 @@ unless ARGV.include? "--noexec"
   dlog "#{red("Exit:")} #{exitValue}"
 
   # Return for the program
-  exitValue
+  if exitValue.is_a? Numeric
+    exit exitValue
+  else
+    exitValue
+  end
 end

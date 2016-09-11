@@ -29,6 +29,7 @@ class Lexer
       [:LESSEQ,       /\A<=\Z/],
       [:GREATEREQ,    /\A>=\Z/],
       [:EQ,           /\A==\Z/],
+      [:NOTEQ,        /\A!\Z/],
 
       # Misc.
       [:LEFT_PAREN,   /\A\(\Z/],

@@ -1,0 +1,10 @@
+func testIF() {
+    let prop = 20;
+    if (prop == 10) {
+        "first";
+    } else if (prop == 25) {
+        "second";
+    };
+};
+
+print(testIF());

@@ -141,6 +141,8 @@ class Parser
         @node << new(SmallerEqualOperator)
       when :EQ
         @node << new(EqualOperator)
+      when :NOTEQ
+        @node << new(NotEqualOperator)
       end
     end
 
@@ -311,7 +313,7 @@ class Parser
 
 
   def E
-    node_production Expression, :E1, :E2, :E3, :E4, :E5, :E6, :E7, :E8, :E9, :E10, :E11, :E12, :E13, :E14, :E15, :E16, :E17
+    node_production Expression, :E1, :E2, :E3, :E4, :E5, :E6, :E7, :E8, :E9, :E10, :E11, :E12, :E13, :E14, :E15, :E16, :E17, :E18
   end
 
   def E1
@@ -371,14 +373,18 @@ class Parser
   end
 
   def E15
-    term(:IDENTIFIER) && term(:ASSIGNMENT) && E()
+    T() && term(:NOTEQ) && E()
   end
 
   def E16
-    T()
+    term(:IDENTIFIER) && term(:ASSIGNMENT) && E()
   end
 
   def E17
+    T()
+  end
+
+  def E18
     F()
   end
 

@@ -193,33 +193,44 @@ class Interpreter
         arguments << run_expression(argument)
       end
 
-      # Check for an internal function call
-      if node.identifier.value == "call_internal"
-        return call_internal_function(arguments[0], arguments[1..-1])
-      end
+      # Get the function that's being executed
+      function = NIL
 
       # Check if the function is defined inside the symbols
-      if @stack[node.identifier.value] && @stack[node.identifier.value].is(FunctionLiteral)
+      if node.identifier.is(FunctionLiteral)
+        function = node.identifier
+      elsif node.identifier.is(IdentifierLiteral)
 
-        # Get the list of arguments the function takes
-        function = @stack[node.identifier.value]
-        argument_ids = function.argumentlist.children.map do |argument|
-          argument.value
+        # Check for an internal function call
+        if node.identifier.value == "call_internal"
+          return call_internal_function(arguments[0], arguments[1..-1])
         end
 
-        # Check if the correct amount of arguments was passed
-        if arguments.length != argument_ids.length
-          raise "Expected #{argument_ids.length} arguments, got #{arguments.length} instead!"
+        # Check the stack for a function definition
+        if @stack[node.identifier.value] && @stack[node.identifier.value].is(FunctionLiteral)
+          function = @stack[node.identifier.value]
+        else
+          raise "#{node.identifier.value} is not a function!"
         end
-
-        # Create a hash for the arguments
-        args = {}
-        argument_ids.each_with_index do |id, index|
-          args[id] = arguments[index]
-        end
-
-        return call_function(@stack[node.identifier.value], args)
       end
+
+      # Get the list of arguments that are required
+      argument_ids = function.argumentlist.children.map do |argument|
+        argument.value
+      end
+
+      # Check if the correct amount of arguments was passed
+      if arguments.length != argument_ids.length
+        raise "Expected #{argument_ids.length} arguments, got #{arguments.length} instead!"
+      end
+
+      # Create a hash for the arguments
+      args = {}
+      argument_ids.each_with_index do |id, index|
+        args[id] = arguments[index]
+      end
+
+      return call_function(function, args)
     end
 
     # Nested expressions inside a statement
@@ -287,6 +298,8 @@ class Interpreter
       return left <= right
     when EqualOperator
       return left == right
+    when NotEqualOperator
+      return left != right
     end
   end
 
@@ -309,8 +322,6 @@ class Interpreter
         end
       end
     end
-
-    return node
   end
 
   # Evaluate a boolean expression

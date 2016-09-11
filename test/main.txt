@@ -1,0 +1,80 @@
+let run = func onlyTrueWasPassed() {
+    let value = true;
+
+    func callback(bool, method) {
+        if (method == "test") {
+            if (bool ! true) {
+                value = false;
+            };
+        } else if (method == "result") {
+            if (value) {0;} else {1;};
+        };
+    };
+    callback;
+}();
+
+
+
+# Test variable assignment
+let a = 25;
+run(test(a, 25, "Variable Assignment"), "test");
+
+
+
+# Test string comparisons
+let a = "Hello";
+run(test(a, "Hello", "String comparison"), "test");
+
+
+
+# Test function scoping
+let name = "Leonard";
+let age = 16;
+func something(name) {
+    name = "Peter";
+    age = 20;
+};
+something(name);
+run(test(name, "Leonard", "Function arguments in own scope"), "test");
+run(test(age, 20, "Access to definition scope"), "test");
+
+
+
+# Check comparison operators
+run(test(2 < 5, true, "Smaller than"), "test");
+run(test(2 > 5, false, "Smaller than negated"), "test");
+
+run(test(5 > 2, true, "Greater than"), "test");
+run(test(5 < 2, false, "Greater than negated"), "test");
+
+run(test(5 <= 5, true, "Smaller or equal than"), "test");
+run(test(10 <= 5, false, "Smaller or equal than negated"), "test");
+
+run(test(10 >= 5, true, "Greater or equal than"), "test");
+run(test(2 >= 5, false, "Greater or equal than negated"), "test");
+
+run(test(20 == 20, true, "Equal than"), "test");
+run(test(20 == 10, false, "Equal than negated"), "test");
+
+run(test(20 ! 10, true, "Not Equal than"), "test");
+run(test(20 ! 20, false, "Not Equal than negated"), "test");
+
+
+
+# Check binary operators
+run(test(2 + 5, 7, "Addition"), "test");
+run(test(10 - 5, 7, "Subtraction"), "test");
+run(test(10 * 5, 50, "Multiplication"), "test");
+run(test(100 / 4, 25, "Division"), "test");
+run(test(10 % 3, 1, "Modulus"), "test");
+run(test(2 ** 5, 32, "Exponential"), "test");
+
+
+
+# Script exit code
+if (run(0, "result")) {
+    print("Test suite passed!");
+} else {
+    print("Test suite failed!");
+};
+run(0, "result");
