@@ -1,17 +1,7 @@
-# 7 Children
-if (yes) {};
+if (true) {
+    print("I am being executed!");
+} else {
+    print("I am not being executed!");
+};
 
-# 11 Children
-if (yes) {} else {};
-
-# 9 Children with 7 subchilds
-if (yes) {} else if (yes) {};
-
-# 9 Children with 11 subchilds
-if (yes) {} else if (yes) {} else {};
-
-# 9 Children with 9 subchilds and 7 subsubchilds
-if (yes) {} else if (yes) {} else if (yes) {};
-
-# 9 Children with 9 subchilds and 11 subsubchilds
-if (yes) {} else if (yes) {} else if (yes) {} else {};
+print("After if statement");

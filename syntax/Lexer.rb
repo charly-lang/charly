@@ -10,7 +10,7 @@ class Lexer
       [:KEYWORD,      /\A(let|func|if|else)\Z/],
       [:NUMERICAL,    /\A-?\d+(\.)?(\d+)?\Z/],
       [:STRING,       /\A"(""|[^"])*"?\Z/],
-      [:BOOLEAN,      /\A(yes|no)\Z/],
+      [:BOOLEAN,      /\A(true|false)\Z/],
       [:ASSIGNMENT,   /\A\=\Z/],
       [:PLUS,         /\A\+\Z/],
       [:MINUS,        /\A\-\Z/],

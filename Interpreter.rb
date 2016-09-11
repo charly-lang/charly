@@ -241,7 +241,7 @@ class Interpreter
 
     # Literals treated as expressions
     # NumericLiteral, IdentifierLiteral, StringLiteral
-    if node.is(NumericLiteral, StringLiteral)
+    if node.is(NumericLiteral, StringLiteral, BooleanLiteral)
       return node.value
     end
 
@@ -256,9 +256,46 @@ class Interpreter
       return @stack[node.value]
     end
 
-    # Booleans
-    if node.is(BooleanLiteral)
-      return node.value
+    # IfStatements
+    if node.is(IfStatement)
+      return run_if_statement(node)
+    end
+  end
+
+  # Evalutate a given IfStatement node
+  def run_if_statement(node)
+
+    # Evaluate the test expression
+    test_result = run_expression(node.test)
+    test_result = eval_bool(test_result)
+
+    # Run the respective handler
+    if test_result
+      return run_block node.consequent
+    else
+      if node.alternate
+        if node.alternate.is(IfStatement)
+          return run_if_statement(node.alternate)
+        elsif node.alternate.is(Block)
+          return run_block node.alternate
+        end
+      end
+    end
+
+    return node
+  end
+
+  # Evaluate a boolean expression
+  def eval_bool(value)
+    case value
+    when Numeric
+      return value != 0
+    when TrueClass
+      return true
+    when FalseClass
+      return false
+    else
+      return true
     end
   end
 
@@ -279,6 +316,8 @@ class Interpreter
         end
       end
       return NIL
+    when "Boolean"
+      return eval_bool(arguments[0])
     when "Number"
       return arguments[0].to_f
     when "String"

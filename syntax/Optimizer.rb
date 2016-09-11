@@ -116,7 +116,7 @@ class Optimizer
 
     # BooleanLiterals value property should be an actual boolean
     if node.is(BooleanLiteral) && node.value.is_a?(String)
-      node.value = node.value == "yes"
+      node.value = node.value == "true"
       @finished = false
       return node
     end
