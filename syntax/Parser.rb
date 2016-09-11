@@ -131,6 +131,16 @@ class Parser
         @node << new(StringLiteral)
       when :BOOLEAN
         @node << new(BooleanLiteral)
+      when :GREATER
+        @node << new(GreaterOperator)
+      when :LESS
+        @node << new(SmallerOperator)
+      when :GREATEREQ
+        @node << new(GreaterEqualOperator)
+      when :LESSEQ
+        @node << new(SmallerEqualOperator)
+      when :EQ
+        @node << new(EqualOperator)
       end
     end
 
@@ -301,7 +311,7 @@ class Parser
 
 
   def E
-    node_production Expression, :E1, :E2, :E3, :E4, :E5, :E6, :E7, :E8, :E9, :E10, :E11, :E12
+    node_production Expression, :E1, :E2, :E3, :E4, :E5, :E6, :E7, :E8, :E9, :E10, :E11, :E12, :E13, :E14, :E15, :E16, :E17
   end
 
   def E1
@@ -341,14 +351,34 @@ class Parser
   end
 
   def E10
-    term(:IDENTIFIER) && term(:ASSIGNMENT) && E()
+    T() && term(:GREATER) && E()
   end
 
   def E11
-    T()
+    T() && term(:LESS) && E()
   end
 
   def E12
+    T() && term(:LESSEQ) && E()
+  end
+
+  def E13
+    T() && term(:GREATEREQ) && E()
+  end
+
+  def E14
+    T() && term(:EQ) && E()
+  end
+
+  def E15
+    term(:IDENTIFIER) && term(:ASSIGNMENT) && E()
+  end
+
+  def E16
+    T()
+  end
+
+  def E17
     F()
   end
 

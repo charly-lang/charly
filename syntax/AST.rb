@@ -109,7 +109,19 @@ class BinaryExpression < Expression
     @operator = operator
     @left = left
     @right = right
+    @children = [@left, @operator, @right]
+  end
+end
 
+# A single comparison expression
+class ComparisonExpression < Expression
+  attr_reader :operator, :left, :right
+
+  def initialize(operator, left, right, parent)
+    super(parent)
+    @operator = operator
+    @left = left
+    @right = right
     @children = [@left, @operator, @right]
   end
 end
@@ -260,6 +272,14 @@ class BinaryOperatorLiteral < Terminal; end
   class DivdOperator < BinaryOperatorLiteral; end
   class ModOperator < BinaryOperatorLiteral; end
   class PowOperator < BinaryOperatorLiteral; end
+
+# Comparisons
+class ComparisonOperatorLiteral < Terminal; end
+  class SmallerOperator < ComparisonOperatorLiteral; end
+  class GreaterOperator < ComparisonOperatorLiteral; end
+  class SmallerEqualOperator < ComparisonOperatorLiteral; end
+  class GreaterEqualOperator < ComparisonOperatorLiteral; end
+  class EqualOperator < ComparisonOperatorLiteral; end
 
 # Other operators
 class AssignmentOperator < Terminal; end
