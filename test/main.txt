@@ -71,12 +71,26 @@ run(test(2 ** 5, 32, "Exponential"), "test");
 
 
 
-# Test while statements
+# Test while loop
+let i = 0;
+while (i < 50) {
+    i = i + 1;
+};
+run(test(i, 50, "While loop"), "test");
+
+# Test the repeat function
 let repeatCount = 0;
 repeat(100, func callback(index) {
     repeatCount = repeatCount + 1;
 });
-run(test(repeatCount, 100, "While loops"), "test");
+run(test(repeatCount, 100, "Repeat function"), "test");
+
+# Test the range function
+let last_index = -1;
+range(100, 150, func callback(i) {
+    last_index = i;
+});
+run(test(last_index, 149, "Range function"), "test");
 
 
 # Script exit code

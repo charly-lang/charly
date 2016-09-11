@@ -45,3 +45,11 @@ func repeat(times, callback) {
         i = i + 1;
     };
 };
+
+func range(start, end, callback) {
+    let i = start;
+    while (i < end) {
+        callback(i);
+        i = i + 1;
+    };
+};
