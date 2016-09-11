@@ -2,4 +2,4 @@ language: ruby
 script:
   - ruby main.rb test/main.txt
 rvm:
-  - 2.3
+  - 2.3.0
