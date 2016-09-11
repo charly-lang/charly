@@ -100,8 +100,19 @@ class IfStatement < Statement
     @test = test
     @consequent = consequent
     @alternate = alternate
-
     @children = [@test, @consequent, @alternate]
+  end
+end
+
+# A single while statement
+class WhileStatement < Statement
+  attr_accessor :test, :consequent
+
+  def initialize(test, consequent, parent)
+    super(parent)
+    @test = test
+    @consequent = consequent
+    @children = [@test, @consequent]
   end
 end
 

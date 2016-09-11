@@ -333,6 +333,14 @@ class Optimizer
       end
     end
 
+    # While statements
+    if node.is(Statement) && node.children.length == 7
+      if node.children[0].value == "while"
+        @finished = false
+        return WhileStatement.new(node.children[2], node.children[5], node.parent)
+      end
+    end
+
     # Function definitions
     if node.is(Statement) && node.children.length == 1
       if node.children[0].is(FunctionLiteral)

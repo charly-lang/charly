@@ -8,7 +8,7 @@ class Lexer
     [
       # Language constructs
       [:COMMENT,      /\A#.*\Z/],
-      [:KEYWORD,      /\A(let|func|if|else)\Z/],
+      [:KEYWORD,      /\A(let|func|if|else|while)\Z/],
       [:NUMERICAL,    /\A-?\d+(\.)?(\d+)?\Z/],
       [:STRING,       /\A"(""|[^"])*"?\Z/],
       [:BOOLEAN,      /\A(true|false)\Z/],

@@ -216,7 +216,7 @@ class Parser
 
 
   def S
-    node_production Statement, :S1, :S2, :S3, :S4
+    node_production Statement, :S1, :S2, :S3, :S4, :S5
   end
 
   def S1
@@ -233,6 +233,10 @@ class Parser
 
   def S4
     I() && term(:TERMINAL)
+  end
+
+  def S5
+    term(:KEYWORD, "while") && term(:LEFT_PAREN) && E() && term(:RIGHT_PAREN) && term(:LEFT_CURLY) && B() && term(:RIGHT_CURLY) && term(:TERMINAL)
   end
 
 
