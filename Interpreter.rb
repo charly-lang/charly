@@ -385,6 +385,8 @@ class Interpreter
       return NIL
     when "variable"
       return @stack[arguments[0]]
+    when "print_color"
+      puts colorize(arguments[0], arguments[1])
     end
   end
 end
