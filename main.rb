@@ -9,7 +9,7 @@ if ARGV.length == 0
 end
 
 # Prelude
-prelude_file = VirtualFile.new "testing/prelude.txt"
+prelude_file = VirtualFile.new "std/prelude.txt"
 prelude_program = Parser.parse prelude_file
 
 # Input File
