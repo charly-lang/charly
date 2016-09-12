@@ -93,6 +93,22 @@ range(100, 150, func callback(i) {
 run(test(last_index, 149, "Range function"), "test");
 
 
+
+# Test different scoping scenarios and rules
+let value = 0;
+func test_functionscope(callback) {
+    let value = 0;
+    callback();
+    run(test(value, 0, "Function scope"), "test");
+};
+test_functionscope(func callback() {
+    value = value + 5;
+});
+run(test(value, 5, "Global scope"), "test");
+
+
+
+
 # Script exit code
 if (run(0, "result") == 0) {
     print("Test suite passed!");

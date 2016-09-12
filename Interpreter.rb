@@ -251,9 +251,9 @@ class Interpreter
       return node.value
     end
 
-    # Literals treated as expressions
-    # NumericLiteral, IdentifierLiteral, StringLiteral
+    # FunctionLiterals
     if node.is(FunctionLiteral)
+      node.block.parent_stack = @stack
       return node
     end
 
