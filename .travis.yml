@@ -1,5 +1,5 @@
 language: ruby
 script:
-  - ruby main.rb test/main.txt --log
+  - ./test.sh
 rvm:
   - 2.3.0
