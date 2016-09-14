@@ -169,6 +169,11 @@ class Parser
       # Skip if a production has already matched
       next if match
 
+      # If func is a boolean, return it
+      if func.instance_of?(TrueClass) || func.instance_of?(FalseClass)
+        match = func unless match
+      end
+
       # Reset
       @next = save
       @node = backup
@@ -208,25 +213,20 @@ class Parser
 
 
   def B
-    node_production Block, :B1, :B2
+    node_production Block, :B1, true
   end
 
   def B1
     S() && BPRIME()
   end
 
-  def B2
-      true
-  end
-
   def BPRIME
-    check_each([:BP1, :BP2])
+    check_each([:BP1, true])
   end
 
   def BP1
     S() && BPRIME()
   end
-  def BP2; true end
 
 
 
@@ -265,7 +265,7 @@ class Parser
   end
 
   def IP
-    check_each([:IP1, :IP2, :IP3])
+    check_each([:IP1, :IP2, true])
   end
 
   def IP1
@@ -274,59 +274,43 @@ class Parser
   def IP2
     term(:KEYWORD, "else") && I()
   end
-  def IP3
-    true
-  end
 
 
 
   # Expression list
   def EL
-    node_production ExpressionList, :EL1, :EL2
+    node_production ExpressionList, :EL1, true
   end
 
   def EL1
     E() && ELPRIME()
   end
 
-  def EL2
-    true
-  end
-
   def ELPRIME
-    check_each([:ELP1, :ELP2])
+    check_each([:ELP1, true])
   end
 
   def ELP1
     term(:COMMA) && E() && ELPRIME()
   end
-  def ELP2; true end
 
 
 
   # Argument List
   def AL
-    node_production ArgumentList, :AL1, :AL2
+    node_production ArgumentList, :AL1, true
   end
 
   def AL1
     term(:IDENTIFIER) && ALPRIME()
   end
 
-  def AL2
-      true
-  end
-
   def ALPRIME
-    check_each([:ALP1, :ALP2])
+    check_each([:ALP1, true])
   end
 
   def ALP1
     term(:COMMA) && term(:IDENTIFIER) && ALPRIME()
-  end
-
-  def ALP2
-    true
   end
 
 
