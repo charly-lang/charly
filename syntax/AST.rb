@@ -1,6 +1,9 @@
 class ASTNode
   attr_accessor :children, :parent
 
+  # Debugging
+  attr_accessor :build_time
+
   def initialize(parent)
     @children = []
     @parent = parent
@@ -36,9 +39,13 @@ class ASTNode
   end
 
   def to_s
-    string = "#: #{self.class.name} - #{children.length} children"
+    if is Terminal
+      string = "#: #{self.class.name}"
+    else
+      string = "#: #{self.class.name} - BT: #{build_time} ms"
+    end
 
-    if meta.length > 0
+    if meta.length > 0 && !ARGV.include?("--nometa")
       string += " - #{meta}"
     end
 

@@ -197,10 +197,11 @@ class Parser
     save = @node
     @node = node_class.new @node
     match = check_each(productions)
-    save << @node if match
+    if match
+      @node.build_time = Time.now.to_ms - start
+      save << @node
+    end
     @node = save
-
-    dlog "Spent #{Time.now.to_ms - start} miliseconds inside #{node_class}"
     match
   end
 
