@@ -8,19 +8,19 @@ if ARGV.length == 0
   raise "No filename passed!"
 end
 
-# Prelude
-prelude_file = VirtualFile.new "std/prelude.txt"
-prelude_program = Parser.parse prelude_file
+files = [ARGV[0]]
+unless ARGV.include? "--noprelude"
+  files.unshift "std/prelude.txt"
+end
 
-# Input File
-input_file = VirtualFile.new ARGV[0]
-input_program = Parser.parse input_file
+programs = []
+files.each do |file|
+  file = VirtualFile.new file
+  programs << Parser.parse(file)
+end
 
 unless ARGV.include? "--noexec"
-  exitValue = Interpreter.new([
-    prelude_program,
-    input_program
-  ]).last_result
+  exitValue = Interpreter.new(programs).last_result
   dlog "#{red("Exit:")} #{exitValue}"
 
   # Return for the program

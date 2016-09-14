@@ -1,1 +1,1 @@
-print(2 + 5.5);
+call_internal("print", "Hello World");

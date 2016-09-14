@@ -1,3 +1,15 @@
+# Sorry for this monstrosity
+class Float
+  old_to_s = instance_method(:to_s)
+  define_method(:to_s) do
+    if (self % 1) == 0
+      self.to_i.to_s
+    else
+      old_to_s.bind(self).()
+    end
+  end
+end
+
 # TODO: Implement real typing rules
 # currently i'm just "faking" it
 module Types
@@ -9,6 +21,8 @@ module Types
       return StringType.new(value)
     when Boolean
       return BooleanType.new(value)
+    when NullType
+      return value
     else
       return StringType.new(value.to_s)
     end
@@ -87,6 +101,19 @@ module Types
   end
 
   class NumericType < Abstract
+    def +(v)
+      if v.is_a? StringType
+        "#{self.value}#{v}"
+      else
+        super
+      end
+    end
+  end
+
+  class StringType < Abstract
+    def +(v)
+      self.value + v.to_s
+    end
   end
 
   class BooleanType < Abstract
@@ -99,16 +126,6 @@ module Types
       else
         False.new value
       end
-    end
-  end
-
-  class StringType < Abstract
-    def +(v)
-      self.value + v.to_s
-    end
-
-    def *(a)
-      self.value * a
     end
   end
 end

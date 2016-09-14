@@ -69,6 +69,21 @@ run(test(100 / 4, 25, "Division"), "test");
 run(test(10 % 3, 1, "Modulus"), "test");
 run(test(2 ** 5, 32, "Exponential"), "test");
 
+# Check nested binary operators
+run(test((5 + 5) + 20, 30, "Nested 1"), "test");
+run(test((70 - 50) + 10, 30, "Nested 2"), "test");
+run(test((5 * 5) + 5, 30, "Nested 3"), "test");
+
+
+
+# Check binary operators between different types
+run(test("lol" * 3, "lollollol", "Multiplaying strings"), "test");
+run(test("test" + "test", "testtest", "Concat strings"), "test");
+run(test("test" + 3, "test3", "Concat strings and numeric integers"), "test");
+run(test("test" + 3.5, "test3.5", "Concat strings and numeric floats"), "test");
+run(test(3 + "test", "3test", "Concat numeric floats and strings"), "test");
+run(test(3.5 + "test", "3.5test", "Concat numeric integers and strings"), "test");
+
 
 
 # Test while loop

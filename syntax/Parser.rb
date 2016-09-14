@@ -46,6 +46,16 @@ class Parser
     dlog "Generating abstract syntax tree"
     B()
 
+    # Check if all tokens were parsed
+    if @next < @tokens.length
+      dlog "Couldn't parse whole file. Failed at: "
+      dlog ""
+      @tokens[@next - 1, 10].each do |token|
+        dlog token
+      end
+      dlog ""
+    end
+
     # Disable the optimizer if the respective CLI flag was passed
     unless ARGV.include? "--noopt"
       optimizer = Optimizer.new
@@ -182,11 +192,15 @@ class Parser
   end
 
   def node_production(node_class, *productions)
+    start = Time.now.to_ms
+
     save = @node
     @node = node_class.new @node
     match = check_each(productions)
     save << @node if match
     @node = save
+
+    dlog "Spent #{Time.now.to_ms - start} miliseconds inside #{node_class}"
     match
   end
 
@@ -317,78 +331,74 @@ class Parser
 
 
   def E
-    node_production Expression, :E1, :E2, :E3, :E4, :E5, :E6, :E7, :E8, :E9, :E10, :E11, :E12, :E13, :E14, :E15, :E16, :E17, :E18
+    node_production Expression, :E1, :E2, :E3, :E4, :E5, :E6, :E7, :E8, :E9, :E10, :E11, :E12, :E13, :E14, :E15, :E16, :E17
   end
 
   def E1
-    term(:LEFT_PAREN) && E() && term(:RIGHT_PAREN)
-  end
-
-  def E2
     F() && term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
   end
 
-  def E3
+  def E2
     T() && term(:MULT) && E()
   end
 
-  def E4
+  def E3
     T() && term(:DIVD) && E()
   end
 
-  def E5
+  def E4
     T() && term(:PLUS) && E()
   end
 
-  def E6
+  def E5
     T() && term(:MINUS) && E()
   end
 
-  def E7
+  def E6
     T() && term(:MODULUS) && E()
   end
 
-  def E8
+  def E7
     T() && term(:POW) && E()
   end
 
-  def E9
+  def E8
     T() && term(:GREATER) && E()
   end
 
-  def E10
+  def E9
     T() && term(:LESS) && E()
   end
 
-  def E11
+  def E10
     T() && term(:LESSEQ) && E()
   end
 
-  def E12
+  def E11
     T() && term(:GREATEREQ) && E()
   end
 
-  def E13
+  def E12
     T() && term(:EQ) && E()
   end
 
-  def E14
+  def E13
     T() && term(:NOTEQ) && E()
   end
 
-  def E15
+  def E14
     term(:IDENTIFIER) && term(:ASSIGNMENT) && E()
   end
 
-  def E16
+  def E15
     term(:IDENTIFIER) && term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
   end
 
-  def E17
+  def E16
     T()
   end
 
-  def E18
+  def E17
     F()
   end
 

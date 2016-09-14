@@ -160,11 +160,11 @@ class Executor
     left = self.exec_expression(node.left, stack)
     right = self.exec_expression(node.right, stack)
 
-    # TODO: Type-check and possily do casting?
+    # TODO: Type-check and possibly do casting?
     result = Types::NullType.new
     result = case node.operator
     when PlusOperator
-      left.value + right.value
+      left + right
     when MinusOperator
       left - right
     when MultOperator
