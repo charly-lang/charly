@@ -1,0 +1,10 @@
+ruby main.rb filename [options...]
+
+<options>
+ --log          # Display logging info
+ --ast          # Display the abstract syntax tree
+ --tokens       # Display a list of tokens found by lexical analysis
+ --noexec       # Don't execute the program
+ --noopt        # Skip the structurization step in the parser (useful for debugging)
+ --nometa       # Hide meta info in the abstract syntax tree
+ --noprelude    # Don't load the prelude file
