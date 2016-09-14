@@ -1,0 +1,7 @@
+func call(value, callback) {
+    callback(value);
+};
+
+print(call(25, func callback(value) {
+    value + 5;
+}));

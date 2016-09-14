@@ -1,7 +1,7 @@
 require_relative "misc/Helper.rb"
 require_relative "misc/File.rb"
 require_relative "syntax/Parser.rb"
-require_relative "Interpreter.rb"
+require_relative "interpreter/Interpreter.rb"
 
 # Check if a filename was passed
 if ARGV.length == 0
@@ -17,11 +17,10 @@ input_file = VirtualFile.new ARGV[0]
 input_program = Parser.parse input_file
 
 unless ARGV.include? "--noexec"
-  interpreter = Interpreter.new([
+  exitValue = Interpreter.new([
     prelude_program,
     input_program
-  ])
-  exitValue = interpreter.execute
+  ]).last_result
   dlog "#{red("Exit:")} #{exitValue}"
 
   # Return for the program
