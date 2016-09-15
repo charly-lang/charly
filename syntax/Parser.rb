@@ -206,7 +206,6 @@ class Parser
   end
 
   def node_production(node_class, *productions)
-    dlog "Trying #{node_class}"
     start = Time.now.to_ms
     save = @node
     @node = node_class.new @node
@@ -259,25 +258,30 @@ class Parser
     })
   end
 
-
-
   def I
-    node_production IfStatementPrimitive, :I1
-  end
+    node_production(IfStatementPrimitive, Proc.new {
+      if term(:KEYWORD, "if") &&
+          term(:LEFT_PAREN) &&
+          E() &&
+          term(:RIGHT_PAREN) &&
+          term(:LEFT_CURLY) &&
+          B() &&
+          term(:RIGHT_CURLY)
 
-  def I1
-    term(:KEYWORD, "if") && term(:LEFT_PAREN) && E() && term(:RIGHT_PAREN) && term(:LEFT_CURLY) && B() && term(:RIGHT_CURLY) && IP()
-  end
+        # Parse the else or else if clause
+        check_each([Proc.new {
+          if term(:KEYWORD, "else")
+            check_each([Proc.new {
+              term(:LEFT_CURLY) && B() && term(:RIGHT_CURLY)
 
-  def IP
-    check_each([:IP1, :IP2, true])
-  end
+            }, Proc.new {
+              I()
 
-  def IP1
-    term(:KEYWORD, "else") && term(:LEFT_CURLY) && B() && term(:RIGHT_CURLY)
-  end
-  def IP2
-    term(:KEYWORD, "else") && I()
+            }, true])
+          end
+        }, true])
+      end
+    })
   end
 
 
