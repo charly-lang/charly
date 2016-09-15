@@ -206,8 +206,8 @@ class Parser
   end
 
   def node_production(node_class, *productions)
+    dlog "Trying #{node_class}"
     start = Time.now.to_ms
-
     save = @node
     @node = node_class.new @node
     match = check_each(productions)
@@ -222,37 +222,41 @@ class Parser
   def B
     node_production(Block, Proc.new {
       found_at_least_one = false
-      while S()
+      while !peek_term(:RIGHT_CURLY) && S()
         found_at_least_one = true unless found_at_least_one
       end
       found_at_least_one
     }, true)
   end
 
-
-
   def S
-    node_production Statement, :S1, :S2, :S3, :S4, :S5
-  end
+    node_production(Statement, Proc.new {
+      if term(:KEYWORD, "let") && term(:IDENTIFIER)
+        check_each([Proc.new {
+          term(:ASSIGNMENT) && E() && term(:TERMINAL)
 
-  def S1
-    term(:KEYWORD, "let") && term(:IDENTIFIER) && term(:ASSIGNMENT) && E() && term(:TERMINAL)
-  end
+        }, Proc.new {
+          term(:TERMINAL)
 
-  def S2
-    term(:KEYWORD, "let") && term(:IDENTIFIER) && term(:TERMINAL)
-  end
+        }])
+      end
+    }, Proc.new {
+      E() && term(:TERMINAL)
 
-  def S3
-    E() && term(:TERMINAL)
-  end
+    }, Proc.new {
+      I() && term(:TERMINAL)
 
-  def S4
-    I() && term(:TERMINAL)
-  end
+    }, Proc.new {
+      term(:KEYWORD, "while") &&
+      term(:LEFT_PAREN) &&
+      E() &&
+      term(:RIGHT_PAREN) &&
+      term(:LEFT_CURLY) &&
+      B() &&
+      term(:RIGHT_CURLY) &&
+      term(:TERMINAL)
 
-  def S5
-    term(:KEYWORD, "while") && term(:LEFT_PAREN) && E() && term(:RIGHT_PAREN) && term(:LEFT_CURLY) && B() && term(:RIGHT_CURLY) && term(:TERMINAL)
+    })
   end
 
 

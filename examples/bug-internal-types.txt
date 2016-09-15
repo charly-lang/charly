@@ -1,1 +1,3 @@
-call_internal("print", "Hello World");
+func a() {
+    let a;
+};
