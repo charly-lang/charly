@@ -284,25 +284,22 @@ class Parser
     })
   end
 
-
-
   # Expression list
   def EL
-    node_production ExpressionList, :EL1, true
-  end
+    node_production(ExpressionList, Proc.new {
+      if E()
+        check_each([Proc.new {
+          found_at_least_one = false
 
-  def EL1
-    E() && ELPRIME()
+          # We are peeking before because we are expanding two different nodes
+          while peek_term(:COMMA) && term(:COMMA) && E()
+            found_at_least_one = true unless found_at_least_one
+          end
+          found_at_least_one
+        }, true])
+      end
+    }, true)
   end
-
-  def ELPRIME
-    check_each([:ELP1, true])
-  end
-
-  def ELP1
-    term(:COMMA) && E() && ELPRIME()
-  end
-
 
 
   # Argument List
