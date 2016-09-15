@@ -73,9 +73,7 @@ class Parser
   end
 
   # Check if the next token is equal to *token*
-  # Changes the @next pointer to point to the next token
-  def term(token, string = "")
-
+  def peek_term(token, string = "")
     if @next >= @tokens.size
       return false
     end
@@ -93,11 +91,18 @@ class Parser
       @next += 1
     end
 
+    # Skip whitespace and comments
     if string != ""
-      match = @tokens[@next].token == token && @tokens[@next].value == string
+      @tokens[@next].token == token && @tokens[@next].value == string
     else
-      match = @tokens[@next].token == token
+      @tokens[@next].token == token
     end
+  end
+
+  # Check if the next token is equal to *token*
+  # Changes the @next pointer to point to the next token
+  def term(token, string = "")
+    match = peek_term(token, string)
 
     def new(node_type)
       node_type.new(@tokens[@next].value, @node)
@@ -214,22 +219,14 @@ class Parser
     match
   end
 
-
-
   def B
-    node_production Block, :B1, true
-  end
-
-  def B1
-    S() && BPRIME()
-  end
-
-  def BPRIME
-    check_each([:BP1, true])
-  end
-
-  def BP1
-    S() && BPRIME()
+    node_production(Block, Proc.new {
+      found_at_least_one = false
+      while S()
+        found_at_least_one = true unless found_at_least_one
+      end
+      found_at_least_one
+    }, true)
   end
 
 
