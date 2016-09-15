@@ -183,7 +183,11 @@ class Parser
       @node = temp
 
       # Try the production
-      match = method(func).call unless match
+      if func.is_a? Proc
+        match = func.call unless match
+      else
+        match = method(func).call unless match
+      end
 
       # Flush the temporary children to the real node
       if match
