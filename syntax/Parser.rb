@@ -301,22 +301,21 @@ class Parser
     }, true)
   end
 
-
-  # Argument List
+  # Expression list
   def AL
-    node_production ArgumentList, :AL1, true
-  end
+    node_production(ArgumentList, Proc.new {
+      if term(:IDENTIFIER)
+        check_each([Proc.new {
+          found_at_least_one = false
 
-  def AL1
-    term(:IDENTIFIER) && ALPRIME()
-  end
-
-  def ALPRIME
-    check_each([:ALP1, true])
-  end
-
-  def ALP1
-    term(:COMMA) && term(:IDENTIFIER) && ALPRIME()
+          # We are peeking before because we are expanding two different nodes
+          while peek_term(:COMMA) && term(:COMMA) && term(:IDENTIFIER)
+            found_at_least_one = true unless found_at_least_one
+          end
+          found_at_least_one
+        }, true])
+      end
+    }, true)
   end
 
 
