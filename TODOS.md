@@ -1,11 +1,10 @@
 # Todos
 
-## Rewrite Parser for better efficieny
-  - Remove left-recursive rules
-  - Better DSL for specifying grammar rules (checking T() over and over again if it matches?)
-  - Implement a way to specify an empty token
-  - Group together productions that start with the same tokens
-  - Implement some kind of heuristics so that nodes that are more often used get checked first
+## Array syntax
+  - Introduce two new terminals called :LEFT_BRACKET & :RIGHT_BRACKET
+  - Functions inside standard library to get count of elements inside array
+  - Get value by index like this `[1, 2, 3](2) => 3`
+  - Parsed as `term(:LEFT_BRACKET) && EL() && term(:RIGHT_BRACKET)`
 
 ## Rewrite Lexer
   - If 0..n matches, all substrings until 0..n-1 also have to match (this is an issue)
