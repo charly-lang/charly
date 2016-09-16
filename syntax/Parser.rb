@@ -47,10 +47,11 @@ class Parser
     B()
 
     # Check if all tokens were parsed
+    # Show the range in which parsing failed
     if @next < @tokens.length
       dlog "Couldn't parse whole file. Failed at: "
       dlog ""
-      @tokens[@next - 1, 10].each do |token|
+      @tokens[@next - 5, 10].each_with_index do |token, index|
         dlog token
       end
       dlog ""
@@ -318,78 +319,39 @@ class Parser
     }, true)
   end
 
-
-
+  # Expressions
   def E
-    node_production Expression, :E1, :E2, :E3, :E4, :E5, :E6, :E7, :E8, :E9, :E10, :E11, :E12, :E13, :E14, :E15, :E16, :E17
-  end
+    node_production(Expression, Proc.new {
 
-  def E1
-    F() && term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
-  end
+      # Parse functions
+      F() && term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
+    }, Proc.new {
 
-  def E2
-    T() && term(:MULT) && E()
-  end
+      # Term
+      if T()
+        check_each([Proc.new {
+          (term(:MULT) || term(:DIVD) || term(:PLUS) || term(:MINUS) ||
+          term(:MODULUS) || term(:POW) || term(:GREATER) || term(:LESS) ||
+          term(:LESSEQ) || term(:GREATEREQ) || term(:EQ) || term(:NOTEQ)) && E()
+        }])
+      end
+    }, Proc.new {
 
-  def E3
-    T() && term(:DIVD) && E()
-  end
-
-  def E4
-    T() && term(:PLUS) && E()
-  end
-
-  def E5
-    T() && term(:MINUS) && E()
-  end
-
-  def E6
-    T() && term(:MODULUS) && E()
-  end
-
-  def E7
-    T() && term(:POW) && E()
-  end
-
-  def E8
-    T() && term(:GREATER) && E()
-  end
-
-  def E9
-    T() && term(:LESS) && E()
-  end
-
-  def E10
-    T() && term(:LESSEQ) && E()
-  end
-
-  def E11
-    T() && term(:GREATEREQ) && E()
-  end
-
-  def E12
-    T() && term(:EQ) && E()
-  end
-
-  def E13
-    T() && term(:NOTEQ) && E()
-  end
-
-  def E14
-    term(:IDENTIFIER) && term(:ASSIGNMENT) && E()
-  end
-
-  def E15
-    term(:IDENTIFIER) && term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
-  end
-
-  def E16
-    T()
-  end
-
-  def E17
-    F()
+      # Parse assignment and call expressions
+      if term(:IDENTIFIER)
+        check_each([Proc.new {
+          term(:ASSIGNMENT) && E()
+        }, Proc.new {
+          term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
+        }])
+      end
+    }, Proc.new {
+      check_each([Proc.new {
+        F()
+      }, Proc.new {
+        T()
+      }])
+    })
   end
 
 
