@@ -374,16 +374,18 @@ class Parser
     })
   end
 
-
   def F
-    node_production Expression, :F1
+    node_production(Expression, Proc.new {
+      term(:KEYWORD, "func") &&
+      term(:IDENTIFIER) &&
+      term(:LEFT_PAREN) &&
+      AL() &&
+      term(:RIGHT_PAREN) &&
+      term(:LEFT_CURLY) &&
+      B() &&
+      term(:RIGHT_CURLY)
+    })
   end
-
-  def F1
-    term(:KEYWORD, "func") && term(:IDENTIFIER) && term(:LEFT_PAREN) && AL() && term(:RIGHT_PAREN) && term(:LEFT_CURLY) && B() && term(:RIGHT_CURLY)
-  end
-
-
 
   def T
     node_production Expression, :T1, :T2, :T3, :T4, :T5, :T6
