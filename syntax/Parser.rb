@@ -374,6 +374,7 @@ class Parser
     })
   end
 
+  # Function literal
   def F
     node_production(Expression, Proc.new {
       term(:KEYWORD, "func") &&
@@ -387,31 +388,29 @@ class Parser
     })
   end
 
+  # Terms
   def T
-    node_production Expression, :T1, :T2, :T3, :T4, :T5, :T6
-  end
-
-  def T1
-    term(:LEFT_PAREN) && E() && term(:RIGHT_PAREN)
-  end
-
-  def T2
-    term(:IDENTIFIER) && term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
-  end
-
-  def T3
-    term(:NUMERICAL)
-  end
-
-  def T4
-    term(:IDENTIFIER)
-  end
-
-  def T5
-    term(:STRING)
-  end
-
-  def T6
-    term(:BOOLEAN)
+    node_production(Expression, Proc.new {
+      term(:LEFT_PAREN) &&
+      E() &&
+      term(:RIGHT_PAREN)
+    }, Proc.new {
+      if term(:IDENTIFIER)
+        check_each([Proc.new {
+          term(:IDENTIFIER) &&
+          term(:LEFT_PAREN) &&
+          EL() &&
+          term(:RIGHT_PAREN)
+        }, true])
+      end
+    }, Proc.new {
+      check_each([Proc.new {
+        term(:NUMERICAL)
+      }, Proc.new {
+        term(:STRING)
+      }, Proc.new {
+        term(:BOOLEAN)
+      }])
+    })
   end
 end
