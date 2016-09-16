@@ -330,9 +330,29 @@ class Parser
       # Term
       if T()
         check_each([Proc.new {
-          (term(:MULT) || term(:DIVD) || term(:PLUS) || term(:MINUS) ||
-          term(:MODULUS) || term(:POW) || term(:GREATER) || term(:LESS) ||
-          term(:LESSEQ) || term(:GREATEREQ) || term(:EQ) || term(:NOTEQ)) && E()
+          term(:MULT) && E()
+        }, Proc.new {
+          term(:DIVD) && E()
+        }, Proc.new {
+          term(:PLUS) && E()
+        }, Proc.new {
+          term(:MINUS) && E()
+        }, Proc.new {
+          term(:MODULUS) && E()
+        }, Proc.new {
+          term(:POW) && E()
+        }, Proc.new {
+          term(:GREATER) && E()
+        }, Proc.new {
+          term(:LESS) && E()
+        }, Proc.new {
+          term(:LESSEQ) && E()
+        }, Proc.new {
+          term(:GREATEREQ) && E()
+        }, Proc.new {
+          term(:EQ) && E()
+        }, Proc.new {
+          term(:NOTEQ) && E()
         }])
       end
     }, Proc.new {
