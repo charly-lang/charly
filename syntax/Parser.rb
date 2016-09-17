@@ -123,6 +123,10 @@ class Parser
         @node << new(LeftCurlyLiteral)
       when :RIGHT_CURLY
         @node << new(RightCurlyLiteral)
+      when :LEFT_BRACK
+        @node << new(LeftBracketLiteral)
+      when :RIGHT_BRACK
+        @node << new(RightBracketLiteral)
       when :PLUS
         @node << new(PlusOperator)
       when :MINUS

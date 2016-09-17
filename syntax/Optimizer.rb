@@ -151,7 +151,7 @@ class Optimizer
     end
 
     # Strip semicolons, commas
-    if node.is(CommaLiteral, SemicolonLiteral)
+    if node.is(CommaLiteral, SemicolonLiteral, LeftBracketLiteral, RightBracketLiteral)
       @finished = false
       return NIL
     end
