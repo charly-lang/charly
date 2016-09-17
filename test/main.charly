@@ -27,6 +27,13 @@ run(test(a, "Hello", "String comparison"), "test");
 
 
 
+# Test writing to index in array
+let someArray = [1, 2];
+someArray(1) = "it works";
+run(test(someArray(1), "it works", "Saving to array index"), "test");
+
+
+
 # Test nested array lookup
 let someArray2 = [1, [2, 3], 4];
 run(test(someArray2(1, 0), 2, "Array index lookup"), "test");
