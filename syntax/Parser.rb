@@ -361,14 +361,18 @@ class Parser
       end
     }, Proc.new {
 
-      # Parse assignment and call expressions
-      if term(:IDENTIFIER)
-        check_each([Proc.new {
-          term(:ASSIGNMENT) && E()
-        }, Proc.new {
-          term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
-        }])
+      # Parse assignments
+      matched = check_each([Proc.new {
+        CE()
+      }, Proc.new {
+        term(:IDENTIFIER)
+      }])
+
+      if matched
+        term(:ASSIGNMENT) && E()
       end
+    }, Proc.new {
+      CE()
     }, Proc.new {
       check_each([Proc.new {
         F()
@@ -381,7 +385,7 @@ class Parser
   # Call Expressions
   def CE
     node_production(CallExpressionNode, Proc.new {
-      false
+      term(:IDENTIFIER) && term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
     })
   end
 

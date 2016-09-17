@@ -39,6 +39,7 @@ let someArray2 = [1, [2, 3], 4];
 run(test(someArray2(1, 0), 2, "Array index lookup"), "test");
 
 
+
 # Test function scoping
 let name = "Leonard";
 let age = 16;

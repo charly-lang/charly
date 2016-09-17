@@ -205,6 +205,7 @@ class VariableAssignment < Expression
 end
 
 # A single function call expression
+class CallExpressionNode < Expression; end
 class CallExpression < Expression
   attr_reader :identifier, :argumentlist
 
@@ -255,6 +256,19 @@ end
 
 # An array
 class ArrayLiteral < Expression
+end
+
+# A write to an index in an array
+class ArrayIndexWrite < Expression
+  attr_accessor :identifier, :location, :expression
+
+  def initialize(identifier, location, expression, parent)
+    super(parent);
+    @identifier = identifier
+    @location = location
+    @expression = expression
+    @children = [identifier, location, expression]
+  end
 end
 
 # A terminal node mapping directly to a token

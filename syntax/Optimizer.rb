@@ -215,11 +215,17 @@ class Optimizer
         expression = node.children[2]
         operator = node.children[1]
 
-        if identifier.is IdentifierLiteral
-          if expression.is Expression, LiteralValue
-
+        if expression.is Expression, LiteralValue
+          if identifier.is IdentifierLiteral
             @finished = false
             return VariableAssignment.new(identifier, expression, node.parent)
+          elsif identifier.is CallExpression
+            @finished = false
+
+            # Get the needed information to get to the array
+            array_identifier = identifier.identifier
+            array_location = identifier.argumentlist
+            return ArrayIndexWrite.new(array_identifier, array_location, expression, node.parent)
           end
         end
       end
@@ -257,7 +263,7 @@ class Optimizer
     end
 
     # Call Expressions
-    if node.is(Statement, Expression) && node.children.length == 4
+    if node.is(CallExpressionNode) && node.children.length == 4
       child1 = node.children[0]
       child2 = node.children[1]
       child3 = node.children[2]
