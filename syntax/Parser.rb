@@ -64,7 +64,7 @@ class Parser
     end
 
     # Output the abstract syntax tree if the CLI flag was passed
-    if ARGV.include?("--ast") && file.filename != "prelude.txt"
+    if ARGV.include?("--ast") && file.filename != "prelude.charly"
       puts "--- #{file.filename} : Abstract Syntax Tree ---"
       puts @tree
       puts "------"
@@ -374,6 +374,13 @@ class Parser
     })
   end
 
+  # Call Expressions
+  def CE
+    node_production(CallExpressionNode, Proc.new {
+      false
+    })
+  end
+
   # Function literal
   def F
     node_production(Expression, Proc.new {
@@ -391,7 +398,9 @@ class Parser
   # Arrays
   def A
     node_production(ArrayLiteral, Proc.new {
-      term(:LEFT_BRACK) && EL() && term(:RIGHT_BRACK)
+      term(:LEFT_BRACK) &&
+      EL() &&
+      term(:RIGHT_BRACK)
     })
   end
 
@@ -402,22 +411,13 @@ class Parser
       E() &&
       term(:RIGHT_PAREN)
     }, Proc.new {
-      A()
-    },Proc.new {
-
-      # Identifiers or arrays
-      check_each([Proc.new {
-        term(:IDENTIFIER)
-      }, Proc.new {
-        A()
-      }])
-
-      # Optional calling parens
-      check_each([Proc.new {
-        term(:LEFT_PAREN) &&
-        EL() &&
-        term(:RIGHT_PAREN)
-      }, true])
+      if term(:IDENTIFIER)
+        check_each([Proc.new {
+          term(:LEFT_PAREN) &&
+          EL() &&
+          term(:RIGHT_PAREN)
+        }, true])
+      end
     }, Proc.new {
       check_each([Proc.new {
         term(:NUMERICAL)
@@ -425,6 +425,8 @@ class Parser
         term(:STRING)
       }, Proc.new {
         term(:BOOLEAN)
+      }, Proc.new {
+        A()
       }])
     })
   end

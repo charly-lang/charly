@@ -110,6 +110,16 @@ module Types
     end
   end
 
+  class ArrayType < Abstract
+    def initialize(values)
+      super(values);
+    end
+
+    def to_s
+      "[ArrayLiteral]"
+    end
+  end
+
   class StringType < Abstract
     def +(v)
       self.value + v.to_s

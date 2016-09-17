@@ -109,6 +109,10 @@ class Executor
       return self.exec_identifier_literal(node, stack)
     end
 
+    if node.is ArrayLiteral
+      return self.exec_array_literal(node, stack)
+    end
+
     if node.is FunctionLiteral
       return self.connect_function_to_stack(node, stack)
     end
@@ -237,6 +241,27 @@ class Executor
 
       # Check the stack for a function definition
       stack_value = stack[node.identifier.value]
+
+      # Return the corresponding item if an array was found
+      if stack_value.is_a? Types::ArrayType
+        arguments.each do |arg|
+
+          # Check if something else than a NumericType was passed
+          if !arg.is_a? Types::NumericType
+            raise "Array index operator expected Types::NumericType, got #{arg.class}"
+          end
+
+          # Check for out of bounds errors
+          if arg.value < 0 || arg.value > (stack_value.value.length - 1)
+            raise "Array index #{arg} is out of bounds!"
+          end
+
+          stack_value = stack_value.value[arg.value]
+        end
+
+        return stack_value
+      end
+
       if stack_value && stack_value.is(FunctionLiteral)
         function = stack_value
       else
@@ -348,6 +373,18 @@ class Executor
   # Return the value of an identifier
   def self.exec_identifier_literal(node, stack)
     return stack[node.value]
+  end
+
+  # Return an array
+  def self.exec_array_literal(node, stack)
+
+    # Resolve all children
+    children = []
+    node.children[0].children.each do |child|
+      children << self.exec_expression(child, stack)
+    end
+
+    return Types::ArrayType.new(children)
   end
 
   # Inline function literal
