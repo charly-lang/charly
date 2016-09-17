@@ -36,6 +36,8 @@ class Lexer
       [:RIGHT_PAREN,  /\A\)\Z/],
       [:LEFT_CURLY,   /\A\{\Z/],
       [:RIGHT_CURLY,  /\A\}\Z/],
+      [:LEFT_BRACK,   /\A\[\Z/],
+      [:RIGHT_BRACK,  /\A\]\Z/],
       [:WHITESPACE,   /\A\s+\Z/]
     ]
   end

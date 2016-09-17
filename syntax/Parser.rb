@@ -302,7 +302,7 @@ class Parser
     }, true)
   end
 
-  # Expression list
+  # Argument list
   def AL
     node_production(ArgumentList, Proc.new {
       if term(:IDENTIFIER)
@@ -388,6 +388,13 @@ class Parser
     })
   end
 
+  # Arrays
+  def A
+    node_production(ArrayLiteral, Proc.new {
+      term(:LEFT_BRACK) && EL() && term(:RIGHT_BRACK)
+    })
+  end
+
   # Terms
   def T
     node_production(Expression, Proc.new {
@@ -395,13 +402,22 @@ class Parser
       E() &&
       term(:RIGHT_PAREN)
     }, Proc.new {
-      if term(:IDENTIFIER)
-        check_each([Proc.new {
-          term(:LEFT_PAREN) &&
-          EL() &&
-          term(:RIGHT_PAREN)
-        }, true])
-      end
+      A()
+    },Proc.new {
+
+      # Identifiers or arrays
+      check_each([Proc.new {
+        term(:IDENTIFIER)
+      }, Proc.new {
+        A()
+      }])
+
+      # Optional calling parens
+      check_each([Proc.new {
+        term(:LEFT_PAREN) &&
+        EL() &&
+        term(:RIGHT_PAREN)
+      }, true])
     }, Proc.new {
       check_each([Proc.new {
         term(:NUMERICAL)

@@ -251,11 +251,10 @@ end
 
 # A list of identifiers seperated by commas
 class ArgumentList < ASTNode
-  def each
-    @children.each do |child|
-      yield child
-    end
-  end
+end
+
+# An array
+class ArrayLiteral < Expression
 end
 
 # A terminal node mapping directly to a token
@@ -287,6 +286,8 @@ class LeftParenLiteral < Terminal; end
 class RightParenLiteral < Terminal; end
 class LeftCurlyLiteral < Terminal; end
 class RightCurlyLiteral < Terminal; end
+class LeftBracketLiteral < Terminal; end
+class RightBracketLiteral < Terminal; end
 
 # Semicolon and comma
 class SemicolonLiteral < Terminal; end
