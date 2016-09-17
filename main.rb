@@ -10,7 +10,7 @@ end
 
 files = [ARGV[0]]
 unless ARGV.include? "--noprelude"
-  files.unshift "std/prelude.txt"
+  files.unshift "std/prelude.charly"
 end
 
 programs = []

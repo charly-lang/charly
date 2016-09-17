@@ -29,7 +29,7 @@ class Parser
     @next = 0
 
     # Output a list of tokens if the respective CLI flag was passed
-    if ARGV.include?("--tokens") && file.filename != "prelude.txt"
+    if ARGV.include?("--tokens") && file.filename != "prelude.charly"
       puts "--- found #{@tokens.length} tokens in #{yellow(file.filename)} ---"
       puts @tokens
       puts "------"
@@ -397,7 +397,6 @@ class Parser
     }, Proc.new {
       if term(:IDENTIFIER)
         check_each([Proc.new {
-          term(:IDENTIFIER) &&
           term(:LEFT_PAREN) &&
           EL() &&
           term(:RIGHT_PAREN)
