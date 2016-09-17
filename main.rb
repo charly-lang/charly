@@ -21,8 +21,10 @@ end
 
 unless ARGV.include? "--noexec"
   exitValue = Interpreter.new(programs).last_result
-  if !exitValue.kind_of?(Numeric)
+  if !exitValue.kind_of?(Types::NumericType)
     exitValue = 0
+  else
+    exitValue = exitValue.value
   end
   dlog "#{red("Exit:")} #{exitValue}"
 

@@ -77,6 +77,10 @@ class Executor
       return self.exec_variable_assignment(node, stack)
     end
 
+    if node.is ArrayIndexWrite
+      return self.exec_array_index_write(node, stack)
+    end
+
     if node.is BinaryExpression
       return self.exec_binary_expression(node, stack)
     end
@@ -157,6 +161,50 @@ class Executor
     #
     # not the value passed in
     return stack[node.identifier.value]
+  end
+
+  # Assign a value to an index inside an array
+  def self.exec_array_index_write(node, stack)
+    identifier = node.children[0].value
+    location = node.children[1].children.map do |child|
+      self.exec_expression(child, stack)
+    end
+    expression = self.exec_expression(node.children[2], stack)
+
+    # Get the right array from the stack
+    array = stack[identifier]
+
+    # Check if the value we got from the stack is really an array
+    if !array.is_a? Types::ArrayType
+      raise "#{identifier} is not an array."
+    end
+
+    # Iterate over the indexes
+    location.each_with_index do |loc, index|
+
+      # Check if the current location is the last
+      if index == location.length - 1
+
+        # This is the last index
+        array.value[loc.value] = expression
+      else
+
+        # Check if the values are an array
+        if !array.value.is_a? Array
+          raise "Index #{loc.value} is not an array"
+        end
+
+        # Check for out-of-bounds errors
+        if loc.value < 0 || loc.value > array.value.length - 1
+          raise "Index #{loc.value} is out of bounds"
+        end
+
+        # Update the array pointer
+        array = array.value[loc.value]
+      end
+    end
+
+    expression
   end
 
   # Perform a binary expression
@@ -300,7 +348,7 @@ class Executor
         if arg.is_a? Types::NullType
           puts "NIL"
         else
-          puts arg.value
+          puts arg
         end
       end
       return Types::NullType.new

@@ -16,14 +16,14 @@ let run = func onlyTrueWasPassed() {
 
 
 # Test variable assignment
-let a = 25;
-run(test(a, 25, "Variable Assignment"), "test");
+let someNumber = 25;
+run(test(someNumber, 25, "Variable Assignment"), "test");
 
 
 
 # Test string comparisons
-let a = "Hello";
-run(test(a, "Hello", "String comparison"), "test");
+let someString = "Hello";
+run(test(someString, "Hello", "String comparison"), "test");
 
 
 
