@@ -317,12 +317,33 @@ class Parser
     }, true)
   end
 
+  # Call Expression
+  def CE
+    node_production(CallExpressionNode, Proc.new {
+      matched = check_each([Proc.new {
+        term(:IDENTIFIER)
+      }])
+
+      if matched
+        check_each([Proc.new {
+          found_at_least_one = false
+          while peek_term(:LEFT_PAREN) && term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
+            found_at_least_one = true
+          end
+          found_at_least_one
+        }, true])
+      end
+    })
+  end
+
   # Expressions
   def E
     node_production(Expression, Proc.new {
-      matched = term(:IDENTIFIER) && check_each([Proc.new {
-        term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
-      }, true])
+      matched = check_each([Proc.new {
+        CE()
+      }, Proc.new {
+        term(:IDENTIFIER)
+      }])
 
       if matched
         term(:ASSIGNMENT) && E()
@@ -387,36 +408,23 @@ class Parser
   # Terms
   def T
     node_production(Expression, Proc.new {
-
-      matched = check_each([Proc.new {
-        term(:IDENTIFIER)
-      }, Proc.new {
-        F()
-      }])
-
-      if matched
-        check_each([Proc.new {
-          found_at_least_one = false
-          while peek_term(:LEFT_PAREN) && term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
-            found_at_least_one = true
-          end
-          found_at_least_one
-        }, true])
-      end
+      term(:NUMERICAL)
+    }, Proc.new {
+      term(:STRING)
+    }, Proc.new {
+      term(:BOOLEAN)
+    }, Proc.new {
+      A()
+    }, Proc.new {
+      F()
+    }, Proc.new {
+      CE()
+    }, Proc.new {
+      term(:IDENTIFIER)
     }, Proc.new {
       term(:LEFT_PAREN) &&
       E() &&
       term(:RIGHT_PAREN)
-    }, Proc.new {
-      check_each([Proc.new {
-        term(:NUMERICAL)
-      }, Proc.new {
-        term(:STRING)
-      }, Proc.new {
-        term(:BOOLEAN)
-      }, Proc.new {
-        A()
-      }])
     })
   end
 end
