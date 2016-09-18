@@ -1,15 +1,69 @@
 # Todos
 
-## Array syntax
-  - Functions inside standard library to get count of elements inside array
+- Function to print the AST of a block at run-time
+  - Depth property
 
-## Parse call expressions correctly
+- Function names should be optional
+
+- More functions for arrays and strings
+  - filter(array, callback) - Return an array containing the elements for which the passed block returned true
+  - first(array) - Return the first element in the array
+  - last(array) - Return the last element
+  - compact(array) - Return an array removing all NullType elements
+  - split(string, search) - Split a string into different pieces
+    - argument has to be a string containing the haystack
+    - if the argument is an empty string, return an array containing each char
+  - concat(array1, array2) - concat two arrays together
+  - secure_read(array, index) - Read the property at an index from an array. If the index is out of bounds, return NULL
+  - delete(arg) - Returns an array where all values equal to *arg* all removed
+  - delete_at(index) - Returns an array where the value at *index* is removed
+  - is_null(value) - Returns true if the value is null
+  - clone(array) - Returns a new array containing copies of all values
+  - empty(array) - Returns true if a given array is empty
+  - flatten(array) - returns an flattened array (recursively)
+  - reverse(array) - returns *array* reversed
+  - index_of(array, value) - returns the index of value inside array
+
+- Math functions
+  - rand() returns a random number between 0 and 1
+
+- Typecheck function
+  - Returns a string
+
+- IO Functions
+  - file_get_contents
+  - file_write_contents
+  - file_append_contents
+  - file_accessible
+  - file_create
+
+- Better control over print methods
+  - print() should print with newline
+  - dump() should print without newline
+
+- require(filename)
+  - run a given program inside *filename*
+  - filename can be a path, relative to the path of the current file
+  - if filename is a folder, require main.charly inside that directory
+  - if a file was already run, don't run again
+
+- load(filename)
+  - the exact same as require(filename) but the file is run again if it was already run before
+
+- global value called ARGV
+  - array of strings of arguments passed from the cli
+
+- Parse call expressions correctly
   - a()()() should work
   - a(1)(1)(1) = 25 should work (array syntax)
 
-## Rewrite Lexer
+- Optimize parser (passive long-term goal)
+  - Performance is currently pretty fucked up
+
+- Rewrite Lexer
+  - Performance is also pretty fucked up
   - If 0..n matches, all substrings until 0..n-1 also have to match (this is an issue)
   - Keep on moving the cursor if something doesn't match and the last string wasn't a match
 
-## Fix weird lexing errors
+- Fix weird lexing errors
   - "2-2" -> :NUM :NUM

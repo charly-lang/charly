@@ -11,7 +11,8 @@ TODO
 - [KCreate - Leonard Schütz](https://github.com/KCreate)
 
 # Inspired by
-TODO
+- Javascript
+- C
 
 # License
 The MIT License (MIT)
