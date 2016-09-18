@@ -36,7 +36,8 @@ class Executor
 
     # Check if the program should be executed
     unless program.should_execute
-      return Types::NullType.new
+      dlog "Program #{yellow(program.file.filename)} is marked as not executable, skipping..."
+      return Types::NumericType.new(1)
     end
 
     # Debugging

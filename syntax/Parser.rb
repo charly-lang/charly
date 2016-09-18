@@ -55,6 +55,7 @@ class Parser
         dlog token
       end
       dlog ""
+      @tree.should_execute = false
     end
 
     # Disable the optimizer if the respective CLI flag was passed
