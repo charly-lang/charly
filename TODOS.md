@@ -32,10 +32,6 @@
   - file_accessible
   - file_create
 
-- Better control over print methods
-  - print() should print with newline
-  - dump() should print without newline
-
 - require(filename)
   - run a given program inside *filename*
   - filename can be a path, relative to the path of the current file
