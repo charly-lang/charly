@@ -145,6 +145,15 @@ run(test(value, 5, "Global scope"), "test");
 
 
 
+# Test the array each function
+let total = 0;
+each([1, 2, 3], func cb(e) {
+    total = total + e;
+});
+run(test(total, 6, "Array each function"), "test");
+
+
+
 # Script exit code
 if (run(0, "result") == 0) {
     print("Test suite passed!");

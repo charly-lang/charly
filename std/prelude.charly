@@ -36,6 +36,7 @@ func test(comp1, comp2, title) {
         print_color(title + " passed!", 32);
     } else {
         print_color(title + " failed!", 31);
+        print_color("Expected: " + String(comp2) + ", got: " + String(comp1), 31);
     };
 
     # Return the result
@@ -61,6 +62,14 @@ func range(start, end, callback) {
 func length(array) {
     call_internal("length", array);
 };
-func each(array, callback) {};
+func each(array, callback) {
+    let i = 0;
+    let arrayCount = length(array);
+    while (i < arrayCount) {
+        callback(array(i), i);
+        i = i + 1;
+    };
+    array;
+};
 func map(array, callback) {};
 func filter(array, callback) {};
