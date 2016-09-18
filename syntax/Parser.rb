@@ -193,11 +193,7 @@ class Parser
       @node = temp
 
       # Try the production
-      if func.is_a? Proc
-        match = func.call unless match
-      else
-        match = method(func).call unless match
-      end
+      match = func.call unless match
 
       # Flush the temporary children to the real node
       if match
@@ -235,18 +231,16 @@ class Parser
 
   def S
     node_production(Statement, Proc.new {
+      E() && term(:TERMINAL)
+
+    }, Proc.new {
       if term(:KEYWORD, "let") && term(:IDENTIFIER)
         check_each([Proc.new {
           term(:ASSIGNMENT) && E() && term(:TERMINAL)
-
         }, Proc.new {
           term(:TERMINAL)
-
         }])
       end
-    }, Proc.new {
-      E() && term(:TERMINAL)
-
     }, Proc.new {
       I() && term(:TERMINAL)
 
@@ -326,6 +320,14 @@ class Parser
   # Expressions
   def E
     node_production(Expression, Proc.new {
+      matched = term(:IDENTIFIER) && check_each([Proc.new {
+        term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
+      }, true])
+
+      if matched
+        term(:ASSIGNMENT) && E()
+      end
+    }, Proc.new {
 
       # Term
       if T()
@@ -353,42 +355,10 @@ class Parser
           term(:EQ) && E()
         }, Proc.new {
           term(:NOTEQ) && E()
-        }])
+        }, true])
       end
-    }, Proc.new {
 
-      # Parse assignments
-      matched = check_each([Proc.new {
-        CE()
-      }, Proc.new {
-        term(:IDENTIFIER)
-      }])
-
-      if matched
-        term(:ASSIGNMENT) && E()
-      end
-    }, Proc.new {
-      check_each([Proc.new {
-        T()
-      }, Proc.new {
-        F()
-      }])
-    })
-  end
-
-  # Call Expressions
-  def CE
-    node_production(CallExpressionNode, Proc.new {
-      matched = check_each([Proc.new {
-        term(:IDENTIFIER)
-      }, Proc.new {
-        F()
-      }])
-
-      if matched
-        term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
-      end
-    })
+    });
   end
 
   # Function literal
@@ -417,15 +387,28 @@ class Parser
   # Terms
   def T
     node_production(Expression, Proc.new {
+
+      matched = check_each([Proc.new {
+        term(:IDENTIFIER)
+      }, Proc.new {
+        F()
+      }])
+
+      if matched
+        check_each([Proc.new {
+          found_at_least_one = false
+          while peek_term(:LEFT_PAREN) && term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
+            found_at_least_one = true
+          end
+          found_at_least_one
+        }, true])
+      end
+    }, Proc.new {
       term(:LEFT_PAREN) &&
       E() &&
       term(:RIGHT_PAREN)
     }, Proc.new {
-      CE()
-    }, Proc.new {
       check_each([Proc.new {
-        term(:IDENTIFIER)
-      }, Proc.new {
         term(:NUMERICAL)
       }, Proc.new {
         term(:STRING)

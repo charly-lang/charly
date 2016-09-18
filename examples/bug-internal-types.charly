@@ -1,1 +1,3 @@
-func run() {}();
+let data = [1, 2];
+data(1) = 4;
+print(data);

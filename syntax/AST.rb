@@ -205,7 +205,6 @@ class VariableAssignment < Expression
 end
 
 # A single function call expression
-class CallExpressionNode < Expression; end
 class CallExpression < Expression
   attr_reader :identifier, :argumentlist
 
