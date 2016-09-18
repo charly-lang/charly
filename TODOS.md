@@ -25,9 +25,6 @@
 - Math functions
   - rand() returns a random number between 0 and 1
 
-- Typecheck function
-  - Returns a string
-
 - IO Functions
   - file_get_contents
   - file_write_contents

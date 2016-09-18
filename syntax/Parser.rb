@@ -111,6 +111,8 @@ class Parser
 
     if match
       case token
+      when :NULL
+        @node << new(NullLiteral)
       when :NUMERICAL
         @node << new(NumericLiteral)
       when :IDENTIFIER
@@ -411,6 +413,8 @@ class Parser
       term(:STRING)
     }, Proc.new {
       term(:BOOLEAN)
+    }, Proc.new {
+      term(:NULL)
     }, Proc.new {
       A()
     }, Proc.new {

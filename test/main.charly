@@ -189,6 +189,18 @@ run(test(received, 10, "Optional function names"), "test");
 
 
 
+# typeof function
+run(test(typeof("test"), "String", "Typeof 1"), "test");
+run(test(typeof(25), "Numeric", "Typeof 2"), "test");
+run(test(typeof(2.5), "Numeric", "Typeof 3"), "test");
+run(test(typeof(-2.7), "Numeric", "Typeof 4"), "test");
+run(test(typeof([1, 2, 3]), "Array", "Typeof 5"), "test");
+run(test(typeof(true), "Bool", "Typeof 6"), "test");
+run(test(typeof(false), "Bool", "Typeof 7"), "test");
+run(test(typeof(null), "Null", "Typeof 8"), "test");
+
+
+
 # Script exit code
 if (run(0, "result") == 0) {
     print("Test suite passed!");

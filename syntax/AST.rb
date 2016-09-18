@@ -228,19 +228,6 @@ class FunctionDefinitionExpression < Expression
   end
 end
 
-# A single function literal
-class FunctionLiteral < Expression
-    attr_reader :identifier, :argumentlist, :block
-
-    def initialize(identifier, argumentlist, block, parent)
-        super(parent)
-        @identifier = identifier
-        @argumentlist = argumentlist
-        @block = block
-        @children = [@identifier, @argumentlist, @block]
-    end
-end
-
 # A list of expressions seperated by commas
 class ExpressionList < ASTNode
   def each
@@ -252,10 +239,6 @@ end
 
 # A list of identifiers seperated by commas
 class ArgumentList < ASTNode
-end
-
-# An array
-class ArrayLiteral < Expression
 end
 
 # A write to an index in an array
@@ -290,10 +273,23 @@ class LiteralValue < Terminal; end;
 
 # A single numeric literal
 class NumericLiteral < LiteralValue; end
+class NullLiteral < LiteralValue; end
 class IdentifierLiteral < LiteralValue; end
 class StringLiteral < LiteralValue; end
 class KeywordLiteral < LiteralValue; end
 class BooleanLiteral < LiteralValue; end
+class ArrayLiteral < Expression; end
+class FunctionLiteral < Expression
+    attr_reader :identifier, :argumentlist, :block
+
+    def initialize(identifier, argumentlist, block, parent)
+        super(parent)
+        @identifier = identifier
+        @argumentlist = argumentlist
+        @block = block
+        @children = [@identifier, @argumentlist, @block]
+    end
+end
 
 # Parantheses
 class LeftParenLiteral < Terminal; end

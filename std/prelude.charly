@@ -30,6 +30,10 @@ func print_color(arg, color_code) {
     call_internal("print_color", arg, color_code);
 };
 
+func typeof(value) {
+    call_internal("typeof", value);
+};
+
 func test(comp1, comp2, title) {
     let result = comp1 == comp2;
     if (result) {

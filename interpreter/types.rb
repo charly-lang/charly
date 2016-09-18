@@ -90,6 +90,10 @@ module Types
         stack[idents[index]] = val
       end
     end
+
+    def self.to_s
+      "Function"
+    end
   end
 
   class NullType < Abstract
@@ -99,6 +103,10 @@ module Types
 
     def to_s
       StringType.new "NULL"
+    end
+
+    def self.to_s
+      "Null"
     end
   end
 
@@ -110,6 +118,10 @@ module Types
         super
       end
     end
+
+    def self.to_s
+      "Numeric"
+    end
   end
 
   class ArrayType < Abstract
@@ -120,17 +132,33 @@ module Types
     def to_s
       "[ArrayLiteral]"
     end
+
+    def self.to_s
+      "Array"
+    end
   end
 
   class StringType < Abstract
     def +(v)
       self.value + v.to_s
     end
+
+    def self.to_s
+      "String"
+    end
   end
 
   class BooleanType < Abstract
-    class True < Abstract; end
-    class False < Abstract; end
+    class True < Abstract
+      def self.to_s
+        "Bool"
+      end
+    end
+    class False < Abstract
+      def self.to_s
+        "Bool"
+      end
+    end
 
     def self.new(value)
       if value
