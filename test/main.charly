@@ -196,6 +196,11 @@ run(test(last([1, 2]), 2, "last function"), "test");
 
 
 
+# Check compact function
+run(test(compact([1, null, 2, null, null]), [1, 2], "compact function"), "test");
+
+
+
 # Test if optional function identifiers work
 let received = 0;
 func increment(value, callback) {

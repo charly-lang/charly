@@ -150,3 +150,9 @@ func last(array) {
         null;
     };
 };
+
+func compact(array) {
+    filter(array, func(v) {
+        v ! null;
+    });
+};
