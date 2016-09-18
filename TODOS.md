@@ -3,8 +3,6 @@
 - Function to print the AST of a block at run-time
   - Depth property
 
-- Function names should be optional
-
 - More functions for arrays and strings
   - filter(array, callback) - Return an array containing the elements for which the passed block returned true
   - first(array) - Return the first element in the array

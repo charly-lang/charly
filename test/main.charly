@@ -177,6 +177,18 @@ run(test(total, 10, "map function"), "test");
 
 
 
+# Test if optional function identifiers work
+let received = 0;
+func increment(value, callback) {
+    callback(value + 1);
+};
+increment(9, func(value) {
+    received = value;
+});
+run(test(received, 10, "Optional function names"), "test");
+
+
+
 # Script exit code
 if (run(0, "result") == 0) {
     print("Test suite passed!");
