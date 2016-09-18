@@ -81,6 +81,10 @@ run(test(20 == 10, false, "Equal than negated"), "test");
 run(test(20 ! 10, true, "Not Equal than"), "test");
 run(test(20 ! 20, false, "Not Equal than negated"), "test");
 
+run(test([1, 2, 3] == [1, 2, 3], true, "Arrays equal"), "test");
+run(test([[1], 2, 3] == [[1], 2, 3], true, "Nested arrays equal"), "test");
+run(test([1, 2, 3, 4] == [1, 2, 3], false, "Unmatching arrays"), "test");
+
 
 
 # Check binary operators

@@ -3,6 +3,11 @@
 - Function to print the AST of a block at run-time
   - Depth property
 
+- Comparing arrays to arrays
+  - Check the length first
+  - Check if each value is equal to the corresponding in the other array
+  - Nested arrays are checked recursively
+
 - More functions for arrays and strings
   - filter(array, callback) - Return an array containing the elements for which the passed block returned true
   - first(array) - Return the first element in the array

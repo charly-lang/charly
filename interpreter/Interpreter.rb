@@ -244,7 +244,24 @@ class Executor
     when SmallerEqualOperator
       return Types::BooleanType.new(left <= right)
     when EqualOperator
-      return Types::BooleanType.new(left == right)
+      if left.is_a?(Types::ArrayType) && right.is_a?(Types::ArrayType)
+        if left.value.count == right.value.count
+
+          # Check each property in the array and compare it to the corresponding in the other one
+          equal = false
+          left.value.each_with_index do |left_value, index|
+
+            # Construct a comparison node from the ast
+            comparison = ComparisonExpression.new("==", left_value, right.value[index], node.parent)
+            equal = self.exec_comparison_expression(comparison, stack) unless equal
+          end
+          return Types::BooleanType.new(equal)
+        else
+          return Types::BooleanType.new(false)
+        end
+      else
+        return Types::BooleanType.new(left == right)
+      end
     when NotEqualOperator
       return Types::BooleanType.new(left != right)
     end
