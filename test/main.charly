@@ -181,6 +181,15 @@ run(test(total, 10, "map function"), "test");
 
 
 
+# Check the filter function
+let initial = [1, 2, 3, 4, 5];
+initial = filter(initial, func(value) {
+    value < 3;
+});
+run(test(initial, [1, 2], "filter function"), "test");
+
+
+
 # Test if optional function identifiers work
 let received = 0;
 func increment(value, callback) {

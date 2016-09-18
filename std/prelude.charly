@@ -118,3 +118,18 @@ func map(array, callback) {
 
     new_array;
 };
+
+func filter(array, callback) {
+
+    # Create the new array
+    let new_array = array_of_size(0);
+
+    # Add the values to the array
+    each(array, func(e) {
+        if (callback(e)) {
+            new_array = append(new_array, e) ;
+        };
+    });
+
+    new_array;
+};
