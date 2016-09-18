@@ -2,6 +2,10 @@ func print(arg) {
     call_internal("print", arg);
 };
 
+func dump(arg) {
+    call_internal("dump", arg);
+};
+
 func Number(arg) {
     call_internal("Number", arg);
 };

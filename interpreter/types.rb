@@ -91,6 +91,10 @@ module Types
       end
     end
 
+    def to_s
+      "Function:#{@identifier}"
+    end
+
     def self.to_s
       "Function"
     end
@@ -102,7 +106,7 @@ module Types
     end
 
     def to_s
-      StringType.new "NULL"
+      "NULL"
     end
 
     def self.to_s
@@ -130,7 +134,9 @@ module Types
     end
 
     def to_s
-      "[ArrayLiteral]"
+      @values.each do |value|
+        puts value
+      end
     end
 
     def self.to_s

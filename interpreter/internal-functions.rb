@@ -7,13 +7,15 @@ class Interpreter
       case name.value
       when "print"
         arguments.each do |arg|
-          if arg.is_a? Types::NullType
-            puts "NIL"
-          else
-            puts arg
-          end
+          puts arg
+          STDOUT.flush
         end
         return Types::NullType.new
+      when "dump"
+        arguments.each do |arg|
+          print arg
+          STDOUT.flush
+        end
       when "Boolean"
         return Types::BooleanType.new(eval_bool(arguments[0].value))
       when "Number"
