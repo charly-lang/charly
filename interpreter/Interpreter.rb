@@ -383,6 +383,12 @@ class Executor
         # TODO: Better error message
         raise "Invalid type"
       end
+    when "array_of_size"
+      values = []
+      arguments[0].value.to_i.times do |i|
+        values << Types::NullType.new
+      end
+      return Types::ArrayType.new(values)
     end
   end
 

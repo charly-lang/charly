@@ -154,6 +154,12 @@ run(test(total, 6, "Array each function"), "test");
 
 
 
+# Check if array_of_size returns a correctly sized array
+let array = array_of_size(5);
+run(test(length(array), 5, "array_of_size returns correctly"), "test");
+
+
+
 # Script exit code
 if (run(0, "result") == 0) {
     print("Test suite passed!");

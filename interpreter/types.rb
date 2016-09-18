@@ -21,6 +21,8 @@ module Types
       return StringType.new(value)
     when Boolean
       return BooleanType.new(value)
+    when Array
+      return ArrayType.new(value)
     when NullType
       return value
     else

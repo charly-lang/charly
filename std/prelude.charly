@@ -59,9 +59,14 @@ func range(start, end, callback) {
     };
 };
 
+func array_of_size(size) {
+    call_internal("array_of_size", size);
+};
+
 func length(array) {
     call_internal("length", array);
 };
+
 func each(array, callback) {
     let i = 0;
     let arrayCount = length(array);
@@ -71,5 +76,3 @@ func each(array, callback) {
     };
     array;
 };
-func map(array, callback) {};
-func filter(array, callback) {};
