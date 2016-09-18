@@ -160,6 +160,13 @@ run(test(length(array), 5, "array_of_size returns correctly"), "test");
 
 
 
+# Append function works correctly
+let initial = [1, 2];
+initial = append(initial, 3);
+run(test(initial(2), 3, "append function"), "test");
+
+
+
 # Script exit code
 if (run(0, "result") == 0) {
     print("Test suite passed!");

@@ -76,3 +76,20 @@ func each(array, callback) {
     };
     array;
 };
+
+func append(array, value) {
+
+    # Create the new array
+    let new_array = array_of_size(length(array) + 1);
+
+    # Copy the old values into the new array
+    each(array, func cb(e, i) {
+        new_array(i) = e;
+    });
+
+    # Add the new value
+    let last_index = length(new_array) - 1;
+    new_array(last_index) = value;
+
+    new_array;
+};
