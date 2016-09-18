@@ -53,6 +53,8 @@ class Interpreter
         return Types::ArrayType.new(values)
       when "typeof"
         return Types::StringType.new(arguments[0].class.to_s)
+      when "rand"
+        return Types::NumericType.new(rand)
       end
     end
   end

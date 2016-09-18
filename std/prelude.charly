@@ -34,6 +34,10 @@ func typeof(value) {
     call_internal("typeof", value);
 };
 
+func rand() {
+    call_internal("rand");
+};
+
 func test(comp1, comp2, title) {
     let result = comp1 == comp2;
     if (result) {

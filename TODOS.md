@@ -23,7 +23,7 @@
   - index_of(array, value) - returns the index of value inside array
 
 - Math functions
-  - rand() returns a random number between 0 and 1
+  - Just interface with the native ruby methods
 
 - IO Functions
   - file_get_contents

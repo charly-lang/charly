@@ -201,6 +201,13 @@ run(test(typeof(null), "Null", "Typeof 8"), "test");
 
 
 
+# Random function
+run(test(typeof(rand()), "Numeric", "Random 1"), "test");
+run(test(typeof(rand()), "Numeric", "Random 2"), "test");
+run(test(typeof(rand()), "Numeric", "Random 3"), "test");
+
+
+
 # Script exit code
 if (run(0, "result") == 0) {
     print("Test suite passed!");
