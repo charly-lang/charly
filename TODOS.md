@@ -4,8 +4,6 @@
   - Depth property
 
 - More functions for arrays and strings
-  - first(array) - Return the first element in the array
-  - last(array) - Return the last element
   - compact(array) - Return an array removing all NullType elements
   - split(string, search) - Split a string into different pieces
     - argument has to be a string containing the haystack

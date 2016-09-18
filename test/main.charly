@@ -190,6 +190,12 @@ run(test(initial, [1, 2], "filter function"), "test");
 
 
 
+# Check the first and last functions
+run(test(first([1, 2]), 1, "first function"), "test");
+run(test(last([1, 2]), 2, "last function"), "test");
+
+
+
 # Test if optional function identifiers work
 let received = 0;
 func increment(value, callback) {

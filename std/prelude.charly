@@ -133,3 +133,20 @@ func filter(array, callback) {
 
     new_array;
 };
+
+func first(array) {
+    if (length(array) > 0) {
+        array(0);
+    } else {
+        null;
+    };
+};
+
+func last(array) {
+    let array_count = length(array);
+    if (array_count > 0) {
+        array(array_count - 1);
+    } else {
+        null;
+    };
+};
