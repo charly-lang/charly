@@ -167,6 +167,16 @@ run(test(initial(2), 3, "append function"), "test");
 
 
 
+# Check if the map function works correctly
+let initial = [1, 2, 3, 4];
+let total = 0;
+map(initial, func cb(e) {
+    total = total + e;
+});
+run(test(total, 10, "map function"), "test");
+
+
+
 # Script exit code
 if (run(0, "result") == 0) {
     print("Test suite passed!");

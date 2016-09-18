@@ -93,3 +93,16 @@ func append(array, value) {
 
     new_array;
 };
+
+func map(array, callback) {
+
+    # Create the new array
+    let new_array = array_of_size(length(array));
+
+    # Add the values to the array
+    each(array, func cb(e, i) {
+        new_array(i) = callback(e, i);
+    });
+
+    new_array;
+};
