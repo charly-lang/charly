@@ -279,7 +279,7 @@ class Optimizer
     end
 
     # Function literals
-    if node.is(Expression) && node.children.length == 8
+    if node.is(Expression) && (node.children.length == 8 || node.children.length == 7)
       child1 = node.children[0]
       child2 = node.children[1]
       child3 = node.children[2]
@@ -289,20 +289,41 @@ class Optimizer
       child7 = node.children[6]
       child8 = node.children[7]
 
-      # Check for the func keyword and identifier
-      if child1.value == "func" && child2.is(IdentifierLiteral)
+      # Check for the func keyword
+      if child1.value == "func"
 
-        # Check for braces and parens
-        if child3.is(LeftParenLiteral) && child5.is(RightParenLiteral) &&
-          child6.is(LeftCurlyLiteral) && child8.is(RightCurlyLiteral)
+        # Check if an identifier was passed
+        if node.children.length == 8
 
-          # Check for the block and the argumentlist
-          if child4.is(ArgumentList) && child7.is(Block)
+          # Check for braces and parens
+          if child3.is(LeftParenLiteral) && child5.is(RightParenLiteral) &&
+            child6.is(LeftCurlyLiteral) && child8.is(RightCurlyLiteral)
 
-            @finished = false
-            return FunctionLiteral.new(child2, child4, child7, node.parent)
+            # Check for the block and the argumentlist
+            if child4.is(ArgumentList) && child7.is(Block)
+
+              @finished = false
+              return FunctionLiteral.new(child2, child4, child7, node.parent)
+            end
+          end
+        else
+
+          # Check for braces and parens
+          if child2.is(LeftParenLiteral) && child4.is(RightParenLiteral) &&
+            child5.is(LeftCurlyLiteral) && child7.is(RightCurlyLiteral)
+
+            # Check for the block and the argumentlist
+            if child3.is(ArgumentList) && child6.is(Block)
+
+              @finished = false
+              return FunctionLiteral.new(nil, child3, child6, node.parent)
+            end
           end
         end
+      end
+
+      # Check for the func keyword and identifier
+      if child1.value == "func" && child2.is(IdentifierLiteral)
       end
     end
 

@@ -384,7 +384,9 @@ class Parser
   def F
     node_production(Expression, Proc.new {
       term(:KEYWORD, "func") &&
-      term(:IDENTIFIER) &&
+      check_each([Proc.new {
+        term(:IDENTIFIER)
+      }, true]) &&
       term(:LEFT_PAREN) &&
       AL() &&
       term(:RIGHT_PAREN) &&

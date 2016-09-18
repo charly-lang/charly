@@ -1,9 +1,0 @@
-# Define a function that takes an argument and a callback
-func call(value, callback) {
-    callback(value);
-};
-
-# Call and print the value
-print(call(25, func callback(value) {
-    value + 5;
-}));

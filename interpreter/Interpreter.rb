@@ -257,11 +257,14 @@ class Executor
   def self.exec_function_definition(node, stack)
     function = node.function
     function.block.parent_stack = stack
-    stack[function.identifier.value, true] = function
 
-    # The return value of a function definition
-    # is the function itself
-    stack[function.identifier.value]
+    # If the function is anonymous, it should not be saved inside the stack
+    if function.identifier == nil
+      function
+    else
+      stack[function.identifier.value, true] = function
+      stack[function.identifier.value]
+    end
   end
 
   # Execute a call expression
@@ -278,9 +281,7 @@ class Executor
     function = Types::NullType.new
 
     # check if the function is a function literal
-    if node.identifier.is(FunctionLiteral)
-      function = node.identifier
-    elsif node.identifier.is(IdentifierLiteral)
+    if node.identifier.is(IdentifierLiteral)
 
       # Check for an internal function call
       if node.identifier.value == "call_internal"
