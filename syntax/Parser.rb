@@ -44,7 +44,7 @@ class Parser
 
     # Generate the abstract syntax tree, starting with a statement
     dlog "Generating abstract syntax tree"
-    B()
+    BlockBody()
 
     # Check if all tokens were parsed
     # Show the range in which parsing failed
@@ -220,6 +220,10 @@ class Parser
   end
 
   def B
+    term(:LEFT_CURLY) && BlockBody() && term(:RIGHT_CURLY)
+  end
+
+  def BlockBody
     node_production(Block, Proc.new {
       found_at_least_one = false
       while !peek_term(:RIGHT_CURLY) && S()
@@ -249,9 +253,7 @@ class Parser
       term(:LEFT_PAREN) &&
       E() &&
       term(:RIGHT_PAREN) &&
-      term(:LEFT_CURLY) &&
       B() &&
-      term(:RIGHT_CURLY) &&
       term(:TERMINAL)
 
     })
@@ -263,19 +265,15 @@ class Parser
           term(:LEFT_PAREN) &&
           E() &&
           term(:RIGHT_PAREN) &&
-          term(:LEFT_CURLY) &&
-          B() &&
-          term(:RIGHT_CURLY)
+          B()
 
         # Parse the else or else if clause
         check_each([Proc.new {
           if term(:KEYWORD, "else")
             check_each([Proc.new {
-              term(:LEFT_CURLY) && B() && term(:RIGHT_CURLY)
-
+              B()
             }, Proc.new {
               I()
-
             }, true])
           end
         }, true])
@@ -390,9 +388,7 @@ class Parser
       term(:LEFT_PAREN) &&
       AL() &&
       term(:RIGHT_PAREN) &&
-      term(:LEFT_CURLY) &&
-      B() &&
-      term(:RIGHT_CURLY)
+      B()
     })
   end
 
