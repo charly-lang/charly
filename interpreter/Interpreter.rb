@@ -370,6 +370,19 @@ class Executor
     when "print_color"
       puts colorize(arguments[0].value, arguments[1].value)
       return Types::NullType.new
+    when "length"
+      case arguments[0]
+      when Types::ArrayType
+        Types::NumericType.new(arguments[0].value.length)
+      when Types::StringType
+        Types::NumericType.new(arguments[0].value.length)
+      when Types::NumericType
+        arguments[0]
+      else
+
+        # TODO: Better error message
+        raise "Invalid type"
+      end
     end
   end
 

@@ -57,3 +57,10 @@ func range(start, end, callback) {
         i = i + 1;
     };
 };
+
+func length(array) {
+    call_internal("length", array);
+};
+func each(array, callback) {};
+func map(array, callback) {};
+func filter(array, callback) {};

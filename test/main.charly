@@ -41,6 +41,14 @@ run(test(someArray2(1, 0), 2, "Array index lookup"), "test");
 
 
 
+# Get the length different properties
+run(test(length([1, 2, 3, [4, 5]]), 4, "Array count function"), "test");
+run(test(length("Hello World"), 11, "String count function"), "test");
+run(test(length(2), 2, "Numeric count function"), "test");
+run(test(length(2000), 2000, "Numeric 2 count function"), "test");
+
+
+
 # Test function scoping
 let name = "Leonard";
 let age = 16;
