@@ -10,11 +10,9 @@
   - secure_read(array, index) - Read the property at an index from an array. If the index is out of bounds, return NULL
   - delete(arg) - Returns an array where all values equal to *arg* all removed
   - delete_at(index) - Returns an array where the value at *index* is removed
-  - is_null(value) - Returns true if the value is null
   - clone(array) - Returns a new array containing copies of all values
   - empty(array) - Returns true if a given array is empty
   - flatten(array) - returns an flattened array (recursively)
-  - reverse(array) - returns *array* reversed
   - index_of(array, value) - returns the index of value inside array
 
 - Math functions

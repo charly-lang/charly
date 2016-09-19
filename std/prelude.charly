@@ -164,10 +164,19 @@ func concat(array1, array2) {
     each(array2, func(v, i) {
         new_array(i + length(array1)) = v;
     });
-
     new_array;
 };
 
 func is_null(value) {
     value == null;
+};
+
+func reverse(array) {
+    let array_length = length(array);
+    let new_array = array_of_size(array_length);
+
+    repeat(array_length, func(i) {
+        new_array(array_length - (i + 1)) = array(i);
+    });
+    new_array;
 };
