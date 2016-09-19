@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/KCreate/interpreter-testing.svg?token=yitMwy9Lg5peiAqCZjoK&branch=master)](https://travis-ci.com/KCreate/interpreter-testing)
+[![Build Status](https://travis-ci.com/KCreate/charly-lang.svg?token=yitMwy9Lg5peiAqCZjoK&branch=master)](https://travis-ci.com/KCreate/charly-lang)
 
 # The __Charly__ programming language interpreter
 
