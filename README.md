@@ -7,6 +7,22 @@ This is my try at writing an interpreter of a dynamic language from scratch with
 # Syntax
 TODO
 
+# CLI options
+```
+ruby main.rb filename [options...]
+
+<options>
+ --log              # Display logging info
+ --ast              # Display the abstract syntax tree
+ --tokens           # Display a list of tokens found by lexical analysis
+ --noexec           # Don't execute the program
+ --noopt            # Skip the structurization step in the parser (useful for debugging)
+ --nometa           # Hide meta info in the abstract syntax tree
+ --noprelude        # Don't load the prelude file
+ --nodeproductions  # Display realtime-information about nodes being produced (laggy af)
+ --dump-ast-json    # Dump the Abstract Syntax Tree of all programs in a file called AST.#{filename}.json inside the parser-dump directory
+```
+
 # Contributors
 - [KCreate - Leonard Schütz](https://github.com/KCreate)
 
