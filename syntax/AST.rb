@@ -56,7 +56,7 @@ class ASTNode
       lines.each {|line|
         if line[0] == "#"
           if children.length == 1 && child.children.length < 2
-            string += line.indent(1, "└╴");
+            string += line.indent(1, "└╴")
           else
             string += line.indent(1, "├╴")
           end
@@ -66,6 +66,24 @@ class ASTNode
       }
     end
     string
+  end
+
+  def as_json(*a)
+    if @children.length > 0
+      {
+        "name" => self.class.to_s,
+        "children" => @children
+      }
+    else
+      {
+        "name" => self.class.to_s,
+        "value" => @value,
+      }
+    end
+  end
+
+  def to_json(*a)
+    as_json.to_json(*a)
   end
 end
 

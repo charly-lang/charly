@@ -9,3 +9,4 @@ ruby main.rb filename [options...]
  --nometa           # Hide meta info in the abstract syntax tree
  --noprelude        # Don't load the prelude file
  --nodeproductions  # Display realtime-information about nodes being produced (laggy af)
+ --dump-ast-json    # Dump the Abstract Syntax Tree of all programs in a file called AST.#{filename}.json inside the parser-dump directory

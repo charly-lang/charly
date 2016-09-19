@@ -71,6 +71,25 @@ class Parser
       puts "------"
     end
 
+    # Output a png file of the AST if the given flag was passed
+    if ARGV.include?("--dump-ast-json") && file.filename != "prelude.charly"
+
+      # We require the json module for this
+      require "json"
+
+      # Create the parser-dump directory if it doesn't exist
+      require 'fileutils'
+      FileUtils::mkdir_p 'parser-dump'
+
+      # Convert the tree to a json structure
+      tree_as_json = JSON.pretty_generate @tree
+
+      # Print the file in the parser-dump directory
+      file = File.new("parser-dump/AST.#{file.filename}.json", "w")
+      file.write tree_as_json
+      file.close
+    end
+
     @tree
   end
 
