@@ -121,8 +121,8 @@ func filter(array, callback) {
     let new_array = array_of_size(0);
 
     # Add the values to the array
-    each(array, func(e) {
-        if (callback(e)) {
+    each(array, func(e, i) {
+        if (callback(e, i)) {
             new_array = append(new_array, e) ;
         };
     });
@@ -191,4 +191,14 @@ func empty(array) {
         };
     });
     all_null;
+};
+
+func delete(array, value) {
+    print("Standard Library: The delete function is not implemented yet.");
+};
+
+func delete_at(array, index) {
+    filter(array, func(v, i) {
+        i ! index;
+    });
 };

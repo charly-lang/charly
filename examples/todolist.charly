@@ -1,0 +1,51 @@
+let todos = [];
+
+func question(title) {
+    print("");
+    dump(title);
+    gets();
+};
+
+# Main loop
+let should_exit = false;
+while (should_exit == false) {
+
+    # Print all todos
+    each(todos, func(todo, index) {
+        if (todo(1)) {
+            dump("[X] ");
+        } else {
+            dump("[ ] ");
+        };
+        print(String(index) + ": " + todo(0));
+    });
+
+    # Print the menu
+    print("");
+    print("-- Todo List written in Charly --");
+    print("-- 1: Add menu item");
+    print("-- 2: Toggle menu item");
+    print("-- 3: Delete menu item");
+    print("-- 4: Quit Todolist");
+    let menu = Number(question("Selection: "));
+
+    # Different menus
+    if (menu == 4) {
+        should_exit = true;
+    };
+
+    if (menu == 1) {
+        let todo_title = question("Title for your new todo: ");
+        todos = append(todos, [todo_title, false]);
+    };
+
+    if (menu == 2) {
+        let todo_index = Number(question("Index to toggle: "));
+        todos(todo_index, 1) = todos(todo_index, 1) == false;
+    };
+
+    if (menu == 3) {
+        let todo_index = Number(question("Index to delete: "));
+        todos = delete_at(todos, todo_index);
+    };
+};

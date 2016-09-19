@@ -340,7 +340,11 @@ class Executor
 
     # Check if the correct amount of arguments was passed
     if arguments.length < argument_ids.length
-      raise "#{function.identifier.value} expected #{argument_ids.length} argument(s), got #{arguments.length} instead!"
+      if function.identifier.is_a? NilClass
+        raise "Anonymous function expected #{argument_ids.length} argument(s), got #{arguments.length} instead!"
+      else
+        raise "#{function.identifier.value} expected #{argument_ids.length} argument(s), got #{arguments.length} instead!"
+      end
     end
 
     # Create new stack for the function arguments to be saved in
