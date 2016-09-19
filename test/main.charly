@@ -201,6 +201,11 @@ run(test(compact([1, null, 2, null, null]), [1, 2], "compact function"), "test")
 
 
 
+# Check the concat function
+run(test(concat([1, 2], [3, 4]), [1, 2, 3, 4], "concat function"), "test");
+
+
+
 # Test if optional function identifiers work
 let received = 0;
 func increment(value, callback) {

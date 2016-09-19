@@ -152,3 +152,18 @@ func compact(array) {
         v ! null;
     });
 };
+
+func concat(array1, array2) {
+    let new_length = length(array1) + length(array2);
+    let new_array = array_of_size(new_length);
+
+    # Copy all values
+    each(array1, func(v, i) {
+        new_array(i) = v;
+    });
+    each(array2, func(v, i) {
+        new_array(i + length(array1)) = v;
+    });
+
+    new_array;
+};

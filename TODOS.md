@@ -4,11 +4,9 @@
   - Depth property
 
 - More functions for arrays and strings
-  - compact(array) - Return an array removing all NullType elements
   - split(string, search) - Split a string into different pieces
     - argument has to be a string containing the haystack
     - if the argument is an empty string, return an array containing each char
-  - concat(array1, array2) - concat two arrays together
   - secure_read(array, index) - Read the property at an index from an array. If the index is out of bounds, return NULL
   - delete(arg) - Returns an array where all values equal to *arg* all removed
   - delete_at(index) - Returns an array where the value at *index* is removed
