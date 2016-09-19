@@ -60,7 +60,7 @@ class Stack
     unless stack == NIL
       stack.values[k] = v
     else
-      raise "Variable '#{k}' not defined!"
+      raise "Can't write to variable '#{k}', not defined!"
     end
   end
 
@@ -71,7 +71,7 @@ class Stack
       unless @parent == NIL
         @parent[k]
       else
-        raise "Variable '#{k}' not defined!"
+        raise "Variable '#{k}' is not defined!"
       end
     end
   end

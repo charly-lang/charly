@@ -1,2 +1,2 @@
-load("api.charly");
-print(increment(1)); # This should print 2
+require("api.charly");
+print(increment(1));

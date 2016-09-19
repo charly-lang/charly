@@ -1,0 +1,21 @@
+# Convert a given value into a Number
+# Returns NULL if the value can't be converted to a number
+func Number(arg) {
+    call_internal("Number", arg);
+};
+
+# Convert a given value into a String
+# Returns NULL if the value can't be converted to a String
+func String(arg) {
+    call_internal("String", arg);
+};
+
+# Get the type of arg
+func typeof(arg) {
+    call_internal("typeof", arg);
+};
+
+# Returns true if arg is null
+func is_null(arg) {
+    arg == null;
+};

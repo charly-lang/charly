@@ -16,9 +16,11 @@ class InterpreterFascade
       stack.session = Session.new
     end
 
+    last_result = Types::NullType.new
     files.each do |file|
-      self.execute_file file, stack
+      last_result = self.execute_file(file, stack)
     end
+    last_result
   end
 
   # Execute a single file

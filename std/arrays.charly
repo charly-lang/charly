@@ -1,0 +1,143 @@
+# Return an array with size size
+# Comes prefilled with NULL
+func array_of_size(size) {
+    call_internal("array_of_size", size);
+};
+
+# Return the length of an array or string
+func length(array) {
+    call_internal("length", array);
+};
+
+# Iterate over all elements in an array
+# The callback receives the element and the index
+func each(array, callback) {
+    let i = 0;
+    let arrayCount = length(array);
+    while (i < arrayCount) {
+        callback(array(i), i);
+        i = i + 1;
+    };
+    array;
+};
+
+# Return a new array containing all elements of the previous array
+# and the new element
+func append(array, value) {
+
+    # Create the new array
+    let new_array = array_of_size(length(array) + 1);
+
+    # Copy the old values into the new array
+    each(array, func cb(e, i) {
+        new_array(i) = e;
+    });
+
+    # Add the new value
+    let last_index = length(new_array) - 1;
+    new_array(last_index) = value;
+
+    new_array;
+};
+
+# Return an array where all values are replaced with the values
+# returned by the callback
+# The callback receives the element and the index
+func map(array, callback) {
+
+    # Create the new array
+    let new_array = array_of_size(length(array));
+
+    # Add the values to the array
+    each(array, func cb(e, i) {
+        new_array(i) = callback(e, i);
+    });
+
+    new_array;
+};
+
+# Return only elements for which the callback returned true
+# The callback receives the element and the index
+func filter(array, callback) {
+
+    # Create the new array
+    let new_array = array_of_size(0);
+
+    # Add the values to the array
+    each(array, func(e, i) {
+        if (callback(e, i)) {
+            new_array = append(new_array, e) ;
+        };
+    });
+
+    new_array;
+};
+
+# Return the first element in an array
+func first(array) {
+    if (length(array) > 0) {
+        array(0);
+    } else {
+        null;
+    };
+};
+
+# Return the last element in an array
+func last(array) {
+    let array_count = length(array);
+    if (array_count > 0) {
+        array(array_count - 1);
+    } else {
+        null;
+    };
+};
+
+# Return an array where all NULL values are removed
+func compact(array) {
+    filter(array, func(v) {
+        v ! null;
+    });
+};
+
+# Concatenate two arrays
+func concat(array1, array2) {
+    let new_length = length(array1) + length(array2);
+    let new_array = array_of_size(new_length);
+
+    # Copy all values
+    each(array1, func(v, i) {
+        new_array(i) = v;
+    });
+    each(array2, func(v, i) {
+        new_array(i + length(array1)) = v;
+    });
+    new_array;
+};
+
+# Return a reversed version of array
+func reverse(array) {
+    let array_length = length(array);
+    let new_array = array_of_size(array_length);
+
+    repeat(array_length, func(i) {
+        new_array(array_length - (i + 1)) = array(i);
+    });
+    new_array;
+};
+
+# Returns true if the array is empty
+func empty(array) {
+    length(array) == 0;
+};
+
+# Returns an array where all values that equal value are removed
+func delete(array, value) {
+    print("Standard Library: The delete function is not implemented yet.");
+};
+
+# Returns an array where the element at index was removed
+func delete_at(array, index) {
+    filter(array, func(v, i) {
+        i ! index;
+    });
+};

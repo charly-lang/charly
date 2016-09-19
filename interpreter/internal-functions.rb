@@ -26,7 +26,7 @@ class Interpreter
       when "gets"
         return Types::StringType.new($stdin.gets)
       when "chomp"
-        return Types::StringType.new(arguments[0].value)
+        return Types::StringType.new(arguments[0].value.chomp)
       when "sleep"
         sleep(arguments[0].value)
         return Types::NullType.new

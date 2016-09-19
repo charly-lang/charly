@@ -1,0 +1,26 @@
+# Print a string into the console
+# Automatically appends a newline
+func print(arg) {
+    call_internal("print", arg);
+};
+
+# Print a string into the console
+# without appending a newline
+func dump(arg) {
+    call_internal("dump", arg);
+};
+
+# Get a string from the user
+func gets() {
+    call_internal("gets");
+};
+
+# Sleep for n miliseconds
+func sleep(arg) {
+    call_internal("sleep", arg);
+};
+
+# Print a string in a given color-code
+func print_color(arg, color_code) {
+    call_internal("print_color", arg, color_code);
+};

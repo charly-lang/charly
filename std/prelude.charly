@@ -1,50 +1,20 @@
-func print(arg) {
-    call_internal("print", arg);
-};
+# Require a file into global scope
+# If the file was already run before,
+# this won't execute
+func require(filename) { call_internal("require", filename); };
 
-func dump(arg) {
-    call_internal("dump", arg);
-};
+# Load a file into global scope
+# This will run the file every-time,
+# as opposed to require which only runs the file once
+func load(filename) { call_internal("load", filename); };
 
-func Number(arg) {
-    call_internal("Number", arg);
-};
-
-func String(arg) {
-    call_internal("String", arg);
-};
-
-func gets() {
-    call_internal("gets");
-};
-
-func chomp(string) {
-    call_internal("String", string);
-};
-
-func sleep(amount) {
-    call_internal("sleep", amount);
-};
-
-func print_color(arg, color_code) {
-    call_internal("print_color", arg, color_code);
-};
-
-func typeof(value) {
-    call_internal("typeof", value);
-};
-
-func rand() {
-    call_internal("rand");
-};
-
-func require(filename) {
-    call_internal("require", filename);
-};
-
-func load(filename) {
-    call_internal("load", filename);
-};
+# Load other parts of the library
+require("types.charly");
+require("io.charly");
+require("math.charly");
+require("strings.charly");
+require("arrays.charly");
+require("language.charly");
 
 func test(comp1, comp2, title) {
     let result = comp1 == comp2;
@@ -59,154 +29,3 @@ func test(comp1, comp2, title) {
     result;
 };
 
-func repeat(times, callback) {
-    let i = 0;
-    while (i < times) {
-        callback(i);
-        i = i + 1;
-    };
-};
-
-func range(start, end, callback) {
-    let i = start;
-    while (i < end) {
-        callback(i);
-        i = i + 1;
-    };
-};
-
-func array_of_size(size) {
-    call_internal("array_of_size", size);
-};
-
-func length(array) {
-    call_internal("length", array);
-};
-
-func each(array, callback) {
-    let i = 0;
-    let arrayCount = length(array);
-    while (i < arrayCount) {
-        callback(array(i), i);
-        i = i + 1;
-    };
-    array;
-};
-
-func append(array, value) {
-
-    # Create the new array
-    let new_array = array_of_size(length(array) + 1);
-
-    # Copy the old values into the new array
-    each(array, func cb(e, i) {
-        new_array(i) = e;
-    });
-
-    # Add the new value
-    let last_index = length(new_array) - 1;
-    new_array(last_index) = value;
-
-    new_array;
-};
-
-func map(array, callback) {
-
-    # Create the new array
-    let new_array = array_of_size(length(array));
-
-    # Add the values to the array
-    each(array, func cb(e, i) {
-        new_array(i) = callback(e, i);
-    });
-
-    new_array;
-};
-
-func filter(array, callback) {
-
-    # Create the new array
-    let new_array = array_of_size(0);
-
-    # Add the values to the array
-    each(array, func(e, i) {
-        if (callback(e, i)) {
-            new_array = append(new_array, e) ;
-        };
-    });
-
-    new_array;
-};
-
-func first(array) {
-    if (length(array) > 0) {
-        array(0);
-    } else {
-        null;
-    };
-};
-
-func last(array) {
-    let array_count = length(array);
-    if (array_count > 0) {
-        array(array_count - 1);
-    } else {
-        null;
-    };
-};
-
-func compact(array) {
-    filter(array, func(v) {
-        v ! null;
-    });
-};
-
-func concat(array1, array2) {
-    let new_length = length(array1) + length(array2);
-    let new_array = array_of_size(new_length);
-
-    # Copy all values
-    each(array1, func(v, i) {
-        new_array(i) = v;
-    });
-    each(array2, func(v, i) {
-        new_array(i + length(array1)) = v;
-    });
-    new_array;
-};
-
-func is_null(value) {
-    value == null;
-};
-
-func reverse(array) {
-    let array_length = length(array);
-    let new_array = array_of_size(array_length);
-
-    repeat(array_length, func(i) {
-        new_array(array_length - (i + 1)) = array(i);
-    });
-    new_array;
-};
-
-func empty(array) {
-    let all_null = true;
-    each(array, func(v) {
-        if (all_null == true) {
-            if (v ! null) {
-                all_null = false;
-            };
-        };
-    });
-    all_null;
-};
-
-func delete(array, value) {
-    print("Standard Library: The delete function is not implemented yet.");
-};
-
-func delete_at(array, index) {
-    filter(array, func(v, i) {
-        i ! index;
-    });
-};

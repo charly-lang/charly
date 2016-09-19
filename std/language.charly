@@ -1,0 +1,19 @@
+# Call the callback n times
+# The callback receives the index
+func repeat(times, callback) {
+    let i = 0;
+    while (i < times) {
+        callback(i);
+        i = i + 1;
+    };
+};
+
+# Call the callback end - start times
+# Same as repeat, but the first value is start
+func range(start, end, callback) {
+    let i = start;
+    while (i < end) {
+        callback(i);
+        i = i + 1;
+    };
+};
