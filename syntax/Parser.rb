@@ -29,7 +29,7 @@ class Parser
     @next = 0
 
     # Output a list of tokens if the respective CLI flag was passed
-    if ARGV.include?("--tokens") && file.filename != "prelude.charly"
+    if ARGV.include?("--tokens")
       puts "--- found #{@tokens.length} tokens in #{yellow(file.fullpath)} ---"
       puts @tokens
       puts "------"
@@ -65,14 +65,14 @@ class Parser
     end
 
     # Output the abstract syntax tree if the CLI flag was passed
-    if ARGV.include?("--ast") && file.filename != "prelude.charly"
+    if ARGV.include?("--ast")
       puts "--- #{file.filename} : Abstract Syntax Tree ---"
       puts @tree
       puts "------"
     end
 
     # Output a png file of the AST if the given flag was passed
-    if ARGV.include?("--dump-ast-json") && file.filename != "prelude.charly"
+    if ARGV.include?("--dump-ast-json")
 
       # We require the json module for this
       require "json"
