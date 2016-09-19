@@ -3,6 +3,15 @@
 - Function to print the AST of a block at run-time
   - Depth property
 
+- Better unit testing framework
+  - Context-specific DSL
+  - describe
+  - it
+  - assert
+    - is_equal
+    - is_null
+    - is_not_null
+
 - More functions for arrays and strings
   - split(string, search) - Split a string into different pieces
     - argument has to be a string containing the haystack
