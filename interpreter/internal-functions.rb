@@ -1,3 +1,4 @@
+require "pathname"
 require_relative "types.rb"
 require_relative "../misc/Helper.rb"
 
@@ -55,6 +56,21 @@ class Interpreter
         return Types::StringType.new(arguments[0].class.to_s)
       when "rand"
         return Types::NumericType.new(rand)
+      when "require"
+
+        # Construct the absolute path to the parent file
+        # The parent file is the one that is including the file
+        full_path = stack.top_node.program.file.fulldirectorypath
+        full_path = File.join full_path, arguments[0].value
+
+        # Check if the file wasn't included already
+        if !stack.session.has_file(full_path)
+          return self.exec_internal_function(Types::StringType.new("load"), arguments, stack)
+        end
+
+        # If the file was already run before,
+        # return the value returned by that file
+        return stack.session.return_value_of_file(full_path)
       when "load"
 
         # Construct the absolute path to the parent file
@@ -62,8 +78,17 @@ class Interpreter
         full_path = stack.top_node.program.file.fulldirectorypath
         full_path = File.join full_path, arguments[0].value
 
+        # Check if the file exists
+        if !Pathname.new(full_path).file?
+          dlog "Failed to import file #{yellow(full_path)}"
+          raise "Failed to import file #{yellow(full_path)}"
+        end
+
         # Execute the program found in the file in the global stack
-        return InterpreterFascade.execute_file(full_path, stack.top_node)
+        # add a reference to the return value to the session
+        return_value = InterpreterFascade.execute_file(full_path, stack.top_node)
+        stack.session.add_return_value(full_path, return_value)
+        return return_value
       end
     end
   end

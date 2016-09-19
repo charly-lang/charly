@@ -16,6 +16,11 @@ let run = onlyTrueWasPassed();
 
 
 
+# Check if require works
+run(test(require("external.charly"), "I am being required!", "File require"), "test");
+
+
+
 # Test variable assignment
 let someNumber = 25;
 run(test(someNumber, 25, "Variable Assignment"), "test");
@@ -44,7 +49,7 @@ run(test(someArray2(1, 0), 2, "Array index lookup"), "test");
 # Test array out-of-bounds lookup
 let someArray = [1, 2, 3];
 run(test(someArray(0), 1, "out-of-bounds index lookup 1"), "test");
-run(test(someArray2(3), null, ""), "out-of-bounds index lookup 2");
+run(test(someArray2(3), null, "out-of-bounds index lookup 2"), "test");
 run(test(someArray2(-2), null, "out-of-bounds index lookup 3"), "test");
 
 

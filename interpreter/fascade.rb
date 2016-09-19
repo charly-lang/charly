@@ -2,6 +2,7 @@ require_relative "../misc/Helper.rb"
 require_relative "../misc/File.rb"
 require_relative "../syntax/Parser.rb"
 require_relative "Interpreter.rb"
+require_relative "session.rb"
 
 class InterpreterFascade
 
@@ -12,6 +13,7 @@ class InterpreterFascade
     # No stack was passed
     if stack == nil
       stack = Stack.new NIL
+      stack.session = Session.new
     end
 
     files.each do |file|
@@ -22,7 +24,15 @@ class InterpreterFascade
   # Execute a single file
   # optionally passing a stack that will be used as the global stack
   def self.execute_file(file, stack = nil)
+
+    # Create the virtual file
     file = VirtualFile.new file
+
+    # Add the file to the current sessions
+    # active files
+    stack.session.files << file
+
+    # Parse the program
     program = Parser.parse(file)
 
     unless ARGV.include? "--noexec"

@@ -1,4 +1,3 @@
-func increment(a) {
-    a + 1;
+func increment(value) {
+    value + 1;
 };
-25;

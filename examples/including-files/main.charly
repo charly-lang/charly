@@ -1,2 +1,2 @@
-let initial = load("api.charly");
-print(increment(initial));
+load("api.charly");
+print(increment(1)); # This should print 2

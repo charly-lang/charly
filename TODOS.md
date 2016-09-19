@@ -34,13 +34,7 @@
   - file_create
 
 - require(filename)
-  - run a given program inside *filename*
-  - filename can be a path, relative to the path of the current file
   - if filename is a folder, require main.charly inside that directory
-  - if a file was already run, don't run again
-
-- load(filename)
-  - the exact same as require(filename) but the file is run again if it was already run before
 
 - global value called ARGV
   - array of strings of arguments passed from the cli
