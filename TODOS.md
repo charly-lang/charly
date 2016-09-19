@@ -11,7 +11,6 @@
   - delete(arg) - Returns an array where all values equal to *arg* all removed
   - delete_at(index) - Returns an array where the value at *index* is removed
   - clone(array) - Returns a new array containing copies of all values
-  - empty(array) - Returns true if a given array is empty
   - flatten(array) - returns an flattened array (recursively)
   - index_of(array, value) - returns the index of value inside array
 

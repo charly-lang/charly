@@ -180,3 +180,15 @@ func reverse(array) {
     });
     new_array;
 };
+
+func empty(array) {
+    let all_null = true;
+    each(array, func(v) {
+        if (all_null == true) {
+            if (v ! null) {
+                all_null = false;
+            };
+        };
+    });
+    all_null;
+};
