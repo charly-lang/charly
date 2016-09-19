@@ -2,7 +2,7 @@ require_relative "../misc/Helper.rb"
 
 # A single stack, containing a pointer to it's parent stack
 class Stack
-  attr_accessor :parent, :values
+  attr_accessor :parent, :values, :program
 
   def initialize(parent)
     @parent = parent
@@ -18,6 +18,13 @@ class Stack
       return @parent.depth(n + 1)
     end
     return n
+  end
+
+  def top_node
+    if @parent
+      return @parent.top_node
+    end
+    return self
   end
 
   # Returns the stack for a given identifier

@@ -55,6 +55,15 @@ class Interpreter
         return Types::StringType.new(arguments[0].class.to_s)
       when "rand"
         return Types::NumericType.new(rand)
+      when "load"
+
+        # Construct the absolute path to the parent file
+        # The parent file is the one that is including the file
+        full_path = stack.top_node.program.file.fulldirectorypath
+        full_path = File.join full_path, arguments[0].value
+
+        # Execute the program found in the file in the global stack
+        return InterpreterFascade.execute_file(full_path, stack.top_node)
       end
     end
   end

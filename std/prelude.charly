@@ -38,6 +38,14 @@ func rand() {
     call_internal("rand");
 };
 
+func require(filename) {
+    call_internal("require", filename);
+};
+
+func load(filename) {
+    call_internal("load", filename);
+};
+
 func test(comp1, comp2, title) {
     let result = comp1 == comp2;
     if (result) {

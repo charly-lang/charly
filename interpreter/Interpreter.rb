@@ -9,13 +9,10 @@ class Interpreter
   attr_reader :last_result
 
   # Initialize the interpreter and insert all required programs
-  def initialize(programs)
-
-    # The global stack all programs have access to
-    main = Stack.new NIL
+  def initialize(programs, stack)
 
     # Execute all programs
-    @last_result = Executor.exec_programs(programs, main)
+    @last_result = Executor.exec_programs(programs, stack)
   end
 end
 
@@ -36,17 +33,18 @@ class Executor
 
     # Check if the program should be executed
     unless program.should_execute
-      dlog "Program #{yellow(program.file.filename)} is marked as not executable, skipping..."
+      dlog "Program #{yellow(program.file.fullpath)} is marked as not executable, skipping..."
       return Types::NumericType.new(1)
     end
 
     # Debugging
-    dlog "Executing program: #{yellow(program.file.filename)}"
+    dlog "Executing program: #{yellow(program.file.fullpath)}"
 
     # Check if the program contains a block
     if program.children.length == 1
 
       # Create a new block
+      stack.program = program
       return self.exec_block(program.children[0], stack)
     end
 

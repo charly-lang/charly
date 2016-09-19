@@ -30,14 +30,14 @@ class Parser
 
     # Output a list of tokens if the respective CLI flag was passed
     if ARGV.include?("--tokens") && file.filename != "prelude.charly"
-      puts "--- found #{@tokens.length} tokens in #{yellow(file.filename)} ---"
+      puts "--- found #{@tokens.length} tokens in #{yellow(file.fullpath)} ---"
       puts @tokens
       puts "------"
     end
 
     # If no tokens were found, return
     if @tokens.length == 0
-      dlog "Aborting, no tokens found in: #{yellow(file.filename)}"
+      dlog "Aborting, no tokens found in: #{yellow(file.fullpath)}"
       @tree.should_execute = false
       return @tree
     end
@@ -82,7 +82,7 @@ class Parser
       FileUtils::mkdir_p 'parser-dump'
 
       # Convert the tree to a json structure
-      tree_as_json = JSON.pretty_generate @tree
+      tree_as_json = @tree.to_json
 
       # Print the file in the parser-dump directory
       file = File.new("parser-dump/AST.#{file.filename}.json", "w")

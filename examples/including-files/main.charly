@@ -1,0 +1,2 @@
+let initial = load("api.charly");
+print(increment(initial));

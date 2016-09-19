@@ -4,6 +4,7 @@ require_relative "Helper.rb"
 class VirtualFile
   attr_reader :filename,
               :fullpath,
+              :fulldirectorypath,
               :directory,
               :size,
               :content
@@ -13,10 +14,11 @@ class VirtualFile
     # Set basic attributes
     @filename = File.basename path
     @fullpath = File.absolute_path path
+    @fulldirectorypath = File.dirname @fullpath
     @directory = File.dirname path
     @size = File.size path
 
-    dlog "Reading source file: #{yellow(path)}"
+    dlog "Reading source file: #{yellow(@fullpath)}"
     @content = File.open(path, "r").read
   end
 
