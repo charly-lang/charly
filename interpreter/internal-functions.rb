@@ -29,8 +29,6 @@ class Interpreter
       when "sleep"
         sleep(arguments[0].value)
         return Types::NullType.new
-      when "variable"
-        return stack[arguments[0].value]
       when "print_color"
         puts colorize(arguments[0].value, arguments[1].value)
         return Types::NullType.new
