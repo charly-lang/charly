@@ -206,6 +206,11 @@ run(test(concat([1, 2], [3, 4]), [1, 2, 3, 4], "concat function"), "test");
 
 
 
+# Check is_null function
+run(test(is_null(null), true, "is_null function"), "test");
+
+
+
 # Test if optional function identifiers work
 let received = 0;
 func increment(value, callback) {

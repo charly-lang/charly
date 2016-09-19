@@ -167,3 +167,7 @@ func concat(array1, array2) {
 
     new_array;
 };
+
+func is_null(value) {
+    value == null;
+};
