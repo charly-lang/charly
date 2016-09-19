@@ -23,10 +23,10 @@ while (should_exit == false) {
     # Print the menu
     print("");
     print("-- Todo List written in Charly --");
-    print("-- 1: Add menu item");
-    print("-- 2: Toggle menu item");
-    print("-- 3: Delete menu item");
-    print("-- 4: Quit Todolist");
+    print("-- 1: Add todo");
+    print("-- 2: Toggle todo");
+    print("-- 3: Delete todo");
+    print("-- 4: Quit application");
     let menu = Number(question("Selection: "));
 
     # Different menus
