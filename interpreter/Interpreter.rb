@@ -317,7 +317,7 @@ class Executor
 
           # Check for out of bounds errors
           if arg.value < 0 || arg.value > (stack_value.value.length - 1)
-            raise "Array index #{arg} is out of bounds!"
+            return Types::NullType.new
           end
 
           stack_value = stack_value.value[arg.value]

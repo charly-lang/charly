@@ -41,6 +41,14 @@ run(test(someArray2(1, 0), 2, "Array index lookup"), "test");
 
 
 
+# Test array out-of-bounds lookup
+let someArray = [1, 2, 3];
+run(test(someArray(0), 1, "out-of-bounds index lookup 1"), "test");
+run(test(someArray2(3), null, ""), "out-of-bounds index lookup 2");
+run(test(someArray2(-2), null, "out-of-bounds index lookup 3"), "test");
+
+
+
 # Get the length different properties
 run(test(length([1, 2, 3, [4, 5]]), 4, "Array count function"), "test");
 run(test(length("Hello World"), 11, "String count function"), "test");
