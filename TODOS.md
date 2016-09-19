@@ -36,6 +36,15 @@
 - require(filename)
   - if filename is a folder, require main.charly inside that directory
 
+- Classes & Objects
+  - Objects are just stacks hidden inside a variable
+  - Implement a kind of locking feature in stack.rb that prevents new variables from being created in it
+  - new Class just creates a stack, executed the given initialize function, and locks the stack
+  - outside objects can then access properties via a member expression
+    - object.property
+    - This should be continiously (like call expressions)
+    - Refernce: `Parse call expressions correctly`
+
 - global value called ARGV
   - array of strings of arguments passed from the cli
 
