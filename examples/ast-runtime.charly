@@ -1,0 +1,4 @@
+dump_ast(func() {
+    let a = 25 + 8;
+    print(a);
+}, Number(gets()));

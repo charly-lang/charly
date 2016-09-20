@@ -301,7 +301,7 @@ class Executor
 
       # Check for an internal function call
       if node.identifier.value == "call_internal"
-        return Interpreter::InternalFunctions.exec_internal_function(arguments[0], arguments[1..-1], stack)
+        return Interpreter::InternalFunctions.exec_internal_function(arguments[0], arguments[1..-1], stack, node)
       end
 
       # Check the stack for a function definition

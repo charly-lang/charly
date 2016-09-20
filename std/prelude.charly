@@ -29,3 +29,6 @@ func test(comp1, comp2, title) {
     result;
 };
 
+func dump_ast(function, depth) {
+    call_internal("dump_ast", function, depth);
+};
