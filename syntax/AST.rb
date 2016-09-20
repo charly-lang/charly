@@ -38,7 +38,7 @@ class ASTNode
     ""
   end
 
-  def to_s
+  def to_s(depth = -1)
     if is Terminal
       string = "#: #{self.class.name}"
     else
@@ -51,19 +51,21 @@ class ASTNode
 
     string += "\n"
 
-    children.each do |child|
-      lines = child.to_s.each_line.entries
-      lines.each {|line|
-        if line[0] == "#"
-          if children.length == 1 && child.children.length < 2
-            string += line.indent(1, "└╴")
-          else
-            string += line.indent(1, "├╴")
+    if depth > 0 || depth < 0
+      children.each do |child|
+        lines = child.to_s(depth - 1).each_line.entries
+        lines.each {|line|
+          if line[0] == "#"
+            if children.length == 1 && child.children.length < 2
+              string += line.indent(1, "└╴")
+            else
+              string += line.indent(1, "├╴")
+            end
+          elsif line.length > 1
+            string += line.indent(1, "│ ")
           end
-        elsif line.length > 1
-          string += line.indent(1, "│ ")
-        end
-      }
+        }
+      end
     end
     string
   end
