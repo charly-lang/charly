@@ -18,6 +18,8 @@ let run = onlyTrueWasPassed();
 
 # Check if require works
 run(test(require("external.charly"), "I am being required!", "File require"), "test");
+run(test(require("test-require"), "I'm being required", "Directory require"), "test");
+run(test(require("test-require/main.charly"), "I'm being required", "Nested file require"), "test");
 
 
 

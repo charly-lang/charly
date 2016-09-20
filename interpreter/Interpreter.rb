@@ -21,9 +21,15 @@ class Executor
 
   # Execute a bunch of programs, each having access to a shared top stack
   def self.exec_programs(programs, stack)
+
+    # Save the current program node
+    program_backup = stack.program
+
     last_result = Types::NullType.new
     programs.each do |program|
+      stack.program = program
       last_result = self.exec_program(program, stack)
+      stack.program = program_backup
     end
     last_result
   end
@@ -42,9 +48,6 @@ class Executor
 
     # Check if the program contains a block
     if program.children.length == 1
-
-      # Create a new block
-      stack.program = program
       return self.exec_block(program.children[0], stack)
     end
 
