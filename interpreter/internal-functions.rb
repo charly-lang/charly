@@ -79,9 +79,15 @@ class Interpreter
         full_path = File.join full_path, arguments[0].value
 
         # Check if the file exists
-        if !Pathname.new(full_path).file?
-          dlog "Failed to import file #{yellow(full_path)}"
-          raise "Failed to import file #{yellow(full_path)}"
+        path = Pathname.new(full_path)
+        if !path.file? && !path.directory?
+          dlog "Failed to import dependency #{yellow(full_path)}"
+          raise "Failed to import dependency #{yellow(full_path)}"
+        end
+
+        # Check if the path is a file or a directory
+        if path.directory?
+          full_path = File.join full_path, "main.charly"
         end
 
         # Execute the program found in the file in the global stack
