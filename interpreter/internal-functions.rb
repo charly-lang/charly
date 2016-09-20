@@ -4,7 +4,7 @@ require_relative "../misc/Helper.rb"
 
 class Interpreter
   class InternalFunctions
-    def self.exec_internal_function(name, arguments, stack)
+    def self.exec_internal_function(name, arguments, stack, node)
       case name.value
       when "print"
         arguments.each do |arg|
@@ -68,7 +68,7 @@ class Interpreter
 
         # Check if the file wasn't included already
         if !stack.session.has_file(full_path)
-          return self.exec_internal_function(Types::StringType.new("load"), arguments, stack)
+          return self.exec_internal_function(Types::StringType.new("load"), arguments, stack, node)
         end
 
         # If the file was already run before,
@@ -95,6 +95,9 @@ class Interpreter
         return_value = InterpreterFascade.execute_file(full_path, stack.top_node)
         stack.session.add_return_value(full_path, return_value)
         return return_value
+      when "dump_ast"
+        puts arguments[0].to_s(arguments[1].value)
+        return Types::NullType.new
       end
     end
   end
