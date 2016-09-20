@@ -62,6 +62,9 @@ class Interpreter
         # The parent file is the one that is including the file
         full_path = stack.top_node.program.file.fulldirectorypath
         full_path = File.join full_path, arguments[0].value
+        if Pathname.new(full_path).directory?
+          full_path = File.join full_path, "main.charly"
+        end
 
         # Check if the file wasn't included already
         if !stack.session.has_file(full_path)
@@ -77,17 +80,14 @@ class Interpreter
         # The parent file is the one that is including the file
         full_path = stack.top_node.program.file.fulldirectorypath
         full_path = File.join full_path, arguments[0].value
-
-        # Check if the file exists
-        path = Pathname.new(full_path)
-        if !path.file? && !path.directory?
-          dlog "Failed to import dependency #{yellow(full_path)}"
-          raise "Failed to import dependency #{yellow(full_path)}"
+        if Pathname.new(full_path).directory?
+          full_path = File.join full_path, "main.charly"
         end
 
-        # Check if the path is a file or a directory
-        if path.directory?
-          full_path = File.join full_path, "main.charly"
+        # Check if the file exists
+        if !Pathname.new(full_path).file? && !Pathname.new(full_path).directory?
+          dlog "Failed to import dependency #{yellow(full_path)}"
+          raise "Failed to import dependency #{yellow(full_path)}"
         end
 
         # Execute the program found in the file in the global stack
