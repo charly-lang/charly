@@ -211,7 +211,7 @@ class Parser
       @node = backup
 
       # Create temporary node
-      temp = Temporary.new NIL
+      temp = Temporary.new @node
       @node = temp
 
       # Try the production
@@ -402,6 +402,29 @@ class Parser
     });
   end
 
+  # Terms
+  def T
+    node_production(Expression, Proc.new {
+      term(:NUMERICAL)
+    }, Proc.new {
+      term(:STRING)
+    }, Proc.new {
+      term(:BOOLEAN)
+    }, Proc.new {
+      term(:NULL)
+    }, Proc.new {
+      A() && consume_call_expression
+    }, Proc.new {
+      F() && consume_call_expression
+    }, Proc.new {
+      term(:IDENTIFIER) && consume_call_expression
+    }, Proc.new {
+      term(:LEFT_PAREN) &&
+      E() &&
+      term(:RIGHT_PAREN) && consume_call_expression
+    })
+  end
+
   # Function literal
   def F
     node_production(Expression, Proc.new {
@@ -425,28 +448,23 @@ class Parser
     })
   end
 
-  # Terms
-  def T
-    node_production(Expression, Proc.new {
-      term(:NUMERICAL)
-    }, Proc.new {
-      term(:STRING)
-    }, Proc.new {
-      term(:BOOLEAN)
-    }, Proc.new {
-      term(:NULL)
-    }, Proc.new {
-      A()
-    }, Proc.new {
-      F()
-    }, Proc.new {
-      CE()
-    }, Proc.new {
-      term(:IDENTIFIER)
-    }, Proc.new {
-      term(:LEFT_PAREN) &&
-      E() &&
-      term(:RIGHT_PAREN)
-    })
+  # Parse a call expression
+  def consume_call_expression
+
+    # @node will always be a Temporary node in this context
+    # And it will always only contain a single value
+    #
+    # We will create new CallExpressionNode and place the first child
+    # of the Temporary node into it
+    backup_node = @node
+    if peek_term(:LEFT_PAREN)
+      @node = @node.parent
+      node_production(CallExpressionNode, Proc.new {
+        @node << backup_node.children[0]
+        backup_node.children.shift
+        term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN) && consume_call_expression
+      })
+    end
+    return true
   end
 end
