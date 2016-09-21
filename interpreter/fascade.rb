@@ -9,7 +9,7 @@ class InterpreterFascade
   # Execute a couple of strings
   # *scripts* is an array of strings
   def self.execute_eval(scripts, stack = nil)
-    self.execute_virtual_files(files.map { |file|
+    self.execute_virtual_files(scripts.map { |file|
       EvalFile.new file
     }, stack)
   end

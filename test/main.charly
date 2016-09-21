@@ -271,6 +271,13 @@ run(test(typeof(rand()), "Numeric", "Random 3"), "test");
 
 
 
+# Check if eval works
+run(test(eval("2 + 5 + (5 * 8);"), 47, "Eval numbers"), "test");
+run(test(eval("let a = 25; a + 25;"), 50, "Eval variables"), "test");
+run(test(eval("func increment(val) { val + 1; }; increment(0);"), 1, "Eval functions"), "test");
+
+
+
 # Script exit code
 if (run(0, "result") == 0) {
     print("Test suite passed!");

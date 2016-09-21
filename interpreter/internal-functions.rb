@@ -98,6 +98,10 @@ class Interpreter
       when "dump_ast"
         puts arguments[0].to_s(arguments[1].value)
         return Types::NullType.new
+      when "eval"
+
+        # Execute and return the input
+        return InterpreterFascade.execute_eval([arguments[0].value], stack)
       end
     end
   end

@@ -17,3 +17,8 @@ func range(start, end, callback) {
         i = i + 1;
     };
 };
+
+# Evaluate and return a string
+func eval(string) {
+    call_internal("eval", string);
+};
