@@ -92,7 +92,7 @@ class Interpreter
 
         # Execute the program found in the file in the global stack
         # add a reference to the return value to the session
-        return_value = InterpreterFascade.execute_file(full_path, stack.top_node)
+        return_value = InterpreterFascade.execute_files([full_path], stack.top_node)
         stack.session.add_return_value(full_path, return_value)
         return return_value
       when "dump_ast"

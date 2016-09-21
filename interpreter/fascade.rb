@@ -6,29 +6,42 @@ require_relative "session.rb"
 
 class InterpreterFascade
 
-  # Execute a couple of files
-  # optionally passing a stack that will be used as the global stack
-  def self.execute_files(files, stack = nil)
+  # Execute a couple of strings
+  # *scripts* is an array of strings
+  def self.execute_eval(scripts, stack = nil)
+    self.execute_virtual_files(files.map { |file|
+      EvalFile.new file
+    }, stack)
+  end
 
-    # No stack was passed
+  # Execute a couple of files
+  # *files* is an array of filenames
+  def self.execute_files(files, stack = nil)
+    self.execute_virtual_files(files.map { |file|
+      RealFile.new file
+    }, stack)
+  end
+
+  # Execute a couple of VirtualFiles
+  # optionally passing a stack that will be used as the global stack
+  def self.execute_virtual_files(files, stack = nil)
+
+    # Optionally create a new stack for the files
     if stack == nil
-      stack = Stack.new NIL
+      stack = Stack.new nil
       stack.session = Session.new
     end
 
     last_result = Types::NullType.new
     files.each do |file|
-      last_result = self.execute_file(file, stack)
+      last_result = self.execute_virtual_file(file, stack)
     end
     last_result
   end
 
-  # Execute a single file
+  # Execute a VirtualFile
   # optionally passing a stack that will be used as the global stack
-  def self.execute_file(file, stack = nil)
-
-    # Create the virtual file
-    file = VirtualFile.new file
+  def self.execute_virtual_file(file, stack = nil)
 
     # Add the file to the current sessions
     # active files

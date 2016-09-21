@@ -12,6 +12,11 @@ unless ARGV.include? "--noprelude"
   files.unshift "std/prelude.charly"
 end
 
+# Absolute the paths to the files
+files.map! do |file|
+  File.absolute_path file
+end
+
 # Execute the program
 exit_value = InterpreterFascade.execute_files(files);
 
