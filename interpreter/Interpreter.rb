@@ -327,11 +327,16 @@ class Executor
         return stack_value
       end
 
-      if stack_value && stack_value.is(FunctionLiteral)
-        function = stack_value
-      else
-        raise "#{node.identifier.value} is not a function!"
-      end
+      function = stack_value
+    elsif node.identifier.is(FunctionLiteral)
+      function = node.identifier
+    elsif node.identifier.is(CallExpression)
+      function = self.exec_call_expression(node.identifier, stack)
+    end
+
+    # Check if function is really a function
+    if !function.is(FunctionLiteral)
+      raise "#{function} is not a function!"
     end
 
     # Get the identities of the arguments that are required

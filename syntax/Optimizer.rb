@@ -269,7 +269,7 @@ class Optimizer
       child3 = node.children[2]
       child4 = node.children[3]
 
-      if child1.is(IdentifierLiteral, FunctionLiteral) && child3.is(ExpressionList)
+      if child1.is(IdentifierLiteral, FunctionLiteral, CallExpression) && child3.is(ExpressionList)
         if child2.is(LeftParenLiteral) && child4.is(RightParenLiteral)
 
           @finished = false
