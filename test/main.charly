@@ -278,6 +278,12 @@ run(test(eval("func increment(val) { val + 1; }; increment(0);"), 1, "Eval funct
 
 
 
+# Check if consecutive call expressions work
+func foo() { func () { 25; }; };
+run(test(foo()(), 25, "Consecutive call expressions"), "test");
+
+
+
 # Script exit code
 if (run(0, "result") == 0) {
     print("Test suite passed!");
