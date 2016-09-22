@@ -224,6 +224,27 @@ class VariableAssignment < Expression
   end
 end
 
+# A class literal
+class ClassLiteral < Expression
+  attr_reader :identifier, :initialize, :block
+
+  def initialize(identifier, initialize, block, parent)
+    super(parent);
+    @identifier = identifier
+    @initialize = initialize
+    @block = block
+  end
+end
+class ClassDefinition < Expression
+  attr_reader :classliteral
+
+  def initialize(classliteral, parent)
+    super(parent);
+    @classliteral = classliteral
+    @children = [classliteral]
+  end
+end
+
 # A single function call expression
 class CallExpressionNode < Expression; end
 class CallExpression < Expression
