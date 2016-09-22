@@ -100,10 +100,6 @@ class Executor
       return self.exec_class_definition(node, stack)
     end
 
-    if node.is ClassLiteral
-      return self.connect_class_to_stack(node, stack)
-    end
-
     if node.is CallExpression
       return self.exec_call_expression(node, stack)
     end
@@ -116,16 +112,12 @@ class Executor
       return self.exec_if_statement(node, stack)
     end
 
-    if node.is NumericLiteral, StringLiteral, BooleanLiteral, ArrayLiteral
+    if node.is NumericLiteral, StringLiteral, BooleanLiteral, ArrayLiteral, FunctionLiteral, ClassLiteral
       return self.exec_literal(node, stack)
     end
 
     if node.is IdentifierLiteral
       return self.exec_identifier_literal(node, stack)
-    end
-
-    if node.is FunctionLiteral
-      return self.connect_function_to_stack(node, stack)
     end
 
     # Nested expressions inside a statement
@@ -279,7 +271,7 @@ class Executor
 
   # Define a function in the current stack
   def self.exec_function_definition(node, stack)
-    function = self.connect_function_to_stack(node.function, stack)
+    function = self.exec_literal(node.function, stack)
 
     # If the function is anonymous, it should not be saved inside the stack
     if function.identifier == nil
@@ -292,7 +284,7 @@ class Executor
 
   # Define a class in the current stack
   def self.exec_class_definition(node, stack)
-    classliteral = self.connect_class_to_stack(node.classliteral, stack)
+    classliteral = self.exec_literal(node.classliteral, stack)
 
     # Save it inside the stack
     stack[classliteral.identifier.value, true] = classliteral
@@ -432,34 +424,26 @@ class Executor
       end
 
       return Types::ArrayType.new(children)
+    when FunctionLiteral
+      Types::FuncType.new(
+        node.identifier,
+        node.argumentlist,
+        node.block,
+        stack
+      )
+    when ClassLiteral
+      Types::ClassType.new(
+        node.identifier,
+        node.initializer,
+        node.block,
+        stack
+      )
     end
   end
 
   # Return the value of an identifier
   def self.exec_identifier_literal(node, stack)
     return stack[node.value]
-  end
-
-  # Inline function literal
-  # this just connects the function to the right parent stack
-  def self.connect_function_to_stack(node, stack)
-    Types::FuncType.new(
-      node.identifier,
-      node.argumentlist,
-      node.block,
-      stack
-    )
-  end
-
-  # Inline class literal
-  # This just connects the class to the right parent stack
-  def self.connect_class_to_stack(node, stack)
-    Types::ClassType.new(
-      node.identifier,
-      node.initializer,
-      node.block,
-      stack
-    )
   end
 
   # Returns true or false for a given value
