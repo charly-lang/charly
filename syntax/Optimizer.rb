@@ -278,6 +278,26 @@ class Optimizer
       end
     end
 
+    # Class Literals
+    if node.is(ClassLiteralNode) && node.children.length == 5
+
+      # Get the identifier and the block
+      identifier = node.children[1]
+      block = node.children[3]
+
+      # Search for a FunctionDefinition with the identifier *new* inside the block
+      initializer = nil
+      block.children.each do |child|
+        if child.is(FunctionDefinitionExpression) && child.function.identifier.value == "new"
+          initializer = child.function
+        end
+      end
+
+      # Create the new ClassLiteral
+      @finished = false
+      return ClassLiteral.new(identifier, initializer, block, node.parent)
+    end
+
     # Function literals
     if node.is(Expression) && (node.children.length == 8 || node.children.length == 7)
       child1 = node.children[0]
@@ -320,10 +340,6 @@ class Optimizer
             end
           end
         end
-      end
-
-      # Check for the func keyword and identifier
-      if child1.value == "func" && child2.is(IdentifierLiteral)
       end
     end
 
@@ -374,6 +390,14 @@ class Optimizer
 
         @finished = false
         return FunctionDefinitionExpression.new(node.children[0], node.parent)
+      end
+    end
+
+    # Class Definitions
+    if node.is(Statement) && node.children.length == 1
+      if node.children[0].is(ClassLiteral)
+        @finished = false
+        return ClassDefinition.new(node.children[0], node.parent)
       end
     end
 

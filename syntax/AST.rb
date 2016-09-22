@@ -234,6 +234,7 @@ class ClassLiteral < Expression
     @identifier = identifier
     @initialize = initialize
     @block = block
+    @children = [identifier, initialize, block]
   end
 end
 class ClassDefinition < Expression
