@@ -225,6 +225,7 @@ class VariableAssignment < Expression
 end
 
 # A class literal
+class ClassLiteralNode < Expression; end
 class ClassLiteral < Expression
   attr_reader :identifier, :initialize, :block
 

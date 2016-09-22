@@ -337,6 +337,13 @@ class Parser
     }, true)
   end
 
+  # A class literal
+  def CL
+    node_production(ClassLiteralNode, Proc.new {
+      term(:KEYWORD, "class") && term(:IDENTIFIER) && B();
+    });
+  end
+
   # Call Expression
   def CE
     node_production(CallExpressionNode, Proc.new {
@@ -422,6 +429,8 @@ class Parser
       term(:LEFT_PAREN) &&
       E() &&
       term(:RIGHT_PAREN) && consume_call_expression
+    }, Proc.new {
+      CL()
     })
   end
 
