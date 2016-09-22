@@ -1,16 +1,8 @@
 class Person {
-    let age;
     let name;
-
-    func new(_name, _age) {
-        age = _age;
+    func new(_name) {
         name = _name;
-    };
-
-    func greet() {
-        print("My name is " + name + "!");
-        print("I'm " + String(age) + " years old!");
     };
 };
 
-let leonard = new(Person, "Leonard", 16);
+print(Person);

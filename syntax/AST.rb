@@ -227,14 +227,14 @@ end
 # A class literal
 class ClassLiteralNode < Expression; end
 class ClassLiteral < Expression
-  attr_reader :identifier, :initialize, :block
+  attr_reader :identifier, :initializer, :block
 
-  def initialize(identifier, initialize, block, parent)
+  def initialize(identifier, initializer, block, parent)
     super(parent);
     @identifier = identifier
-    @initialize = initialize
+    @initialize = initializer
     @block = block
-    @children = [identifier, initialize, block]
+    @children = [identifier, initializer, block]
   end
 end
 class ClassDefinition < Expression

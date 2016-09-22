@@ -96,6 +96,14 @@ class Executor
       return self.exec_function_definition(node, stack)
     end
 
+    if node.is ClassDefinition
+      return self.exec_class_definition(node, stack)
+    end
+
+    if node.is ClassLiteral
+      return self.connect_class_to_stack(node, stack)
+    end
+
     if node.is CallExpression
       return self.exec_call_expression(node, stack)
     end
@@ -271,8 +279,7 @@ class Executor
 
   # Define a function in the current stack
   def self.exec_function_definition(node, stack)
-    function = node.function
-    function.block.parent_stack = stack
+    function = self.connect_function_to_stack(node.function, stack)
 
     # If the function is anonymous, it should not be saved inside the stack
     if function.identifier == nil
@@ -281,6 +288,15 @@ class Executor
       stack[function.identifier.value, true] = function
       stack[function.identifier.value]
     end
+  end
+
+  # Define a class in the current stack
+  def self.exec_class_definition(node, stack)
+    classliteral = self.connect_class_to_stack(node.classliteral, stack)
+
+    # Save it inside the stack
+    stack[classliteral.identifier.value, true] = classliteral
+    stack[classliteral.identifier.value]
   end
 
   # Execute a call expression
@@ -328,14 +344,14 @@ class Executor
       end
 
       function = stack_value
-    elsif node.identifier.is(FunctionLiteral)
-      function = node.identifier
+    elsif node.identifier.is(Types::FuncType)
+      function = self.connect_function_to_stack(node.identifier, stack)
     elsif node.identifier.is(CallExpression)
       function = self.exec_call_expression(node.identifier, stack)
     end
 
     # Check if function is really a function
-    if !function.is(FunctionLiteral)
+    if !function.is Types::FuncType
       raise "#{function} is not a function!"
     end
 
@@ -427,8 +443,23 @@ class Executor
   # Inline function literal
   # this just connects the function to the right parent stack
   def self.connect_function_to_stack(node, stack)
-    node.block.parent_stack = stack
-    return node
+    Types::FuncType.new(
+      node.identifier,
+      node.argumentlist,
+      node.block,
+      stack
+    )
+  end
+
+  # Inline class literal
+  # This just connects the class to the right parent stack
+  def self.connect_class_to_stack(node, stack)
+    Types::ClassType.new(
+      node.identifier,
+      node.initializer,
+      node.block,
+      stack
+    )
   end
 
   # Returns true or false for a given value
