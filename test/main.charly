@@ -284,6 +284,26 @@ run(test(foo()(), 25, "Consecutive call expressions"), "test");
 
 
 
+# Check if the __arguments__ meta property works inside functions
+let received = [];
+func print_meta() {
+    received = __arguments__;
+};
+print_meta("hello", "world", "charly-lang");
+run(test(received, ["hello", "world", "charly-lang"], "__arguments__ meta property"), "test");
+
+
+
+# Check if the __arguments__ meta property can be overwritten
+let received = [];
+func print_meta(__arguments__) {
+    received = __arguments__;
+};
+print_meta("hello", "world", "charly-lang");
+run(test(received, "hello", "__arguments__ meta property can be overwritten"), "test");
+
+
+
 # Script exit code
 if (run(0, "result") == 0) {
     print("Test suite passed!");

@@ -134,9 +134,9 @@ module Types
     end
 
     def to_s
-      @values.each do |value|
-        puts value
-      end
+      @values.map { |value|
+        value.to_s
+      }.join("\n")
     end
 
     def self.to_s

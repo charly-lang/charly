@@ -356,6 +356,7 @@ class Executor
     # Create new stack for the function arguments to be saved in
     # and to be passed to self.exec_block
     function_stack = Stack.new(function.block.parent_stack)
+    function_stack["__arguments__", true] = Types::ArrayType.new arguments
     arguments.each_with_index do |arg, index|
       function_stack[argument_ids[index], true] = arg
     end
