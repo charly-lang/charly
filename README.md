@@ -73,6 +73,8 @@ __Including other files__
 ```charly
 require("external.charly"); # Include a file in the current directory
 require("somelibrary"); # Include the main.charly file in the folder somelibrary
+
+# Note: This is not implemented yet, see Issue #21
 require("someotherlibrary"); # Include the someotherlibrary from the standard library
 ```
 
