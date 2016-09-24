@@ -79,6 +79,20 @@ class Stack
     end
   end
 
+  def contains_key(k, check_parent = true)
+    if @values.key? k
+      return true
+    elsif check_parent
+      unless @parent == NIL
+        return true
+      else
+        return false
+      end
+    else
+      return false
+    end
+  end
+
   def [](k, check_parent = true)
     if @values.key? k
       @values[k]
@@ -88,6 +102,8 @@ class Stack
       else
         raise "Variable '#{k}' is not defined!"
       end
+    else
+      raise "Variable '#{k}' is not defined!"
     end
   end
 end

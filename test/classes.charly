@@ -1,9 +1,17 @@
 class Person {
     let name;
-    func constructor(_name) {
+    let age;
+
+    func constructor(_name, _age) {
         name = _name;
+        age = _age;
     };
 };
 
-let leonard = new(Person, "Leonard");
-print(leonard);
+let leonard = new(Person, "Leonard", 16);
+let peter = new(Person, "Peter", 20);
+
+print(memberex(leonard, "name"));
+print(memberex(leonard, "age"));
+print(memberex(peter, "name"));
+print(memberex(peter, "age"));

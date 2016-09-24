@@ -35,3 +35,9 @@ func new(ident) {
 
     call_internal("new", ident, arguments);
 };
+
+# Access a member property of an objects
+# Temporary function until member expressions are fully implemented
+func memberex(object, property) {
+    call_internal("memberex", object, property);
+};

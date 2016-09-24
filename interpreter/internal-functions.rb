@@ -108,6 +108,10 @@ class Interpreter
 
         # Execute and return the input
         return InterpreterFascade.execute_eval([arguments[0].value], stack)
+      when "memberex"
+        object = arguments[0]
+        property = arguments[1].value
+        return object.stack[property, false]
       end
     end
   end

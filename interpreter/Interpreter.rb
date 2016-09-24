@@ -291,28 +291,6 @@ class Executor
     stack[classliteral.identifier.value]
   end
 
-  # Instantiate a new instance of *ident*
-  # Passing the contructor *arguments*
-  def self.exec_object_instantiation(ident, arguments, stack)
-
-    # Create a new stack for the constructor to run in
-    object_stack = Stack.new ident.parent_stack
-
-    # Execute the class block
-    self.exec_block(ident.block, object_stack)
-
-    # Execute the constructor inside the object_stack
-    if ident.constructor
-      self.exec_function(ident.constructor, arguments, object_stack);
-    end
-
-    # Lock the stack to prevent further variable declarations
-    object_stack.lock
-
-    # Create the ObjectType instance
-    return Types::ObjectType.new(ident, object_stack)
-  end
-
   # Execute a call expression
   # returns the result of the expression
   def self.exec_call_expression(node, stack)
@@ -371,6 +349,30 @@ class Executor
 
     # Execute the function
     return self.exec_function(function, arguments)
+  end
+
+  # Instantiate a new instance of *ident*
+  # Passing the contructor *arguments*
+  def self.exec_object_instantiation(ident, arguments, stack)
+
+    # Create a new stack for the constructor to run in
+    object_stack = Stack.new ident.parent_stack
+
+    # Execute the class block
+    self.exec_block(ident.block, object_stack)
+
+    # Execute the constructor inside the object_stack
+    if object_stack.contains_key("constructor", false)
+      self.exec_function(object_stack["constructor", false], arguments);
+    end
+
+    # Lock the stack to prevent further variable declarations
+    # and remove the constructor
+    object_stack.lock
+    object_stack.values.delete "constructor"
+
+    # Create the ObjectType instance
+    return Types::ObjectType.new(ident, object_stack)
   end
 
   # Execute a given function
