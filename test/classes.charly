@@ -1,17 +1,34 @@
-class Person {
-    let name;
-    let age;
+class List {
+    let data = [];
 
-    func constructor(_name, _age) {
-        name = _name;
-        age = _age;
+    func push(arg) {
+        data = append(data, arg);
+    };
+
+    func pop() {
+        let new_data = [];
+        let popped = null;
+        each(data, func(value, index) {
+            if (index ! (length(data) - 1)) {
+                new_data = append(new_data, value);
+            } else {
+                popped = value;
+            };
+        });
+        data = new_data;
+        popped;
     };
 };
 
-let leonard = new(Person, "Leonard", 16);
-let peter = new(Person, "Peter", 20);
+let myList = new(List);
+let push = memberex(myList, "push");
+let pop = memberex(myList, "pop");
 
-print(memberex(leonard, "name"));
-print(memberex(leonard, "age"));
-print(memberex(peter, "name"));
-print(memberex(peter, "age"));
+push("!");
+push("World");
+push("Hello");
+
+print(pop()); # Hello
+print(pop()); # World
+print(pop()); # !
+print(pop()); # NULL
