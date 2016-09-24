@@ -63,40 +63,76 @@ module Types
     def to_s
       value.to_s
     end
+
+    def is(*types)
+      match = false
+      types.each do |type|
+        if !match
+          match = self.kind_of? type
+        end
+      end
+      match
+    end
   end
 
   class FuncType < Abstract
-    attr_accessor :identifier, :arguments, :block, :parent_stack
+    attr_accessor :identifier, :argumentlist, :block, :parent_stack
 
-    def initialize(identifier, arguments, block, parent_stack)
+    def initialize(identifier, argumentlist, block, parent_stack)
       @identifier = identifier
-      @arguments = arguments
+      @argumentlist = argumentlist
       @block = block
       @parent_stack = parent_stack
-    end
 
-    # Arguments is the parameters in the order
-    # the arguments were specified on initialization
-    def call(args, stack)
-
-      # Get the identities of the arguments
-      idents = @arguments.map do |arg|
-        arg.value
-      end
-
-      # Insert the args into the current stack,
-      # under the identity listed in the arguments
-      args[0, idents.length].each_with_index do |val, index|
-        stack[idents[index]] = val
-      end
+      # Connect the block to the right parent_stack
+      @block.parent_stack = parent_stack
     end
 
     def to_s
-      "Function:#{@identifier}"
+      "Function:#{@identifier.value}"
     end
 
     def self.to_s
       "Function"
+    end
+  end
+
+  class ClassType < Abstract
+    attr_accessor :identifier, :constructor, :block, :parent_stack
+
+    def initialize(identifier, constructor, block, parent_stack)
+      @identifier = identifier
+      @constructor = constructor
+      @block = block
+      @parent_stack = parent_stack
+
+      # Connect the block to the right parent_stack
+      @block.parent_stack = parent_stack
+    end
+
+    def to_s
+      "Class:#{@identifier.value}"
+    end
+
+    def self.to_s
+      "Class"
+    end
+  end
+
+  class ObjectType < Abstract
+    attr_accessor :class_type, :stack
+
+    def initialize(class_type, stack)
+      @class_type = class_type
+      @stack = stack
+    end
+
+    def to_s
+      "[Object:#{class_type.identifier.value}]"
+    end
+
+    def self.to_s
+      "Object"
     end
   end
 

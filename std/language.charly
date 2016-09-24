@@ -22,3 +22,22 @@ func range(start, end, callback) {
 func eval(string) {
     call_internal("eval", string);
 };
+
+# Create a new instance of *ident*
+# Passing the constructor all arguments passed after the ident
+func new(ident) {
+    let arguments = [];
+    each(__arguments__, func(arg, i) {
+        if (i > 0) {
+            arguments = append(arguments, arg);
+        };
+    });
+
+    call_internal("new", ident, arguments);
+};
+
+# Access a member property of an objects
+# Temporary function until member expressions are fully implemented
+func memberex(object, property) {
+    call_internal("memberex", object, property);
+};

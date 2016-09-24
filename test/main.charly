@@ -304,6 +304,19 @@ run(test(received, "hello", "__arguments__ meta property can be overwritten"), "
 
 
 
+# Check if classes work
+# This is just a simple test
+class Person {
+    let name;
+    func constructor(_name) {
+        name = _name;
+    };
+};
+let leonard = new(Person, "Leonard");
+run(test(memberex(leonard, "name"), "Leonard", "Classes and member lookup"), "test");
+
+
+
 # Script exit code
 if (run(0, "result") == 0) {
     print("Test suite passed!");
