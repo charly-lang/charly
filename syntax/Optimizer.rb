@@ -286,16 +286,16 @@ class Optimizer
       block = node.children[3]
 
       # Search for a FunctionDefinition with the identifier *new* inside the block
-      initializer = nil
+      constructor = nil
       block.children.each do |child|
-        if child.is(FunctionDefinitionExpression) && child.function.identifier.value == "new"
-          initializer = child.function
+        if child.is(FunctionDefinitionExpression) && child.function.identifier.value == "constructor"
+          constructor = child.function
         end
       end
 
       # Create the new ClassLiteral
       @finished = false
-      return ClassLiteral.new(identifier, initializer, block, node.parent)
+      return ClassLiteral.new(identifier, constructor, block, node.parent)
     end
 
     # Function literals

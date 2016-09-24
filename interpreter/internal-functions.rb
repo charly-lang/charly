@@ -6,6 +6,12 @@ class Interpreter
   class InternalFunctions
     def self.exec_internal_function(name, arguments, stack, node)
       case name.value
+      when "new"
+
+        # Unpack the constructor arguments
+        arguments[1] = arguments[1].value
+
+        return Executor.exec_object_instantiation(arguments[0], arguments[1], stack);
       when "print"
         arguments.each do |arg|
           puts arg

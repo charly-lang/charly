@@ -1,8 +1,9 @@
 class Person {
     let name;
-    func new(_name) {
+    func constructor(_name) {
         name = _name;
     };
 };
 
-print(Person);
+let leonard = new(Person, "Leonard");
+print(leonard);

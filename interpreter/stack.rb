@@ -79,10 +79,10 @@ class Stack
     end
   end
 
-  def [](k)
+  def [](k, check_parent = true)
     if @values.key? k
       @values[k]
-    else
+    elsif check_parent
       unless @parent == NIL
         @parent[k]
       else

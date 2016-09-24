@@ -98,11 +98,11 @@ module Types
   end
 
   class ClassType < Abstract
-    attr_accessor :identifier, :initializer, :block, :parent_stack
+    attr_accessor :identifier, :constructor, :block, :parent_stack
 
-    def initialize(identifier, initializer, block, parent_stack)
+    def initialize(identifier, constructor, block, parent_stack)
       @identifier = identifier
-      @initializer = initializer
+      @constructor = constructor
       @block = block
       @parent_stack = parent_stack
 
@@ -120,11 +120,15 @@ module Types
   end
 
   class ObjectType < Abstract
+    attr_accessor :class_type, :stack
+
     def initialize(class_type, stack)
+      @class_type = class_type
+      @stack = stack
     end
 
     def to_s
-      "[Object]"
+      "[Object:#{class_type.identifier.value}]"
     end
 
     def self.to_s

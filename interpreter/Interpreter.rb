@@ -291,6 +291,28 @@ class Executor
     stack[classliteral.identifier.value]
   end
 
+  # Instantiate a new instance of *ident*
+  # Passing the contructor *arguments*
+  def self.exec_object_instantiation(ident, arguments, stack)
+
+    # Create a new stack for the constructor to run in
+    object_stack = Stack.new ident.parent_stack
+
+    # Execute the class block
+    self.exec_block(ident.block, object_stack)
+
+    # Execute the constructor inside the object_stack
+    if ident.constructor
+      self.exec_function(ident.constructor, arguments, object_stack);
+    end
+
+    # Lock the stack to prevent further variable declarations
+    object_stack.lock
+
+    # Create the ObjectType instance
+    return Types::ObjectType.new(ident, object_stack)
+  end
+
   # Execute a call expression
   # returns the result of the expression
   def self.exec_call_expression(node, stack)
@@ -347,6 +369,15 @@ class Executor
       raise "#{function} is not a function!"
     end
 
+    # Execute the function
+    return self.exec_function(function, arguments)
+  end
+
+  # Execute a given function
+  # Passing it some arguments
+  # Inside a stack
+  def self.exec_function(function, arguments, stack = nil)
+
     # Get the identities of the arguments that are required
     argument_ids = function.argumentlist.children.map do |argument|
       argument.value
@@ -363,7 +394,7 @@ class Executor
 
     # Create new stack for the function arguments to be saved in
     # and to be passed to self.exec_block
-    function_stack = Stack.new(function.block.parent_stack)
+    function_stack = Stack.new(stack || function.block.parent_stack)
     function_stack["__arguments__", true] = Types::ArrayType.new arguments
     arguments.each_with_index do |arg, index|
       function_stack[argument_ids[index], true] = arg
@@ -434,7 +465,7 @@ class Executor
     when ClassLiteral
       Types::ClassType.new(
         node.identifier,
-        node.initializer,
+        self.exec_literal(node.constructor, stack),
         node.block,
         stack
       )
