@@ -44,7 +44,6 @@ while (i < 10) {
 
 __User Input__
 ```charly
-
 # Strings
 let input = gets();
 print(input);
