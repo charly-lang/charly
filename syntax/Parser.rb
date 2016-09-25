@@ -100,19 +100,6 @@ class Parser
     end
 
     # Skip whitespace and comments
-    while @tokens[@next].token == :COMMENT ||
-          @tokens[@next].token == :WHITESPACE do
-
-      # We reached the end of the file
-      if @next + 1 > (@tokens.length - 1)
-        return false
-      end
-
-      # Increment the pointer
-      @next += 1
-    end
-
-    # Skip whitespace and comments
     if string != ""
       @tokens[@next].token == token && @tokens[@next].value == string
     else
@@ -192,7 +179,7 @@ class Parser
     match
   end
 
-  def check_each(list)
+  def check_each(list, node_class = Temporary)
     save = @next
     backup = @node
     match = false
@@ -211,7 +198,7 @@ class Parser
       @node = backup
 
       # Create temporary node
-      temp = Temporary.new @node
+      temp = node_class.new @node
       @node = temp
 
       # Try the production
@@ -232,7 +219,7 @@ class Parser
     start = Time.now.to_ms
     save = @node
     @node = node_class.new @node
-    match = check_each(productions)
+    match = check_each(productions, node_class)
     if match
       @node.build_time = Time.now.to_ms - start
       save << @node
@@ -257,9 +244,6 @@ class Parser
 
   def S
     node_production(Statement, Proc.new {
-      E() && term(:TERMINAL)
-
-    }, Proc.new {
       if term(:KEYWORD, "let") && term(:IDENTIFIER)
         check_each([Proc.new {
           term(:ASSIGNMENT) && E() && term(:TERMINAL)
@@ -278,6 +262,8 @@ class Parser
       B() &&
       term(:TERMINAL)
 
+    }, Proc.new {
+      E() && term(:TERMINAL)
     })
   end
 
@@ -344,38 +330,9 @@ class Parser
     });
   end
 
-  # Call Expression
-  def CE
-    node_production(CallExpressionNode, Proc.new {
-      matched = check_each([Proc.new {
-        term(:IDENTIFIER)
-      }])
-
-      if matched
-        check_each([Proc.new {
-          found_at_least_one = false
-          while peek_term(:LEFT_PAREN) && term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
-            found_at_least_one = true
-          end
-          found_at_least_one
-        }, true])
-      end
-    })
-  end
-
   # Expressions
   def E
     node_production(Expression, Proc.new {
-      matched = check_each([Proc.new {
-        CE()
-      }, Proc.new {
-        term(:IDENTIFIER)
-      }])
-
-      if matched
-        term(:ASSIGNMENT) && E()
-      end
-    }, Proc.new {
 
       # Term
       if T()
@@ -403,6 +360,8 @@ class Parser
           term(:EQ) && E()
         }, Proc.new {
           term(:NOTEQ) && E()
+        }, Proc.new {
+          term(:ASSIGNMENT) && E()
         }, true])
       end
 
@@ -465,12 +424,18 @@ class Parser
     #
     # We will create new CallExpressionNode and place the first child
     # of the Temporary node into it
-    backup_node = @node
     if peek_term(:LEFT_PAREN)
+
+      backup_node = @node
+      backup_children = @node.children.clone
+      @node.children.clear
       @node = @node.parent
-      node_production(CallExpressionNode, Proc.new {
-        @node << backup_node.children[0]
-        backup_node.children.shift
+
+      return node_production(CallExpressionNode, Proc.new {
+        left_side = Expression.new(backup_node.parent)
+        left_side.children = backup_children
+        @node << left_side
+
         term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN) && consume_call_expression
       })
     end
