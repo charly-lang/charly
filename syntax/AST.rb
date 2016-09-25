@@ -259,6 +259,19 @@ class CallExpression < Expression
   end
 end
 
+# A single member expression
+class MemberExpressionNode < Expression; end
+class MemberExpression < Expression
+  attr_accessor :identifier, :member
+
+  def initialize(identifier, member, parent)
+    super(parent)
+    @identifier = identifier
+    @member = member
+    @children = [identifier, member]
+  end
+end
+
 # A single function definition
 class FunctionDefinitionExpression < Expression
   attr_accessor :function
