@@ -104,6 +104,10 @@ class Executor
       return self.exec_call_expression(node, stack)
     end
 
+    if node.is MemberExpression
+      return self.exec_member_expression(node, stack)
+    end
+
     if node.is WhileStatement
       return self.exec_while_statement(node, stack)
     end
@@ -352,6 +356,26 @@ class Executor
 
     # Execute the function
     return self.exec_function(function, arguments)
+  end
+
+  # Perform a member lookup
+  def self.exec_member_expression(node, stack)
+
+    # Get some values
+    ident = self.exec_expression(node.identifier, stack)
+    member = node.member.value
+
+    # Check if ident is an object
+    if !ident.is(Types::ObjectType)
+      raise "#{ident} is not an object!"
+    end
+
+    # Check the stack for the value
+    if ident.stack.contains_key(member, false)
+      return ident.stack[member, false]
+    else
+      return Types::NullType.new
+    end
   end
 
   # Instantiate a new instance of *ident*
