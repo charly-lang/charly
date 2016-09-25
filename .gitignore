@@ -1,3 +1,4 @@
 .git
 *.swp
 parser-dump
+test/debugging.charly
