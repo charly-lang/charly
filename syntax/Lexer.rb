@@ -16,6 +16,7 @@ class Lexer
       [:IDENTIFIER,   /\A(\w|_)+\Z/],
       [:COMMA,        /\A,\Z/],
       [:TERMINAL,     /\A;\Z/],
+      [:POINT,        /\A\.\Z/],
 
       # Operators etc.
       [:ASSIGNMENT,   /\A\=\Z/],
