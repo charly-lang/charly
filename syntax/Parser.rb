@@ -446,9 +446,7 @@ class Parser
 
       return node_production(CallExpressionNode, Proc.new {
         left_side = Expression.new(backup_node.parent)
-        backup_children.each do |child|
-          left_side << child
-        end
+        left_side.children = backup_children
         @node << left_side
 
         term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN) && consume_call_expression
