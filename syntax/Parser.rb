@@ -192,7 +192,7 @@ class Parser
     match
   end
 
-  def check_each(list)
+  def check_each(list, node_class = Temporary)
     save = @next
     backup = @node
     match = false
@@ -211,7 +211,7 @@ class Parser
       @node = backup
 
       # Create temporary node
-      temp = Temporary.new @node
+      temp = node_class.new @node
       @node = temp
 
       # Try the production
@@ -232,7 +232,7 @@ class Parser
     start = Time.now.to_ms
     save = @node
     @node = node_class.new @node
-    match = check_each(productions)
+    match = check_each(productions, node_class)
     if match
       @node.build_time = Time.now.to_ms - start
       save << @node
@@ -257,9 +257,6 @@ class Parser
 
   def S
     node_production(Statement, Proc.new {
-      E() && term(:TERMINAL)
-
-    }, Proc.new {
       if term(:KEYWORD, "let") && term(:IDENTIFIER)
         check_each([Proc.new {
           term(:ASSIGNMENT) && E() && term(:TERMINAL)
@@ -278,6 +275,8 @@ class Parser
       B() &&
       term(:TERMINAL)
 
+    }, Proc.new {
+      E() && term(:TERMINAL)
     })
   end
 
@@ -438,12 +437,20 @@ class Parser
     #
     # We will create new CallExpressionNode and place the first child
     # of the Temporary node into it
-    backup_node = @node
     if peek_term(:LEFT_PAREN)
+
+      backup_node = @node
+      backup_children = @node.children.clone
+      @node.children.clear
       @node = @node.parent
-      node_production(CallExpressionNode, Proc.new {
-        @node << backup_node.children[0]
-        backup_node.children.shift
+
+      return node_production(CallExpressionNode, Proc.new {
+        left_side = Expression.new(backup_node.parent)
+        backup_children.each do |child|
+          left_side << child
+        end
+        @node << left_side
+
         term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN) && consume_call_expression
       })
     end
