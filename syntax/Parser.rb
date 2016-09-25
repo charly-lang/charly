@@ -100,19 +100,6 @@ class Parser
     end
 
     # Skip whitespace and comments
-    while @tokens[@next].token == :COMMENT ||
-          @tokens[@next].token == :WHITESPACE do
-
-      # We reached the end of the file
-      if @next + 1 > (@tokens.length - 1)
-        return false
-      end
-
-      # Increment the pointer
-      @next += 1
-    end
-
-    # Skip whitespace and comments
     if string != ""
       @tokens[@next].token == token && @tokens[@next].value == string
     else

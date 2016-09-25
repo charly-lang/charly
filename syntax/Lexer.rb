@@ -97,7 +97,10 @@ class Lexer
       forward += 1
     end
 
-    tokens
+    tokens.select! do |t|
+      t.token != :WHITESPACE &&
+      t.token != :COMMENT
+    end
   end
 
   def self.identify(input, line, file)
