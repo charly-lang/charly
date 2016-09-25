@@ -269,12 +269,23 @@ class Optimizer
       child3 = node.children[2]
       child4 = node.children[3]
 
-      if child1.is(IdentifierLiteral, FunctionLiteral, CallExpression) && child3.is(ExpressionList)
+      if child3.is(ExpressionList)
         if child2.is(LeftParenLiteral) && child4.is(RightParenLiteral)
 
           @finished = false
           return CallExpression.new(child1, child3, node.parent)
         end
+      end
+    end
+
+    # Member Expressions
+    if node.is(MemberExpressionNode)
+
+      # Check for the point
+      if node.children[1].is(PointLiteral)
+
+        @finished = false
+        return MemberExpression.new(node.children[0], node.children[2], node.parent)
       end
     end
 
@@ -401,6 +412,6 @@ class Optimizer
       end
     end
 
-    node
+    return node
   end
 end
