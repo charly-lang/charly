@@ -101,8 +101,7 @@ end
 
 # A single program with no parent nodes
 class Program < Block
-  attr_reader :file
-  attr_accessor :should_execute
+  attr_accessor :file, :should_execute
 
   def initialize(file)
     super(NIL)
@@ -150,7 +149,7 @@ end
 
 # A single binary expression, performing a calculation
 class BinaryExpression < Expression
-  attr_reader :operator, :left, :right
+  attr_accessor :operator, :left, :right
 
   def initialize(operator, left, right, parent)
     super(parent)
@@ -163,7 +162,7 @@ end
 
 # A single comparison expression
 class ComparisonExpression < Expression
-  attr_reader :operator, :left, :right
+  attr_accessor :operator, :left, :right
 
   def initialize(operator, left, right, parent)
     super(parent)
@@ -184,7 +183,7 @@ end
 # let a = 2;
 # let myvar = "hello";
 class VariableDeclaration < Statement
-  attr_reader :identifier
+  attr_accessor :identifier
 
   def initialize(identifier, parent)
     super(parent)
@@ -203,7 +202,7 @@ end
 # let a;
 # let myvar;
 class VariableInitialisation < Statement
-  attr_reader :identifier, :expression
+  attr_accessor :identifier, :expression
 
   def initialize(identifier, expression, parent)
     super(parent)
@@ -214,7 +213,7 @@ class VariableInitialisation < Statement
 end
 
 class VariableAssignment < Expression
-  attr_reader :identifier, :expression
+  attr_accessor :identifier, :expression
 
   def initialize(identifier, expression, parent)
     super(parent)
@@ -224,10 +223,33 @@ class VariableAssignment < Expression
   end
 end
 
+# A class literal
+class ClassLiteralNode < Expression; end
+class ClassLiteral < Expression
+  attr_accessor :identifier, :constructor, :block
+
+  def initialize(identifier, constructor, block, parent)
+    super(parent);
+    @identifier = identifier
+    @constructor = constructor
+    @block = block
+    @children = [identifier, constructor, block]
+  end
+end
+class ClassDefinition < Expression
+  attr_accessor :classliteral
+
+  def initialize(classliteral, parent)
+    super(parent);
+    @classliteral = classliteral
+    @children = [classliteral]
+  end
+end
+
 # A single function call expression
 class CallExpressionNode < Expression; end
 class CallExpression < Expression
-  attr_reader :identifier, :argumentlist
+  attr_accessor :identifier, :argumentlist
 
   def initialize(identifier, argumentlist, parent)
     super(parent)
@@ -239,7 +261,7 @@ end
 
 # A single function definition
 class FunctionDefinitionExpression < Expression
-  attr_reader :function
+  attr_accessor :function
 
   def initialize(function, parent)
     super(parent)
@@ -300,7 +322,7 @@ class KeywordLiteral < LiteralValue; end
 class BooleanLiteral < LiteralValue; end
 class ArrayLiteral < Expression; end
 class FunctionLiteral < Expression
-    attr_reader :identifier, :argumentlist, :block
+    attr_accessor :identifier, :argumentlist, :block
 
     def initialize(identifier, argumentlist, block, parent)
         super(parent)

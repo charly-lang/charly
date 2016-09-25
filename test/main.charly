@@ -304,6 +304,36 @@ run(test(received, "hello", "__arguments__ meta property can be overwritten"), "
 
 
 
+# Check if classes work
+# This is just a simple test
+class Person {
+    let name;
+    func constructor(_name) {
+        name = _name;
+    };
+};
+let leonard = new(Person, "Leonard");
+run(test(memberex(leonard, "name"), "Leonard", "Classes and member lookup"), "test");
+
+
+
+# Check if the argument order of nested call expressions is correct
+let f1_result = null;
+let f2_result = null;
+let f3_result = null;
+func(arg) {
+    f1_result = arg;
+    func(arg) {
+        f2_result = arg;
+        func(arg) {
+            f3_result = arg;
+        };
+    };
+}(1)(2)(3);
+run(test([f1_result, f2_result, f3_result], [1, 2, 3], "Argument order of nested call expressions"), "test");
+
+
+
 # Script exit code
 if (run(0, "result") == 0) {
     print("Test suite passed!");
