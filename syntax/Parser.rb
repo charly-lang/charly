@@ -344,38 +344,9 @@ class Parser
     });
   end
 
-  # Call Expression
-  def CE
-    node_production(CallExpressionNode, Proc.new {
-      matched = check_each([Proc.new {
-        term(:IDENTIFIER)
-      }])
-
-      if matched
-        check_each([Proc.new {
-          found_at_least_one = false
-          while peek_term(:LEFT_PAREN) && term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN)
-            found_at_least_one = true
-          end
-          found_at_least_one
-        }, true])
-      end
-    })
-  end
-
   # Expressions
   def E
     node_production(Expression, Proc.new {
-      matched = check_each([Proc.new {
-        CE()
-      }, Proc.new {
-        term(:IDENTIFIER)
-      }])
-
-      if matched
-        term(:ASSIGNMENT) && E()
-      end
-    }, Proc.new {
 
       # Term
       if T()
@@ -403,6 +374,8 @@ class Parser
           term(:EQ) && E()
         }, Proc.new {
           term(:NOTEQ) && E()
+        }, Proc.new {
+          term(:ASSIGNMENT) && E()
         }, true])
       end
 
