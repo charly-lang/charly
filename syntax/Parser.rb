@@ -136,6 +136,8 @@ class Parser
         @node << new(LeftBracketLiteral)
       when :RIGHT_BRACK
         @node << new(RightBracketLiteral)
+      when :POINT
+        @node << new(PointLiteral)
       when :PLUS
         @node << new(PlusOperator)
       when :MINUS
@@ -371,23 +373,23 @@ class Parser
   # Terms
   def T
     node_production(Expression, Proc.new {
-      term(:NUMERICAL)
+      term(:NUMERICAL) && consume_call_expression && consume_member_expression
     }, Proc.new {
-      term(:STRING)
+      term(:STRING) && consume_call_expression && consume_member_expression
     }, Proc.new {
-      term(:BOOLEAN)
+      term(:BOOLEAN) && consume_call_expression && consume_member_expression
     }, Proc.new {
-      term(:NULL)
+      term(:NULL) && consume_call_expression && consume_member_expression
     }, Proc.new {
-      A() && consume_call_expression
+      A() && consume_call_expression && consume_member_expression
     }, Proc.new {
-      F() && consume_call_expression
+      F() && consume_call_expression && consume_member_expression
     }, Proc.new {
-      term(:IDENTIFIER) && consume_call_expression
+      term(:IDENTIFIER) && consume_call_expression && consume_member_expression
     }, Proc.new {
       term(:LEFT_PAREN) &&
       E() &&
-      term(:RIGHT_PAREN) && consume_call_expression
+      term(:RIGHT_PAREN) && consume_call_expression && consume_member_expression
     }, Proc.new {
       CL()
     })
@@ -431,13 +433,43 @@ class Parser
       @node.children.clear
       @node = @node.parent
 
-      return node_production(CallExpressionNode, Proc.new {
-        left_side = Expression.new(backup_node.parent)
+      matched = node_production(CallExpressionNode, Proc.new {
+        left_side = backup_node.class.new(backup_node.parent)
         left_side.children = backup_children
         @node << left_side
 
-        term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN) && consume_call_expression
+        term(:LEFT_PAREN) && EL() && term(:RIGHT_PAREN) && consume_call_expression && consume_member_expression
       })
+      @node = backup_node
+      return matched
+    end
+    return true
+  end
+
+  # Parse a member expression
+  def consume_member_expression
+
+    # @node will always be a Temporary node in this context
+    # And it will always only contain a single value
+    #
+    # We will create new CallExpressionNode and place the first child
+    # of the Temporary node into it
+    if peek_term(:POINT)
+
+      backup_node = @node
+      backup_children = @node.children.clone
+      @node.children.clear
+      @node = @node.parent
+
+      matched = node_production(MemberExpressionNode, Proc.new {
+        left_side = backup_node.class.new(backup_node.parent)
+        left_side.children = backup_children
+        @node << left_side
+
+        term(:POINT) && term(:IDENTIFIER) && consume_call_expression && consume_member_expression
+      })
+      @node = backup_node
+      return matched
     end
     return true
   end

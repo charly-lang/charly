@@ -354,9 +354,10 @@ class RightCurlyLiteral < Terminal; end
 class LeftBracketLiteral < Terminal; end
 class RightBracketLiteral < Terminal; end
 
-# Semicolon and comma
+# Punctuators
 class SemicolonLiteral < Terminal; end
 class CommaLiteral < Terminal; end
+class PointLiteral < Terminal; end
 
 # Arithmetic operators
 class BinaryOperatorLiteral < Terminal; end
