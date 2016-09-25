@@ -301,19 +301,26 @@ class Executor
       arguments << self.exec_expression(argument, stack)
     end
 
+    # Execute the identifier of the CE only if it's not an IdentifierLiteral
+    # We have custom behaviour for things like the call_internal or the
+    # ArrayIndexWrite operation
+    if !node.identifier.is(IdentifierLiteral)
+      node.identifier = self.exec_expression(node.identifier, stack)
+    end
+
     # Get the function that's being executed
-    function = Types::NullType.new
+    function = node.identifier
 
     # check if the function is a function literal
-    if node.identifier.is(IdentifierLiteral)
+    if function.is(IdentifierLiteral)
 
       # Check for an internal function call
-      if node.identifier.value == "call_internal"
+      if function.value == "call_internal"
         return Interpreter::InternalFunctions.exec_internal_function(arguments[0], arguments[1..-1], stack, node)
       end
 
-      # Check the stack for a function definition
-      stack_value = stack[node.identifier.value]
+      # Check if the value is an ArrayType
+      stack_value = stack[function.value]
 
       # Return the corresponding item if an array was found
       if stack_value.is_a? Types::ArrayType
@@ -336,10 +343,6 @@ class Executor
       end
 
       function = stack_value
-    elsif node.identifier.is(Types::FuncType)
-      function = self.connect_function_to_stack(node.identifier, stack)
-    elsif node.identifier.is(CallExpression)
-      function = self.exec_call_expression(node.identifier, stack)
     end
 
     # Check if function is really a function

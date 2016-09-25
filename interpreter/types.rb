@@ -89,7 +89,11 @@ module Types
     end
 
     def to_s
-      "Function:#{@identifier.value}"
+      if @identifier
+        "Function:#{@identifier.value}"
+      else
+        "Function:[anonymous]"
+      end
     end
 
     def self.to_s
