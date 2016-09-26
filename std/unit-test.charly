@@ -1,0 +1,122 @@
+class UnitTest {
+
+    # A single test defined in the it function
+    class Test {
+        let title;
+        let assertions = [];
+
+        func constructor(_title) {
+            title = _title;
+        };
+
+        func add_assertion(real, expect) {
+            assertions = append(assertions, [
+                real,
+                expect,
+                real == expect
+            ]);
+        };
+
+        func all_passed() {
+            let all_passed = true;
+            each(assertions, func(assertion) {
+                if (all_passed == true) {
+                    all_passed = assertion(2);
+                };
+            });
+            all_passed;
+        };
+
+        func failed_assertions() {
+            filter(assertions, func(assertion) {
+                assertion(2) ! true;
+            });
+        };
+    };
+
+    # A single suite
+    # contains a list of tests
+    class Suite {
+        let title;
+        let tests = [];
+
+        func constructor(_title) {
+            title = _title;
+        };
+
+        func add_test(test) {
+            tests = append(tests, test);
+        };
+
+        func all_tests_passed() {
+            let all_passed = true;
+            each(tests, func(test) {
+                if (all_passed == true) {
+                    all_passed = test.all_passed();
+                };
+            });
+            all_passed;
+        };
+    };
+
+    let title;
+    let suites = [];
+
+    func constructor(_title) {
+        title = _title;
+    };
+
+    # Begin a new series of connected test-suites
+    func begin(callback) {
+
+        callback(func describe(description, callback) {
+            let current_suite = new(Suite, description);
+
+            print(colorize("Suite: " + description, 33));
+            callback(func it(description, callback) {
+                let current_test = new(Test, description);
+
+                dump(colorize("Test: " + description + " ", 37));
+                callback(func assert(real, expect) {
+                    current_test.add_assertion(real, expect);
+                });
+
+                if (current_test.all_passed()) {
+                    dump(colorize("Passed", 32));
+                    print("");
+                } else {
+                    dump(colorize("Failed", 31));
+                    print("");
+
+                    # Show additional info for failed tests
+                    each(current_test.failed_assertions(), func(fa) {
+                        print(colorize("Expected: " + String(fa(1)) + ", got: " + String(fa(0)), 31));
+                    });
+                };
+
+                current_suite.add_test(current_test);
+            });
+
+            # Add the current_suite to the suites array
+            suites = append(suites, current_suite);
+        });
+
+        if (all_suites_passed()) {
+            0;
+        } else {
+            1;
+        };
+    };
+
+    # Returns true if all suites have passed
+    # False if at least one has failed
+    func all_suites_passed() {
+        let all_passed = true;
+        each(suites, func(suite) {
+            if (all_passed == true) {
+                all_passed = suite.all_tests_passed();
+            };
+        });
+        all_passed;
+    };
+};
