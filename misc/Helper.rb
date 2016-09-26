@@ -17,11 +17,7 @@ end
 
 # Colored output
 def colorize(text, color_code)
-  if !ARGV.include? "--nocolor"
-    "\e[#{color_code.to_i}m#{text}\e[0m"
-  else
-    text
-  end
+  "\e[#{color_code.to_i}m#{text}\e[0m"
 end
 def grey(text); colorize(text, 30) end
 def red(text); colorize(text, 31) end
