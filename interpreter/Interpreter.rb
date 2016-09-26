@@ -188,14 +188,17 @@ class Executor
 
   # Assign a value to an index inside an array
   def self.exec_array_index_write(node, stack)
-    identifier = node.children[0].value
+
+    if !node.children[0].is(IdentifierLiteral)
+      array = self.exec_expression(node.children[0], stack)
+    else
+      array = stack.get(node.children[0].value)
+    end
+
     location = node.children[1].children.map do |child|
       self.exec_expression(child, stack)
     end
     expression = self.exec_expression(node.children[2], stack)
-
-    # Get the right array from the stack
-    array = stack.get(identifier)
 
     # Check if the value we got from the stack is really an array
     if !array.is_a? Types::ArrayType
@@ -528,6 +531,8 @@ class Executor
     when Types::BooleanType::True
       return true
     when Types::BooleanType::False
+      return false
+    when Types::NullType
       return false
     when TrueClass
       true
