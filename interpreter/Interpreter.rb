@@ -156,14 +156,34 @@ class Executor
   # the return value is the value of the identifier
   # after the assignment
   def self.exec_variable_assignment(node, stack)
-    value = self.exec_expression(node.expression, stack)
-    stack.write(node.identifier.value, value, false)
 
-    # Return value is the value of the variable
-    # after the assignment
-    #
-    # not the value passed in
-    return stack.get(node.identifier.value)
+    # Resolve the value of the expression
+    value = self.exec_expression(node.expression, stack)
+
+    # Check if node is a member expression
+    if node.identifier.is(MemberExpression)
+
+      # Resolve the left-hand side of the expression
+      # up the top level but not including it
+      # Top(not-resolved) -> left(resolved) -> left(resolved)
+      identifier = node.identifier.identifier
+      member = node.identifier.member
+
+      # Resolving
+      identifier = self.exec_expression(identifier, stack)
+
+      # Check if the identifier is an object
+      if !identifier.is(Types::ObjectType)
+        raise "'#{identifier}' is not an object!"
+      end
+
+      # Perform the write on the objects stack
+      identifier.stack.write(member.value, value, false, false)
+    else
+      stack.write(node.identifier.value, value, false)
+    end
+
+    return value
   end
 
   # Assign a value to an index inside an array
@@ -207,7 +227,7 @@ class Executor
       end
     end
 
-    expression
+    return expression
   end
 
   # Perform a binary expression

@@ -195,7 +195,7 @@ class Optimizer
         operator = node.children[1]
 
         if left.is Expression, LiteralValue
-          if right.is Expression, LiteralValue
+          if right.is Expression, LiteralValue,
 
             @finished = false
             return ComparisonExpression.new(operator, left, right, node.parent)
@@ -215,8 +215,8 @@ class Optimizer
         expression = node.children[2]
         operator = node.children[1]
 
-        if expression.is Expression, LiteralValue
-          if identifier.is IdentifierLiteral
+        if expression.is Expression, LiteralValue, MemberExpression
+          if identifier.is IdentifierLiteral, MemberExpression
             @finished = false
             return VariableAssignment.new(identifier, expression, node.parent)
           elsif identifier.is CallExpression
