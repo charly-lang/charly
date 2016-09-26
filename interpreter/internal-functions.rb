@@ -36,9 +36,8 @@ class Interpreter
       when "sleep"
         sleep(arguments[0].value)
         return Types::NullType.new
-      when "print_color"
-        puts colorize(arguments[0].value, arguments[1].value)
-        return Types::NullType.new
+      when "colorize"
+        return colorize(arguments[0].value, arguments[1].value)
       when "length"
         case arguments[0]
         when Types::ArrayType
