@@ -252,7 +252,9 @@ class Executor
         left / right
       end
     when ModOperator
-      left % right
+      if right != 0 || right != -0
+        left % right
+      end
     when PowOperator
       left ** right
     end
