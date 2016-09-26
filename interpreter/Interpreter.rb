@@ -346,27 +346,27 @@ class Executor
       # Check if the value is an ArrayType
       stack_value = stack.get(function.value)
 
-      # Return the corresponding item if an array was found
-      if stack_value.is_a? Types::ArrayType
-        arguments.each do |arg|
+      function = stack_value
+    end
 
-          # Check if something else than a NumericType was passed
-          if !arg.is_a? Types::NumericType
-            raise "Array index operator expected Types::NumericType, got #{arg.class}"
-          end
+    # Return the corresponding item if an array was found
+    if function.is_a? Types::ArrayType
+      arguments.each do |arg|
 
-          # Check for out of bounds errors
-          if arg.value < 0 || arg.value > (stack_value.value.length - 1)
-            return Types::NullType.new
-          end
-
-          stack_value = stack_value.value[arg.value]
+        # Check if something else than a NumericType was passed
+        if !arg.is_a? Types::NumericType
+          raise "Array index operator expected Types::NumericType, got #{arg.class}"
         end
 
-        return stack_value
+        # Check for out of bounds errors
+        if arg.value < 0 || arg.value > (function.value.length - 1)
+          return Types::NullType.new
+        end
+
+        function = function.value[arg.value]
       end
 
-      function = stack_value
+      return function
     end
 
     # Check if function is really a function
