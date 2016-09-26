@@ -1,6 +1,8 @@
 [![Build Status](https://travis-ci.com/KCreate/charly-lang.svg?token=yitMwy9Lg5peiAqCZjoK&branch=master)](https://travis-ci.com/KCreate/charly-lang)
 
-# The __Charly__ programming language interpreter
+<img align="right" alt="Charly" width="150" src="docs/images/charly.png" />
+
+# The Charly programming language
 
 This is my try at writing an interpreter of a dynamic language from scratch with my bare hands.
 
