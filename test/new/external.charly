@@ -1,3 +1,0 @@
-# This file is used to check if the require and load functions work correctly
-func __external__test__function__() { 30; };
-25;
