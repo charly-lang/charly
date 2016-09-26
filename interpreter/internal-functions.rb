@@ -37,7 +37,7 @@ class Interpreter
         sleep(arguments[0].value)
         return Types::NullType.new
       when "colorize"
-        return colorize(arguments[0].value, arguments[1].value)
+        return Types::StringType.new(colorize(arguments[0].value, arguments[1].value))
       when "length"
         case arguments[0]
         when Types::ArrayType
@@ -107,10 +107,8 @@ class Interpreter
 
         # Execute and return the input
         return InterpreterFascade.execute_eval([arguments[0].value], stack)
-      when "memberex"
-        object = arguments[0]
-        property = arguments[1].value
-        return object.stack[property, false]
+      when "time_ms"
+        return Types::NumericType.new(Time.new.to_ms)
       end
     end
   end
