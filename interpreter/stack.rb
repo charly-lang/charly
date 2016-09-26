@@ -47,63 +47,56 @@ class Stack
     @locked = false
   end
 
-  # Returns the stack for a given identifier
-  def stack_for_key(k)
-    if @values.key? k
-      self
-    else
-      if @parent != NIL
-        @parent.stack_for_key k
+  def write(key, value, declaration = false, check_parent = true)
+
+    # Check if this is a declaration
+    if declaration
+
+      # Check if the stack is locked
+      if @locked
+        raise "Could not write to variable '#{key}', stack is locked!"
       else
-        NIL
+        @values[key] = value
+        return value
       end
     end
+
+    # Check if the current stack contains the key
+    if contains key
+      @values[key] = value
+      return value
+    elsif check_parent && @parent != nil
+      return @parent.write(key, value, false, true)
+    end
   end
 
-  def []=(k, d, v)
-    if @locked
-      raise "Can't write to locked stack!"
-    end
-
-    stack = stack_for_key k
-
-    if d
-      @values[k] = v
-      return
-    end
-
-    unless stack == NIL
-      stack.values[k] = v
+  # Get a key from the stack
+  # If the key doesn't exist, check the parent stack
+  # unless *check_parent* is passed
+  def get(key, check_parent = true)
+    if contains key
+      return @values[key]
+    elsif check_parent && @parent != nil
+      return @parent.get(key)
     else
-      raise "Can't write to variable '#{k}', not defined!"
+      raise "Variable '#{key}' is not defined!"
     end
   end
 
-  def contains_key(k, check_parent = true)
-    if @values.key? k
+  # Check if the current stack contains a value
+  def contains(key)
+    return @values.key? key
+  end
+
+  # Check if the current stack, or any of it's parents stack
+  # contain a given key
+  def defined(key)
+    if contains(key)
       return true
-    elsif check_parent
-      unless @parent == NIL
-        return true
-      else
-        return false
-      end
+    elsif @parent != nil
+      return @parent.defined(key)
     else
       return false
-    end
-  end
-
-  def [](k, check_parent = true)
-    if @values.key? k
-      @values[k]
-    elsif check_parent
-      unless @parent == NIL
-        @parent[k]
-      else
-        raise "Variable '#{k}' is not defined!"
-      end
-    else
-      raise "Variable '#{k}' is not defined!"
     end
   end
 end

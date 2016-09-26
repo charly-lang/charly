@@ -311,9 +311,29 @@ class Person {
     func constructor(_name) {
         name = _name;
     };
+
+    func greet(greeter) {
+        greeter + " " + name;
+    };
 };
 let leonard = new(Person, "Leonard");
-run(test(memberex(leonard, "name"), "Leonard", "Classes and member lookup"), "test");
+run(test(leonard.name, "Leonard", "Classes"), "test");
+run(test(leonard.greet("Hello"), "Hello Leonard", "Member Expressions"), "test");
+
+
+
+# Check if overwriting object properties work
+leonard.name = "Peter";
+run(test(leonard.name, "Peter", "Writing to object properties"), "test");
+
+
+
+# Check if overwriting object properties runs in the correct scope
+let changed = false;
+class Test {};
+let myTest = new(Test);
+myTest.changed = true;
+run(test(changed, false, "Writing to object properties in the correct scope"), "test");
 
 
 

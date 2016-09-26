@@ -259,6 +259,19 @@ class CallExpression < Expression
   end
 end
 
+# A single member expression
+class MemberExpressionNode < Expression; end
+class MemberExpression < Expression
+  attr_accessor :identifier, :member
+
+  def initialize(identifier, member, parent)
+    super(parent)
+    @identifier = identifier
+    @member = member
+    @children = [identifier, member]
+  end
+end
+
 # A single function definition
 class FunctionDefinitionExpression < Expression
   attr_accessor :function
@@ -341,9 +354,10 @@ class RightCurlyLiteral < Terminal; end
 class LeftBracketLiteral < Terminal; end
 class RightBracketLiteral < Terminal; end
 
-# Semicolon and comma
+# Punctuators
 class SemicolonLiteral < Terminal; end
 class CommaLiteral < Terminal; end
+class PointLiteral < Terminal; end
 
 # Arithmetic operators
 class BinaryOperatorLiteral < Terminal; end

@@ -104,6 +104,10 @@ class Executor
       return self.exec_call_expression(node, stack)
     end
 
+    if node.is MemberExpression
+      return self.exec_member_expression(node, stack)
+    end
+
     if node.is WhileStatement
       return self.exec_while_statement(node, stack)
     end
@@ -135,7 +139,7 @@ class Executor
   # the return value is the value of the variable
   def self.exec_variable_initialisation(node, stack)
     value = self.exec_expression(node.expression, stack)
-    stack[node.identifier.value, true] = value
+    stack.write(node.identifier.value, value, true)
     value
   end
 
@@ -144,7 +148,7 @@ class Executor
   # the return value is NULL
   def self.exec_variable_declaration(node, stack)
     value = Types::NullType.new
-    stack[node.identifier.value, true] = value
+    stack.write(node.identifier.value, value, true)
     value
   end
 
@@ -152,26 +156,49 @@ class Executor
   # the return value is the value of the identifier
   # after the assignment
   def self.exec_variable_assignment(node, stack)
-    value = self.exec_expression(node.expression, stack)
-    stack[node.identifier.value, false] = value
 
-    # Return value is the value of the variable
-    # after the assignment
-    #
-    # not the value passed in
-    return stack[node.identifier.value]
+    # Resolve the value of the expression
+    value = self.exec_expression(node.expression, stack)
+
+    # Check if node is a member expression
+    if node.identifier.is(MemberExpression)
+
+      # Resolve the left-hand side of the expression
+      # up the top level but not including it
+      # Top(not-resolved) -> left(resolved) -> left(resolved)
+      identifier = node.identifier.identifier
+      member = node.identifier.member
+
+      # Resolving
+      identifier = self.exec_expression(identifier, stack)
+
+      # Check if the identifier is an object
+      if !identifier.is(Types::ObjectType)
+        raise "'#{identifier}' is not an object!"
+      end
+
+      # Perform the write on the objects stack
+      identifier.stack.write(member.value, value, false, false)
+    else
+      stack.write(node.identifier.value, value, false)
+    end
+
+    return value
   end
 
   # Assign a value to an index inside an array
   def self.exec_array_index_write(node, stack)
-    identifier = node.children[0].value
+
+    if !node.children[0].is(IdentifierLiteral)
+      array = self.exec_expression(node.children[0], stack)
+    else
+      array = stack.get(node.children[0].value)
+    end
+
     location = node.children[1].children.map do |child|
       self.exec_expression(child, stack)
     end
     expression = self.exec_expression(node.children[2], stack)
-
-    # Get the right array from the stack
-    array = stack[identifier]
 
     # Check if the value we got from the stack is really an array
     if !array.is_a? Types::ArrayType
@@ -203,7 +230,7 @@ class Executor
       end
     end
 
-    expression
+    return expression
   end
 
   # Perform a binary expression
@@ -277,8 +304,8 @@ class Executor
     if function.identifier == nil
       function
     else
-      stack[function.identifier.value, true] = function
-      stack[function.identifier.value]
+      stack.write(function.identifier.value, function, true)
+      stack.get(function.identifier.value)
     end
   end
 
@@ -287,8 +314,8 @@ class Executor
     classliteral = self.exec_literal(node.classliteral, stack)
 
     # Save it inside the stack
-    stack[classliteral.identifier.value, true] = classliteral
-    stack[classliteral.identifier.value]
+    stack.write(classliteral.identifier.value, classliteral, true)
+    stack.get(classliteral.identifier.value)
   end
 
   # Execute a call expression
@@ -301,57 +328,71 @@ class Executor
       arguments << self.exec_expression(argument, stack)
     end
 
-    # Execute the identifier of the CE only if it's not an IdentifierLiteral
-    # We have custom behaviour for things like the call_internal or the
-    # ArrayIndexWrite operation
-    if !node.identifier.is(IdentifierLiteral)
-      node.identifier = self.exec_expression(node.identifier, stack)
-    end
-
-    # Get the function that's being executed
-    function = node.identifier
-
-    # check if the function is a function literal
-    if function.is(IdentifierLiteral)
+    # Get the identifier of the call expression
+    # If the identifier is an IdentifierLiteral we first check if it's a "call_internal" call
+    function = nil
+    if node.identifier.is(IdentifierLiteral)
 
       # Check for an internal function call
-      if function.value == "call_internal"
+      if node.identifier.value == "call_internal"
         return Interpreter::InternalFunctions.exec_internal_function(arguments[0], arguments[1..-1], stack, node)
       end
 
-      # Check if the value is an ArrayType
-      stack_value = stack[function.value]
+      function = stack.get(node.identifier.value)
+    else
 
-      # Return the corresponding item if an array was found
-      if stack_value.is_a? Types::ArrayType
-        arguments.each do |arg|
+      # Resolve the identifier
+      function = self.exec_expression(node.identifier, stack)
+    end
 
-          # Check if something else than a NumericType was passed
-          if !arg.is_a? Types::NumericType
-            raise "Array index operator expected Types::NumericType, got #{arg.class}"
-          end
+    # Return the corresponding item if an array was found
+    if function.is_a? Types::ArrayType
+      arguments.each do |arg|
 
-          # Check for out of bounds errors
-          if arg.value < 0 || arg.value > (stack_value.value.length - 1)
-            return Types::NullType.new
-          end
-
-          stack_value = stack_value.value[arg.value]
+        # Check if something else than a NumericType was passed
+        if !arg.is_a? Types::NumericType
+          raise "Array index operator expected Types::NumericType, got #{arg.class}"
         end
 
-        return stack_value
+        # Check for out of bounds errors
+        if arg.value < 0 || arg.value > (function.value.length - 1)
+          return Types::NullType.new
+        end
+
+        function = function.value[arg.value]
       end
 
-      function = stack_value
+      return function
     end
 
     # Check if function is really a function
     if !function.is Types::FuncType
+      puts node
       raise "#{function} is not a function!"
     end
 
     # Execute the function
     return self.exec_function(function, arguments)
+  end
+
+  # Perform a member lookup
+  def self.exec_member_expression(node, stack)
+
+    # Get some values
+    ident = self.exec_expression(node.identifier, stack)
+    member = node.member.value
+
+    # Check if ident is an object
+    if !ident.is(Types::ObjectType)
+      raise "#{ident} is not an object!"
+    end
+
+    # Check the stack for the value
+    if ident.stack.contains(member)
+      return ident.stack.get(member)
+    else
+      return Types::NullType.new
+    end
   end
 
   # Instantiate a new instance of *ident*
@@ -365,8 +406,8 @@ class Executor
     self.exec_block(ident.block, object_stack)
 
     # Execute the constructor inside the object_stack
-    if object_stack.contains_key("constructor", false)
-      self.exec_function(object_stack["constructor", false], arguments);
+    if object_stack.contains("constructor")
+      self.exec_function(object_stack.get("constructor"), arguments);
     end
 
     # Lock the stack to prevent further variable declarations
@@ -400,9 +441,9 @@ class Executor
     # Create new stack for the function arguments to be saved in
     # and to be passed to self.exec_block
     function_stack = Stack.new(stack || function.block.parent_stack)
-    function_stack["__arguments__", true] = Types::ArrayType.new arguments
+    function_stack.write("__arguments__", Types::ArrayType.new(arguments), true)
     arguments.each_with_index do |arg, index|
-      function_stack[argument_ids[index], true] = arg
+      function_stack.write(argument_ids[index], arg, true)
     end
 
     # Execute the block
@@ -479,7 +520,7 @@ class Executor
 
   # Return the value of an identifier
   def self.exec_identifier_literal(node, stack)
-    return stack[node.value]
+    return stack.get(node.value)
   end
 
   # Returns true or false for a given value
@@ -490,6 +531,8 @@ class Executor
     when Types::BooleanType::True
       return true
     when Types::BooleanType::False
+      return false
+    when Types::NullType
       return false
     when TrueClass
       true

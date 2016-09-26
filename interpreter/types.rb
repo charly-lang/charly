@@ -174,7 +174,7 @@ module Types
     end
 
     def to_s
-      @values.map { |value|
+      @value.map { |value|
         value.to_s
       }.join("\n")
     end
