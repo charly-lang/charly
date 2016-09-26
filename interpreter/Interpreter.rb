@@ -202,7 +202,7 @@ class Executor
 
     # Check if the value we got from the stack is really an array
     if !array.is_a? Types::ArrayType
-      raise "#{identifier} is not an array."
+      raise "#{array} is not an array."
     end
 
     # Iterate over the indexes
