@@ -2,3 +2,7 @@
 func chomp(string) {
     call_internal("chomp", string);
 };
+
+func colorize(string, colorcode) {
+    call_internal("colorize", string, colorcode);
+};

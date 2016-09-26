@@ -19,12 +19,12 @@ module Types
       return NumericType.new(value)
     when String
       return StringType.new(value)
-    when Boolean
+    when TrueClass, FalseClass
       return BooleanType.new(value)
     when Array
       return ArrayType.new(value)
-    when NullType
-      return value
+    when NilClass
+      return NullType.new
     else
       return StringType.new(value.to_s)
     end

@@ -1,363 +1,592 @@
-func onlyTrueWasPassed() {
-    let value = true;
+new(UnitTest, "Charly Language").begin(func(describe) {
 
-    func callback(bool, method) {
-        if (method == "test") {
-            if (bool ! true) {
-                value = false;
+    describe("File require & load", func(it) {
+
+        it("Loads the contents of an external file", func(assert) {
+            assert(load("external.charly"), 25);
+            assert(load("external.charly"), 25);
+            assert(__external__test__function__(), 30);
+            assert(require("external.charly"), 25);
+        });
+
+    });
+
+    describe("Variables", func(it) {
+
+        it("Assigns a value to a variable", func(assert) {
+            let my_string = "Hello World";
+            let my_number = 25;
+            let my_bool = false;
+            let my_array = [1, "Whatsup", false];
+            let my_null = null;
+
+            assert(my_string, "Hello World");
+            assert(my_number, 25);
+            assert(my_bool, false);
+            assert(my_array, [1, "Whatsup", false]);
+            assert(my_null, null);
+        });
+
+        it("resolves variables in calculations", func(assert) {
+            let first_number = 25;
+            let second_number = 5;
+
+            assert(first_number + second_number, 30);
+        });
+
+        it("concats strings", func(assert) {
+            let left_string = "Hello";
+            let right_string = "World";
+
+            assert(left_string + right_string, "HelloWorld");
+        });
+
+    });
+
+    describe("Arithmetics", func(it) {
+
+        it("adds numbers", func(assert) {
+            assert(2 + 2, 4);
+            assert(10 + -50, -40);
+            assert(2.5 + 9.7, 12.2);
+            assert(-20.5 + 20.5, 0);
+            assert(999.999 + 999.999, 1999.998);
+        });
+
+        it("subtracts numbers", func(assert) {
+            assert(20 - 5, 15);
+            assert(3 - 3, 0);
+            assert(-5 - 9, -14);
+            assert(-0 - -0, 0);
+            assert(-20 - -90, 70);
+        });
+
+        it("multiplies numbers", func(assert) {
+            assert(2 * 0, 0);
+            assert(2 * 5, 10);
+            assert(3 * 25, 75);
+            assert(9 * -50, -450);
+            assert(0.5 * 5, 2.5);
+        });
+
+        it("divides numbers", func(assert) {
+            assert(5 / 0, null);
+            assert(5 / -2, -2.5);
+            assert(10 / 4, 2.5);
+            assert(100 / 8, 12.5);
+            assert(1 / 2, 0.5);
+        });
+
+        it("modulus operator", func(assert) {
+            assert(6 % 3, 0);
+            assert(0 % 0, null);
+            assert(177 % 34, 7);
+            assert(700 % 200, 100);
+            assert(20 % 3, 2);
+        });
+
+        it("pow operator", func(assert) {
+            assert(2**8, 256);
+            assert(50**3, 125000);
+            assert(2**4, 16);
+            assert(50**1, 50);
+            assert(50**0, 1);
+        });
+
+    });
+
+    describe("Comparisons", func(it) {
+
+        it("compares equal numbers using the :EQ operator", func(assert) {
+            assert(2 == 2, true);
+            assert(20 == 20, true);
+            assert(10 == 10, true);
+            assert(2.2323 == 2.2323, true);
+            assert(9.666 == 9.666, true);
+            assert(-0 == -0, true);
+            assert(-0 == 0, true);
+        });
+
+        it("compares non-equal numbers using the :EQ operator", func(assert) {
+            assert(2 == 4, false);
+            assert(10 == 20, false);
+            assert(2.5 == 2.499999, false);
+            assert(-20 == 20, false);
+            assert(2 == 20, false);
+        });
+
+        it("compares booleans to other types", func(assert) {
+            assert(1 == true, false);
+            assert(0 == true, false);
+            assert(25 == true, false);
+            assert(false == true, false);
+            assert(true == true, true);
+            assert([1, 2] == true, false);
+            assert(null == true, false);
+            assert(null == false, false);
+        });
+
+        it("compares equal numbers using the :NOTEQ operators", func(assert) {
+            assert(2 ! 2, false);
+            assert(2 ! 2, false);
+            assert(-20 ! -20, false);
+            assert(99 ! 99, false);
+            assert(200 ! 200, false);
+        });
+
+        it("compares non-equal numbers using the :NOTEQ operators", func(assert) {
+            assert(2 ! 4, true);
+            assert(10 ! 20, true);
+            assert(2.5 ! 2.499999, true);
+            assert(-20 ! 20, true);
+            assert(2 ! 20, true);
+        });
+
+        it("compares numbers using the :GREATER operator", func(assert) {
+            assert(2 > 5, false);
+            assert(10 > 10, false);
+            assert(20 > -20, true);
+            assert(4 > 3, true);
+            assert(0 > -1, true);
+        });
+
+        it("compares numbers using the :LESS operator", func(assert) {
+            assert(2 < 5, true);
+            assert(10 < 10, false);
+            assert(20 < -20, false);
+            assert(4 < 3, false);
+            assert(0 < -1, false);
+        });
+
+        it("compares numbers using the :GREATEREQ operator", func(assert) {
+            assert(5 >= 2, true);
+            assert(10 >= 10, true);
+            assert(20 >= 20, true);
+            assert(4 >= 3, true);
+            assert(0 >= -1, true);
+        });
+
+        it("compares numbers using the :LESSEQ operator", func(assert) {
+            assert(2 <= 5, true);
+            assert(10 <= 10, true);
+            assert(20 <= -20, false);
+            assert(4 <= 3, false);
+            assert(200 <= 200, true);
+        });
+
+        it("compares strings", func(assert) {
+            assert("test" == "test", true);
+            assert("lool" == "lool", true);
+            assert("täöüp" == "täöüp", true);
+            assert(" hello" == " hello", true);
+            assert(" wassup " == "wassup", false);
+        });
+
+        it("compares arrays", func(assert) {
+            assert([] == [], true);
+            assert([1, 2, 3] == [1, 2, 3], true);
+            assert([1, "test", 3] == [1, "test", 3], true);
+            assert([1, null, false] == [1, null, false], true);
+            assert([1, [2, 3]] == [1, [2, 3]], true);
+        });
+
+    });
+
+    describe("Arrays", func(it) {
+
+        it("member expressions on arrays", func(assert) {
+            assert([1, 2, 3](1), 2);
+            assert([1, 2, 3](0), 1);
+            assert([1, 2, 3](3), null);
+            assert([1, 2, 3](-1), null);
+        });
+
+        it("multi-level member expressions on arrays", func(assert) {
+            assert([1, [2, [3]]](0), 1);
+            assert([1, [2, [3]]](1, 0), 2);
+            assert([1, [2, [3]]](1, 1, 0), 3);
+            assert([1, [2, [3]]](1, 1, 1), null);
+        });
+
+        it("writes to a array index", func(assert) {
+            let my_array = [1, 2, 3];
+            my_array(0) = 2;
+            my_array(1) = 4;
+            my_array(2) = 6;
+
+            assert(my_array, [2, 4, 6]);
+        });
+
+        it("writes to a nested array", func(assert) {
+            let my_array = [1, [2, 3], 4];
+            my_array(0) = 2;
+            my_array(1, 0) = 4;
+            my_array(1, 1) = 6;
+            my_array(2) = 8;
+
+            assert(my_array, [2, [4, 6], 8]);
+        });
+
+        it("length function", func(assert) {
+            assert(length([1, 2, 3]), 3);
+            assert(length([1, 2]), 2);
+            assert(length([1]), 1);
+            assert(length([]), 0);
+        });
+
+        it("works with the each function", func(assert) {
+            let sum = 0;
+            each([1, 2, 3, 4], func(v) {
+                sum = sum + v;
+            });
+
+            assert(sum, 10);
+        });
+
+        it("creates a new array using array_of_size", func(assert) {
+            let my_array = array_of_size(5);
+
+            assert(length(my_array), 5);
+            assert(my_array(1), null);
+        });
+
+        it("appends to the array", func(assert) {
+            let my_array = [1, 2];
+            my_array = append(my_array, 3);
+            my_array = append(my_array, [1, 2]);
+            my_array = append(my_array, "test");
+
+            assert(my_array(0), 1);
+            assert(my_array(2), 3);
+            assert(my_array(3), [1, 2]);
+            assert(my_array(4), "test");
+        });
+
+        it("map function", func(assert) {
+            let my_array = [1, 2, 3];
+            my_array = map(my_array, func(e, i) {
+                e * i;
+            });
+
+            assert(my_array, [0, 2, 6]);
+        });
+
+        it("filter function", func(assert) {
+            let my_array = [1, 2, 3, 4, 5, 6];
+            my_array = filter(my_array, func(e, i) {
+                e < 5;
+            });
+
+            assert(my_array, [1, 2, 3, 4]);
+        });
+
+        it("last & first functions", func(assert) {
+            let my_array = [1, 2, 3];
+
+            assert(first(my_array), 1);
+            assert(last(my_array), 3);
+        });
+
+        it("compact function", func(assert) {
+            let my_array = [1, 2, 3, null, 6, [null]];
+            my_array = compact(my_array);
+
+            assert(my_array, [1, 2, 3, 6, [null]]);
+        });
+
+        it("concat function", func(assert) {
+            let my_array = [1, 2];
+            my_array = concat(my_array, [3, 4]);
+
+            assert(my_array, [1, 2, 3, 4]);
+        });
+
+        it("reverse function", func(assert) {
+            let my_array = [1, 2, 3];
+            my_array = reverse(my_array);
+
+            assert(my_array, [3, 2, 1]);
+        });
+
+        it("empty function", func(assert) {
+            assert(empty([1, 2]), false);
+            assert(empty([1]), false);
+            assert(empty([]), true);
+            assert(empty(""), true);
+        });
+
+    });
+
+    describe("Numerics", func(it) {
+
+        it("turns integers into floats", func(assert) {
+            assert(2 == 2.0, true);
+            assert(20 == 20.0, true);
+            assert(0.0 == 0.0, true);
+        });
+
+    });
+
+    describe("Strings", func(it) {
+
+        it("length function", func(assert) {
+            assert(length("hello world"), 11);
+            assert(length("hello"), 5);
+            assert(length("ä"), 1);
+            assert(length(""), 0);
+        });
+
+        it("can be multiplied", func(assert) {
+            assert("test" * 3, "testtesttest");
+            assert(" " * 3, "   ");
+            assert("a" * 10, "aaaaaaaaaa");
+            assert("a" * 1.5, "a");
+        });
+
+    });
+
+    describe("Functions", func(it) {
+
+        it("calls a function", func(assert) {
+            let called = false;
+            func call_me() {
+                called = true;
             };
-        } else if (method == "result") {
-            if (value) {0;} else {1;};
-        };
-    };
-    callback;
-};
-let run = onlyTrueWasPassed();
+            call_me();
 
+            assert(called, true);
+        });
 
+        it("passes arguments to a function", func(assert) {
+            let arg1;
+            let arg2;
+            func call_me(_arg1, _arg2) {
+                arg1 = _arg1;
+                arg2 = _arg2;
+            };
+            call_me("hello", 25);
 
-# Check if require works
-run(test(require("external.charly"), "I am being required!", "File require"), "test");
-run(test(require("test-require"), "I'm being required", "Directory require"), "test");
-run(test(require("test-require/main.charly"), "I'm being required", "Nested file require"), "test");
+            assert(arg1, "hello");
+            assert(arg2, 25);
+        });
 
+        it("creates the __argument__ variable", func(assert) {
+            let args_received;
+            func call_me() {
+                args_received = __arguments__;
+            };
+            call_me("hello", "world", "this", "should", "work");
 
+            assert(args_received, ["hello", "world", "this", "should", "work"]);
+        });
 
-# Test variable assignment
-let someNumber = 25;
-run(test(someNumber, 25, "Variable Assignment"), "test");
+        it("__argument__ variable can be overwritten", func(assert) {
+            let args_received;
+            func call_me(__arguments__) {
+                args_received = __arguments__;
+            };
+            call_me("hello", "world", "this", "should", "work");
 
+            assert(args_received, "hello");
+        });
 
+        it("can access the parent scope", func(assert) {
+            let change_me = false;
+            func call_me() {
+                change_me = true;
+            };
+            call_me();
 
-# Test string comparisons
-let someString = "Hello";
-run(test(someString, "Hello", "String comparison"), "test");
+            assert(change_me, true);
+        });
 
+        it("writes to arguments instead of parent scope", func(assert) {
+            let dont_change_me = false;
+            func call_me(dont_change_me) {
+                dont_change_me = true;
+            };
+            call_me(true);
 
+            assert(dont_change_me, false);
+        });
 
-# Test writing to index in array
-let someArray = [1, 2];
-someArray(1) = "it works";
-run(test(someArray(1), "it works", "Saving to array index"), "test");
+        it("runs callbacks in the right scope", func(assert) {
+            let change_me = false;
 
+            func call_me(callback) {
+                let change_me = 25;
+                callback();
+            };
 
+            call_me(func() {
+                change_me = true;
+            });
 
-# Test nested array lookup
-let someArray2 = [1, [2, 3], 4];
-run(test(someArray2(1, 0), 2, "Array index lookup"), "test");
+            assert(change_me, true);
+        });
 
+        it("consecutive call expressions", func(assert) {
+            func call_me() {
+                func() {
+                    func() {
+                        25;
+                    };
+                };
+            };
 
+            assert(call_me()()(), 25);
+        });
 
-# Test array out-of-bounds lookup
-let someArray = [1, 2, 3];
-run(test(someArray(0), 1, "out-of-bounds index lookup 1"), "test");
-run(test(someArray2(3), null, "out-of-bounds index lookup 2"), "test");
-run(test(someArray2(-2), null, "out-of-bounds index lookup 3"), "test");
+        it("passes arguments in the right order", func(assert) {
+            let f1;
+            let f2;
+            let f3;
 
+            func(a1) {
+                func(a2) {
+                    func(a3) {
+                        f1 = a1;
+                        f2 = a2;
+                        f3 = a3;
+                    };
+                };
+            }(1)(2)(3);
 
+            assert(f1, 1);
+            assert(f2, 2);
+            assert(f3, 3);
+        });
 
-# Get the length different properties
-run(test(length([1, 2, 3, [4, 5]]), 4, "Array count function"), "test");
-run(test(length("Hello World"), 11, "String count function"), "test");
-run(test(length(2), 2, "Numeric count function"), "test");
-run(test(length(2000), 2000, "Numeric 2 count function"), "test");
+    });
 
+    describe("Misc. standard library functions", func(it) {
 
+        it("is_null function", func(assert) {
+            assert(is_null(null), true);
+            assert(is_null(25), false);
+        });
 
-# Test function scoping
-let name = "Leonard";
-let age = 16;
-func something(name) {
-    name = "Peter";
-    age = 20;
-};
-something(name);
-run(test(name, "Leonard", "Function arguments in own scope"), "test");
-run(test(age, 20, "Access to definition scope"), "test");
+        it("typeof function", func(assert) {
 
+            class TestClass {};
 
+            assert(typeof(25), "Numeric");
+            assert(typeof("test"), "String");
+            assert(typeof(false), "Bool");
+            assert(typeof(null), "Null");
+            assert(typeof([1, 2]), "Array");
+            assert(typeof(func() {}), "Function");
+            assert(typeof(class ignore {}), "Class");
+            assert(typeof(new(TestClass)), "Object");
+        });
 
-# Check comparison operators
-run(test(2 < 5, true, "Smaller than"), "test");
-run(test(2 > 5, false, "Smaller than negated"), "test");
+        it("eval function", func(assert) {
+            assert(eval("20 + 5;"), 25);
+            assert(eval("5 < 20;"), true);
+            assert(eval("5 / 0;"), null);
+            assert(eval("[1, 2];"), [1, 2]);
+        });
 
-run(test(5 > 2, true, "Greater than"), "test");
-run(test(5 < 2, false, "Greater than negated"), "test");
+    });
 
-run(test(5 <= 5, true, "Smaller or equal than"), "test");
-run(test(10 <= 5, false, "Smaller or equal than negated"), "test");
+    describe("Math functions", func(it) {
 
-run(test(10 >= 5, true, "Greater or equal than"), "test");
-run(test(2 >= 5, false, "Greater or equal than negated"), "test");
+        it("rand function", func(assert) {
+            assert(typeof(rand()), "Numeric");
+            assert(typeof(rand()), "Numeric");
+            assert(typeof(rand()), "Numeric");
+            assert(typeof(rand()), "Numeric");
 
-run(test(20 == 20, true, "Equal than"), "test");
-run(test(20 == 10, false, "Equal than negated"), "test");
+            assert(rand() < 1, true);
+            assert(rand() < 1, true);
+            assert(rand() < 1, true);
 
-run(test(20 ! 10, true, "Not Equal than"), "test");
-run(test(20 ! 20, false, "Not Equal than negated"), "test");
+            assert(rand() > 0, true);
+            assert(rand() > 0, true);
+            assert(rand() > 0, true);
+        });
 
-run(test([1, 2, 3] == [1, 2, 3], true, "Arrays equal"), "test");
-run(test([[1], 2, 3] == [[1], 2, 3], true, "Nested arrays equal"), "test");
-run(test([1, 2, 3, 4] == [1, 2, 3], false, "Unmatching arrays"), "test");
+    });
 
+    describe("Classes", func(it) {
 
+        it("creates a new class", func(assert) {
+            class Person {
+                let name;
+                let age;
 
-# Check binary operators
-run(test(2 + 5, 7, "Addition"), "test");
-run(test(10 - 5, 5, "Subtraction"), "test");
-run(test(10 * 5, 50, "Multiplication"), "test");
-run(test(100 / 4, 25, "Division"), "test");
-run(test(10 % 3, 1, "Modulus"), "test");
-run(test(2 ** 5, 32, "Exponential"), "test");
+                func constructor(_name, _age) {
+                    name = _name;
+                    age = _age;
+                };
+            };
 
-# Check nested binary operators
-run(test((5 + 5) + 20, 30, "Nested 1"), "test");
-run(test((70 - 50) + 10, 30, "Nested 2"), "test");
-run(test((5 * 5) + 5, 30, "Nested 3"), "test");
+            let leonard = new(Person, "Leonard", 16);
+            let peter = new(Person, "Peter", 20);
 
+            assert(leonard.name, "Leonard");
+            assert(leonard.age, 16);
+            assert(peter.name, "Peter");
+            assert(peter.age, 20);
+        });
 
+        it("calls functions inside classes", func(assert) {
+            class Box {
+                let value = null;
+                func set(_value) {
+                    value = _value;
+                };
+            };
 
-# Check binary operators between different types
-run(test("lol" * 3, "lollollol", "Multiplaying strings"), "test");
-run(test("test" + "test", "testtest", "Concat strings"), "test");
-run(test("test" + 3, "test3", "Concat strings and numeric integers"), "test");
-run(test("test" + 3.5, "test3.5", "Concat strings and numeric floats"), "test");
-run(test(3 + "test", "3test", "Concat numeric floats and strings"), "test");
-run(test(3.5 + "test", "3.5test", "Concat numeric integers and strings"), "test");
+            let myBox = new(Box);
+            assert(myBox.value, null);
+            myBox.set("this works");
+            assert(myBox.value, "this works");
+        });
 
+        it("member expressions are boxed in the object", func(assert) {
+            class Box {};
+            let myBox = new(Box);
 
+            let changed = false;
+            myBox.changed = true;
 
-# Test while loop
-let i = 0;
-while (i < 50) {
-    i = i + 1;
-};
-run(test(i, 50, "While loop"), "test");
+            assert(changed, false);
+        });
 
-# Test the repeat function
-let repeatCount = 0;
-repeat(100, func callback(index) {
-    repeatCount = repeatCount + 1;
+    });
+
+    describe("While loops", func(it) {
+
+        it("runs for the specified amount of time", func(assert) {
+            let sum = 0;
+            let index = 0;
+            while (index < 500) {
+                sum = sum + index;
+                index = index + 1;
+            };
+
+            assert(sum, 124750);
+        });
+
+        it("works in the repeat function", func(assert) {
+            let sum = 0;
+            repeat(50, func(i) {
+                sum = sum + i;
+            });
+
+            assert(sum, 1225);
+        });
+
+        it("works in the range function", func(assert) {
+            let sum = 0;
+            range(50, 150, func(i) {
+                sum = sum + i;
+            });
+
+            assert(sum, 9950);
+        });
+
+    });
+
 });
-run(test(repeatCount, 100, "Repeat function"), "test");
-
-# Test the range function
-let last_index = -1;
-range(100, 150, func callback(i) {
-    last_index = i;
-});
-run(test(last_index, 149, "Range function"), "test");
-
-
-
-# Test different scoping scenarios and rules
-let value = 0;
-func test_functionscope(callback) {
-    let value = 0;
-    callback();
-    run(test(value, 0, "Function scope"), "test");
-};
-test_functionscope(func callback() {
-    value = value + 5;
-});
-run(test(value, 5, "Global scope"), "test");
-
-
-
-# Test the array each function
-let total = 0;
-each([1, 2, 3], func cb(e) {
-    total = total + e;
-});
-run(test(total, 6, "Array each function"), "test");
-
-
-
-# Check if array_of_size returns a correctly sized array
-let array = array_of_size(5);
-run(test(length(array), 5, "array_of_size returns correctly"), "test");
-
-
-
-# Append function works correctly
-let initial = [1, 2];
-initial = append(initial, 3);
-run(test(initial(2), 3, "append function"), "test");
-
-
-
-# Check if the map function works correctly
-let initial = [1, 2, 3, 4];
-let total = 0;
-map(initial, func cb(e) {
-    total = total + e;
-});
-run(test(total, 10, "map function"), "test");
-
-
-
-# Check the filter function
-let initial = [1, 2, 3, 4, 5];
-initial = filter(initial, func(value) {
-    value < 3;
-});
-run(test(initial, [1, 2], "filter function"), "test");
-
-
-
-# Check the first and last functions
-run(test(first([1, 2]), 1, "first function"), "test");
-run(test(last([1, 2]), 2, "last function"), "test");
-
-
-
-# Check compact function
-run(test(compact([1, null, 2, null, null]), [1, 2], "compact function"), "test");
-
-
-
-# Check the concat function
-run(test(concat([1, 2], [3, 4]), [1, 2, 3, 4], "concat function"), "test");
-
-
-
-# Check is_null function
-run(test(is_null(null), true, "is_null function"), "test");
-
-
-
-# Check reverse function
-run(test(reverse([1, 2, 3]), [3, 2, 1], "reverse function 1"), "test");
-run(test(reverse([1]), [1], "reverse function 2"), "test");
-run(test(reverse([1, "test", 2]), [2, "test", 1], "reverse function 3"), "test");
-
-
-
-# Check empty function
-run(test(empty([1]), false, "empty function 1"), "test");
-run(test(empty([1, 2]), false, "empty function 2"), "test");
-run(test(empty([]), true, "empty function 3"), "test");
-
-
-
-# Test if optional function identifiers work
-let received = 0;
-func increment(value, callback) {
-    callback(value + 1);
-};
-increment(9, func(value) {
-    received = value;
-});
-run(test(received, 10, "Optional function names"), "test");
-
-
-
-# typeof function
-run(test(typeof("test"), "String", "Typeof 1"), "test");
-run(test(typeof(25), "Numeric", "Typeof 2"), "test");
-run(test(typeof(2.5), "Numeric", "Typeof 3"), "test");
-run(test(typeof(-2.7), "Numeric", "Typeof 4"), "test");
-run(test(typeof([1, 2, 3]), "Array", "Typeof 5"), "test");
-run(test(typeof(true), "Bool", "Typeof 6"), "test");
-run(test(typeof(false), "Bool", "Typeof 7"), "test");
-run(test(typeof(null), "Null", "Typeof 8"), "test");
-
-
-
-# Random function
-run(test(typeof(rand()), "Numeric", "Random 1"), "test");
-run(test(typeof(rand()), "Numeric", "Random 2"), "test");
-run(test(typeof(rand()), "Numeric", "Random 3"), "test");
-
-
-
-# Check if eval works
-run(test(eval("2 + 5 + (5 * 8);"), 47, "Eval numbers"), "test");
-run(test(eval("let a = 25; a + 25;"), 50, "Eval variables"), "test");
-run(test(eval("func increment(val) { val + 1; }; increment(0);"), 1, "Eval functions"), "test");
-
-
-
-# Check if consecutive call expressions work
-func foo() { func () { 25; }; };
-run(test(foo()(), 25, "Consecutive call expressions"), "test");
-
-
-
-# Check if the __arguments__ meta property works inside functions
-let received = [];
-func print_meta() {
-    received = __arguments__;
-};
-print_meta("hello", "world", "charly-lang");
-run(test(received, ["hello", "world", "charly-lang"], "__arguments__ meta property"), "test");
-
-
-
-# Check if the __arguments__ meta property can be overwritten
-let received = [];
-func print_meta(__arguments__) {
-    received = __arguments__;
-};
-print_meta("hello", "world", "charly-lang");
-run(test(received, "hello", "__arguments__ meta property can be overwritten"), "test");
-
-
-
-# Check if classes work
-# This is just a simple test
-class Person {
-    let name;
-    func constructor(_name) {
-        name = _name;
-    };
-
-    func greet(greeter) {
-        greeter + " " + name;
-    };
-};
-let leonard = new(Person, "Leonard");
-run(test(leonard.name, "Leonard", "Classes"), "test");
-run(test(leonard.greet("Hello"), "Hello Leonard", "Member Expressions"), "test");
-
-
-
-# Check if overwriting object properties work
-leonard.name = "Peter";
-run(test(leonard.name, "Peter", "Writing to object properties"), "test");
-
-
-
-# Check if overwriting object properties runs in the correct scope
-let changed = false;
-class Test {};
-let myTest = new(Test);
-myTest.changed = true;
-run(test(changed, false, "Writing to object properties in the correct scope"), "test");
-
-
-
-# Check if the argument order of nested call expressions is correct
-let f1_result = null;
-let f2_result = null;
-let f3_result = null;
-func(arg) {
-    f1_result = arg;
-    func(arg) {
-        f2_result = arg;
-        func(arg) {
-            f3_result = arg;
-        };
-    };
-}(1)(2)(3);
-run(test([f1_result, f2_result, f3_result], [1, 2, 3], "Argument order of nested call expressions"), "test");
-
-
-
-# Script exit code
-if (run(0, "result") == 0) {
-    print("Test suite passed!");
-} else {
-    print("Test suite failed!");
-};
-run(0, "result");
