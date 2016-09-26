@@ -322,6 +322,21 @@ run(test(leonard.greet("Hello"), "Hello Leonard", "Member Expressions"), "test")
 
 
 
+# Check if overwriting object properties work
+leonard.name = "Peter";
+run(test(leonard.name, "Peter", "Writing to object properties"), "test");
+
+
+
+# Check if overwriting object properties runs in the correct scope
+let changed = false;
+class Test {};
+let myTest = new(Test);
+myTest.changed = true;
+run(test(changed, false, "Writing to object properties in the correct scope"), "test");
+
+
+
 # Check if the argument order of nested call expressions is correct
 let f1_result = null;
 let f2_result = null;

@@ -139,7 +139,7 @@ class Executor
   # the return value is the value of the variable
   def self.exec_variable_initialisation(node, stack)
     value = self.exec_expression(node.expression, stack)
-    stack[node.identifier.value, true] = value
+    stack.write(node.identifier.value, value, true)
     value
   end
 
@@ -148,7 +148,7 @@ class Executor
   # the return value is NULL
   def self.exec_variable_declaration(node, stack)
     value = Types::NullType.new
-    stack[node.identifier.value, true] = value
+    stack.write(node.identifier.value, value, true)
     value
   end
 
@@ -157,13 +157,13 @@ class Executor
   # after the assignment
   def self.exec_variable_assignment(node, stack)
     value = self.exec_expression(node.expression, stack)
-    stack[node.identifier.value, false] = value
+    stack.write(node.identifier.value, value, false)
 
     # Return value is the value of the variable
     # after the assignment
     #
     # not the value passed in
-    return stack[node.identifier.value]
+    return stack.get(node.identifier.value)
   end
 
   # Assign a value to an index inside an array
@@ -175,7 +175,7 @@ class Executor
     expression = self.exec_expression(node.children[2], stack)
 
     # Get the right array from the stack
-    array = stack[identifier]
+    array = stack.get(identifier)
 
     # Check if the value we got from the stack is really an array
     if !array.is_a? Types::ArrayType
@@ -281,8 +281,8 @@ class Executor
     if function.identifier == nil
       function
     else
-      stack[function.identifier.value, true] = function
-      stack[function.identifier.value]
+      stack.write(function.identifier.value, function, true)
+      stack.get(function.identifier.value)
     end
   end
 
@@ -291,8 +291,8 @@ class Executor
     classliteral = self.exec_literal(node.classliteral, stack)
 
     # Save it inside the stack
-    stack[classliteral.identifier.value, true] = classliteral
-    stack[classliteral.identifier.value]
+    stack.write(classliteral.identifier.value, classliteral, true)
+    stack.get(classliteral.identifier.value)
   end
 
   # Execute a call expression
@@ -324,7 +324,7 @@ class Executor
       end
 
       # Check if the value is an ArrayType
-      stack_value = stack[function.value]
+      stack_value = stack.get(function.value)
 
       # Return the corresponding item if an array was found
       if stack_value.is_a? Types::ArrayType
@@ -371,8 +371,8 @@ class Executor
     end
 
     # Check the stack for the value
-    if ident.stack.contains_key(member, false)
-      return ident.stack[member, false]
+    if ident.stack.contains(member)
+      return ident.stack.get(member)
     else
       return Types::NullType.new
     end
@@ -389,8 +389,8 @@ class Executor
     self.exec_block(ident.block, object_stack)
 
     # Execute the constructor inside the object_stack
-    if object_stack.contains_key("constructor", false)
-      self.exec_function(object_stack["constructor", false], arguments);
+    if object_stack.contains("constructor")
+      self.exec_function(object_stack.get("constructor"), arguments);
     end
 
     # Lock the stack to prevent further variable declarations
@@ -424,9 +424,9 @@ class Executor
     # Create new stack for the function arguments to be saved in
     # and to be passed to self.exec_block
     function_stack = Stack.new(stack || function.block.parent_stack)
-    function_stack["__arguments__", true] = Types::ArrayType.new arguments
+    function_stack.write("__arguments__", Types::ArrayType.new(arguments), true)
     arguments.each_with_index do |arg, index|
-      function_stack[argument_ids[index], true] = arg
+      function_stack.write(argument_ids[index], arg, true)
     end
 
     # Execute the block
@@ -503,7 +503,7 @@ class Executor
 
   # Return the value of an identifier
   def self.exec_identifier_literal(node, stack)
-    return stack[node.value]
+    return stack.get(node.value)
   end
 
   # Returns true or false for a given value
