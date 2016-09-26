@@ -79,7 +79,7 @@ class Stack
     elsif check_parent && @parent != nil
       return @parent.get(key)
     else
-      raise "Variable '#{k}' is not defined!"
+      raise "Variable '#{key}' is not defined!"
     end
   end
 

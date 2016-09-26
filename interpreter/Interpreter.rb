@@ -325,28 +325,21 @@ class Executor
       arguments << self.exec_expression(argument, stack)
     end
 
-    # Execute the identifier of the CE only if it's not an IdentifierLiteral
-    # We have custom behaviour for things like the call_internal or the
-    # ArrayIndexWrite operation
-    if !node.identifier.is(IdentifierLiteral)
-      node.identifier = self.exec_expression(node.identifier, stack)
-    end
-
-    # Get the function that's being executed
-    function = node.identifier
-
-    # check if the function is a function literal
-    if function.is(IdentifierLiteral)
+    # Get the identifier of the call expression
+    # If the identifier is an IdentifierLiteral we first check if it's a "call_internal" call
+    function = nil
+    if node.identifier.is(IdentifierLiteral)
 
       # Check for an internal function call
-      if function.value == "call_internal"
+      if node.identifier.value == "call_internal"
         return Interpreter::InternalFunctions.exec_internal_function(arguments[0], arguments[1..-1], stack, node)
       end
 
-      # Check if the value is an ArrayType
-      stack_value = stack.get(function.value)
+      function = stack.get(node.identifier.value)
+    else
 
-      function = stack_value
+      # Resolve the identifier
+      function = self.exec_expression(node.identifier, stack)
     end
 
     # Return the corresponding item if an array was found
@@ -371,6 +364,7 @@ class Executor
 
     # Check if function is really a function
     if !function.is Types::FuncType
+      puts node
       raise "#{function} is not a function!"
     end
 
