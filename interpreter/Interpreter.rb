@@ -248,7 +248,9 @@ class Executor
     when MultOperator
       left * right
     when DivdOperator
-      left / right
+      if right != 0 || right != -0
+        left / right
+      end
     when ModOperator
       left % right
     when PowOperator
