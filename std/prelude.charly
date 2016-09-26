@@ -1,12 +1,16 @@
 # Require a file into global scope
 # If the file was already run before,
 # this won't execute
-func require(filename) { call_internal("require", filename); };
+func require(filename) {
+    call_internal("require", filename);
+};
 
 # Load a file into global scope
 # This will run the file every-time,
 # as opposed to require which only runs the file once
-func load(filename) { call_internal("load", filename); };
+func load(filename) {
+    call_internal("load", filename);
+};
 
 # Load other parts of the library
 require("types.charly");
@@ -15,19 +19,7 @@ require("math.charly");
 require("strings.charly");
 require("arrays.charly");
 require("language.charly");
-
-func test(comp1, comp2, title) {
-    let result = comp1 == comp2;
-    if (result) {
-        print_color(title + " passed!", 32);
-    } else {
-        print_color(title + " failed!", 31);
-        print_color("Expected: " + String(comp2) + ", got: " + String(comp1), 31);
-    };
-
-    # Return the result
-    result;
-};
+require("unit-test.charly");
 
 func dump_ast(function, depth) {
     call_internal("dump_ast", function, depth);
