@@ -84,6 +84,23 @@ array = append(array, 4);
 print(array); # => 1, 2, 3, 4
 ```
 
+__Classes & Objects__
+```charly
+class Person {
+    let name;
+    let age;
+
+    func constructor(_name, _age) {
+        name = _name;
+        age = _age;
+    };
+};
+
+let leonard = new(Person, "Leonard", 16);
+print(leonard.name); # "Leonard"
+print(leonard.age); # 16
+```
+
 Note: More documentation about Array methods will work
 
 # CLI options
