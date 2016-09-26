@@ -96,6 +96,7 @@ class UnitTest {
 
                 current_suite.add_test(current_test);
             });
+            print("");
 
             # Add the current_suite to the suites array
             suites = append(suites, current_suite);
