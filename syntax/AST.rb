@@ -147,7 +147,19 @@ end
 class Expression < ASTNode
 end
 
-# A single binary expression, performing a calculation
+# A single unary expression
+class UnaryExpression < Expression
+  attr_accessor :operator, :right
+
+  def initialize(operator, right, parent)
+    super(parent)
+    @operator = operator
+    @right = right
+    @children = [@operator, @right]
+  end
+end
+
+# A single binary expression
 class BinaryExpression < Expression
   attr_accessor :operator, :left, :right
 
@@ -360,13 +372,13 @@ class CommaLiteral < Terminal; end
 class PointLiteral < Terminal; end
 
 # Arithmetic operators
-class BinaryOperatorLiteral < Terminal; end
-  class PlusOperator < BinaryOperatorLiteral; end
-  class MinusOperator < BinaryOperatorLiteral; end
-  class MultOperator < BinaryOperatorLiteral; end
-  class DivdOperator < BinaryOperatorLiteral; end
-  class ModOperator < BinaryOperatorLiteral; end
-  class PowOperator < BinaryOperatorLiteral; end
+class OperatorLiteral < Terminal; end
+  class PlusOperator < OperatorLiteral; end
+  class MinusOperator < OperatorLiteral; end
+  class MultOperator < OperatorLiteral; end
+  class DivdOperator < OperatorLiteral; end
+  class ModOperator < OperatorLiteral; end
+  class PowOperator < OperatorLiteral; end
 
 # Comparisons
 class ComparisonOperatorLiteral < Terminal; end

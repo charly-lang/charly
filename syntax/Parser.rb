@@ -337,7 +337,7 @@ class Parser
     node_production(Expression, Proc.new {
 
       # Term
-      if T()
+      if UE()
         check_each([Proc.new {
           term(:MULT) && E()
         }, Proc.new {
@@ -368,6 +368,15 @@ class Parser
       end
 
     });
+  end
+
+  # Unary Expressions (Postfix)
+  def UE
+    node_production(Expression, Proc.new {
+      check_each([Proc.new {
+        term(:MINUS)
+      }, true]) && T()
+    })
   end
 
   # Terms
