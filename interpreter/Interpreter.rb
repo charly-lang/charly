@@ -84,6 +84,10 @@ class Executor
       return self.exec_array_index_write(node, stack)
     end
 
+    if node.is UnaryExpression
+      return self.exec_unary_expression(node, stack)
+    end
+
     if node.is BinaryExpression
       return self.exec_binary_expression(node, stack)
     end
@@ -231,6 +235,22 @@ class Executor
     end
 
     return expression
+  end
+
+  def self.exec_unary_expression(node, stack)
+
+    # Resolve the right side
+    right = self.exec_expression(node.right, stack)
+
+    case node.operator
+    when MinusOperator
+      case right
+      when Types::NumericType
+        return Types::NumericType.new(-right.value)
+      end
+    when NotEqualOperator
+      return Types::BooleanType.new(!self.eval_bool(right, stack))
+    end
   end
 
   # Perform a binary expression

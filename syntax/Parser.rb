@@ -51,8 +51,14 @@ class Parser
     if @next < @tokens.length
       dlog "Couldn't parse whole file. Failed at: "
       dlog ""
-      @tokens[@next - 5, 10].each_with_index do |token, index|
-        dlog token
+      if (@next - 5) > 0
+        @tokens[@next - 5, 20].each_with_index do |token|
+          dlog token
+        end
+      else
+        @tokens.each do |token|
+          dlog token
+        end
       end
       dlog ""
       @tree.should_execute = false
@@ -337,7 +343,7 @@ class Parser
     node_production(Expression, Proc.new {
 
       # Term
-      if T()
+      if UE()
         check_each([Proc.new {
           term(:MULT) && E()
         }, Proc.new {
@@ -368,6 +374,19 @@ class Parser
       end
 
     });
+  end
+
+  # Unary Expressions (Postfix)
+  def UE
+    node_production(Expression, Proc.new {
+      check_each([Proc.new {
+        term(:MINUS) && UE()
+      }, Proc.new {
+        term(:NOTEQ) && UE()
+      }, Proc.new {
+        T()
+      }])
+    })
   end
 
   # Terms

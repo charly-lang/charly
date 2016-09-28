@@ -162,11 +162,27 @@ class Optimizer
   # Optimize the groupings of the node
   def flow_group(node)
 
+    # Unary Expressions
+    if node.is(Expression) && node.children.length == 2 && !node.is(UnaryExpression)
+
+      # Check for the operator
+      if node.children[0].is(OperatorLiteral, NotEqualOperator)
+        operator = node.children[0]
+        right = node.children[1]
+
+        # Typecheck right side
+        if right.is Expression, LiteralValue
+          @finished = false
+          return UnaryExpression.new(operator, right, node.parent)
+        end
+      end
+    end
+
     # Arithmetic expressions involving an operator
     if node.is(Expression) && node.children.length == 3 && !node.is(BinaryExpression)
 
       # Check for the operator
-      if node.children[1].is(BinaryOperatorLiteral)
+      if node.children[1].is(OperatorLiteral)
 
         # Typecheck left and right argument
         left = node.children[0]
