@@ -248,6 +248,8 @@ class Executor
       when Types::NumericType
         return Types::NumericType.new(-right.value)
       end
+    when NotEqualOperator
+      return Types::BooleanType.new(!self.eval_bool(right, stack))
     end
   end
 

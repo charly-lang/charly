@@ -166,7 +166,7 @@ class Optimizer
     if node.is(Expression) && node.children.length == 2 && !node.is(UnaryExpression)
 
       # Check for the operator
-      if node.children[0].is(OperatorLiteral)
+      if node.children[0].is(OperatorLiteral, NotEqualOperator)
         operator = node.children[0]
         right = node.children[1]
 
