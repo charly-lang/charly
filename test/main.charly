@@ -190,6 +190,14 @@ new(UnitTest, "Charly Language").begin(func(describe) {
             assert([1, [2, 3]] == [1, [2, 3]], true);
         });
 
+        it("inverts a boolean", func(assert) {
+            assert(!false, true);
+            assert(!true, false);
+            assert(!25, false);
+            assert(!0, true);
+            assert(![1, 2], false);
+        });
+
     });
 
     describe("Arrays", func(it) {
