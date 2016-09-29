@@ -376,11 +376,11 @@ class Parser
     });
   end
 
-  # Unary Expressions (Postfix)
+  # Unary Expressions (prefix)
   def UE
     node_production(Expression, Proc.new {
       check_each([Proc.new {
-        term(:MINUS) && UE()
+        term(:MINUS) && T()
       }, Proc.new {
         term(:NOTEQ) && UE()
       }, Proc.new {
