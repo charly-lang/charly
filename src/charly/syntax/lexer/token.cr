@@ -6,6 +6,8 @@ enum TokenType
   Numeric
   Identifier
   String
+  Boolean
+  Null
   Keyword
 
   # Arithmetic Operators

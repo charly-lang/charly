@@ -140,6 +140,28 @@ class Lexer
       next_char TokenType::RightBracket
     when '\0'
       @token.type = TokenType::EOF
+    when 'c'
+      case next_char
+      when 'l'
+        case next_char
+        when 'a'
+          case next_char
+          when 's'
+            case next_char
+            when 's'
+              check_ident_or_keyword(TokenType::Keyword, start)
+            else
+              consume_ident(start)
+            end
+          else
+            consume_ident(start)
+          end
+        else
+          consume_ident(start)
+        end
+      else
+        consume_ident(start)
+      end
     when 'e'
       case next_char
       when 'l'
@@ -147,7 +169,7 @@ class Lexer
         when 's'
           case next_char
           when 'e'
-            check_ident_or_keyword("else", start)
+            check_ident_or_keyword(TokenType::Keyword, start)
           else
             consume_ident(start)
           end
@@ -164,7 +186,24 @@ class Lexer
         when 'n'
           case next_char
           when 'c'
-            check_ident_or_keyword("func", start)
+            check_ident_or_keyword(TokenType::Keyword, start)
+          else
+            consume_ident(start)
+          end
+        else
+          consume_ident(start)
+        end
+      when 'a'
+        case next_char
+        when 'l'
+          case next_char
+          when 's'
+            case next_char
+            when 'e'
+              check_ident_or_keyword(TokenType::Boolean, start)
+            else
+              consume_ident(start)
+            end
           else
             consume_ident(start)
           end
@@ -177,7 +216,7 @@ class Lexer
     when 'i'
       case next_char
       when 'f'
-        check_ident_or_keyword("if", start)
+        check_ident_or_keyword(TokenType::Keyword, start)
       else
         consume_ident(start)
       end
@@ -186,7 +225,7 @@ class Lexer
       when 'e'
         case next_char
         when 't'
-          check_ident_or_keyword("let", start)
+          check_ident_or_keyword(TokenType::Keyword, start)
         else
           consume_ident(start)
         end
@@ -198,7 +237,36 @@ class Lexer
       when 'e'
         case next_char
         when 'w'
-          check_ident_or_keyword("new", start)
+          check_ident_or_keyword(TokenType::Keyword, start)
+        else
+          consume_ident(start)
+        end
+      when 'u'
+        case next_char
+        when 'l'
+          case next_char
+          when 'l'
+            check_ident_or_keyword(TokenType::Null, start)
+          else
+            consume_ident(start)
+          end
+        else
+          consume_ident(start)
+        end
+      else
+        consume_ident(start)
+      end
+    when 't'
+      case next_char
+      when 'r'
+        case next_char
+        when 'u'
+          case next_char
+          when 'e'
+            check_ident_or_keyword(TokenType::Boolean, start)
+          else
+            consume_ident(start)
+          end
         else
           consume_ident(start)
         end
@@ -214,29 +282,7 @@ class Lexer
           when 'l'
             case next_char
             when 'e'
-              check_ident_or_keyword("while", start)
-            else
-              consume_ident(start)
-            end
-          else
-            consume_ident(start)
-          end
-        else
-          consume_ident(start)
-        end
-      else
-        consume_ident(start)
-      end
-    when 'c'
-      case next_char
-      when 'l'
-        case next_char
-        when 'a'
-          case next_char
-          when 's'
-            case next_char
-            when 's'
-              check_ident_or_keyword("class", start)
+              check_ident_or_keyword(TokenType::Keyword, start)
             else
               consume_ident(start)
             end
@@ -257,6 +303,7 @@ class Lexer
       end
     end
 
+    @token.raw = string_range(start)
     @token
   end
 
@@ -308,18 +355,36 @@ class Lexer
     is_float = false
 
     while true
-      char = next_char
-      if char.digit?
+      case next_char
+      when .digit?
         # Nothing to do
-      elsif char == '_'
+      when '_'
         has_underscore = true
       else
         break
       end
     end
 
+    if current_char == '.' && peek_char.digit?
+      next_char
+      while true
+        case next_char
+        when .digit?
+          # Nothing to do
+        when '_'
+          has_underscore = true
+        else
+          break
+        end
+      end
+    end
+
     number_value = string_range(start)
-    @token.value = number_value.tr("_", "")
+
+    if has_underscore
+      number_value = number_value.tr("_", "")
+    end
+    @token.value = number_value
   end
 
   # Consume a string literal
@@ -364,7 +429,6 @@ class Lexer
     @token.type = TokenType::String
     @token.value = io.to_s
     next_char
-    @token.raw = string_range(start - 2)
   end
 
   # Starts consuming an identifier
@@ -392,9 +456,8 @@ class Lexer
       consume_ident(start)
     else
       next_char
-      @token.type = TokenType::Keyword
+      @token.type = symbol
       @token.value = string_range(start)
-      @token.raw = @token.value
     end
   end
 
