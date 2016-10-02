@@ -179,6 +179,24 @@ class Structure
       node.children.shift
     end
 
+    # A class literal inside a block is a class definition
+    if node.is_a?(ClassLiteral) && node.parent.is_a?(Block)
+      @finished = false
+      new_node = ClassDefinition.new(node.parent)
+      new_node << node
+      return new_node
+    end
+
+    # Remove the expressionlist from arrayliterals
+    if node.is_a?(ArrayLiteral) && node.children[0].is_a?(ExpressionList)
+      node.children[0].children.each do |child|
+        node << child
+        child.parent = node
+      end
+      node.children.shift
+      @finished = false
+    end
+
     node
   end
 end
