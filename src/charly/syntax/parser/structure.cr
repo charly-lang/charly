@@ -164,10 +164,19 @@ class Structure
       end
 
       # Ifs with a else block
-      if node.children.size == 5 && (node.children[4].is_a?(Block) || node.children[4].is_a?(IfStatement))
+      if node.children.size == 5 &&
+          (node.children[4].is_a?(Block) || node.children[4].is_a?(IfStatement))
         node.children.delete_at(3)
         node.children.delete_at(0)
+        @finished = false
       end
+    end
+
+    # Class Literals
+    if node.is_a?(ClassLiteral) && node.children.size == 3
+
+      # Remove the class keyword
+      node.children.shift
     end
 
     node

@@ -1,4 +1,4 @@
-if (true) {};
-if (true) {} else {};
-if (true) {} else if (true) {};
-if (true) {} else if (true) {} else {};
+func a() {};
+class Test {
+  func constructor() {};
+};
