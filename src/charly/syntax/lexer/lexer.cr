@@ -5,7 +5,7 @@ class Lexer
   property tokens : Array(Token)
   property input : VirtualFile
   property reader : Char::Reader
-  property token
+  property token : Token
 
   def initialize(input)
     @input = input
@@ -37,13 +37,15 @@ class Lexer
 
   # Resets the current token list and the current token
   def reset_token
-    @token = Token.new
+    @token.type = TokenType::Unknown
+    @token.value = ""
+    @token.raw = ""
   end
 
   # Returns the contents of @reader.string
   # starting at *start* and stopping at @reader.pos - 1
   def string_range(start)
-    @reader.string[start..@reader.pos - 1]
+    @reader.string.byte_slice(start, @reader.pos - start)
   end
 
   # Return all tokens in a string
@@ -51,7 +53,7 @@ class Lexer
 
     # Read as many tokens as we can
     while next_token.is_a? Token
-      @tokens << @token
+      @tokens << @token.dup
 
       # Break if we reached the end of the file
       if @token.type == TokenType::EOF
@@ -74,8 +76,14 @@ class Lexer
       consume_newline
     when ';'
       next_char TokenType::Semicolon
+    when ','
+      next_char TokenType::Comma
+    when '.'
+      next_char TokenType::Point
+    when '"'
+      consume_string(start)
     when '0'..'9'
-      consume_numeric
+      consume_numeric(start)
     when '+'
       next_char TokenType::Plus
     when '-'
@@ -83,23 +91,167 @@ class Lexer
     when '/'
       next_char TokenType::Divd
     when '*'
-      case next_char
+      case peek_char
       when '*'
+        next_char
         next_char TokenType::Pow
       else
         next_char TokenType::Mult
       end
     when '%'
       next_char TokenType::Mod
+    when '='
+      case peek_char
+      when '='
+        next_char
+        next_char TokenType::Equal
+      else
+        next_char TokenType::Assignment
+      end
+    when '!'
+      next_char TokenType::Not
+    when '<'
+      case peek_char
+      when '='
+        next_char
+        next_char TokenType::LessEqual
+      else
+        next_char TokenType::Less
+      end
+    when '>'
+      case peek_char
+      when '='
+        next_char
+        next_char TokenType::GreaterEqual
+      else
+        next_char TokenType::Greater
+      end
     when '('
       next_char TokenType::LeftParen
     when ')'
       next_char TokenType::RightParen
+    when '{'
+      next_char TokenType::LeftCurly
+    when '}'
+      next_char TokenType::RightCurly
+    when '['
+      next_char TokenType::LeftBracket
+    when ']'
+      next_char TokenType::RightBracket
     when '\0'
       @token.type = TokenType::EOF
+    when 'e'
+      case next_char
+      when 'l'
+        case next_char
+        when 's'
+          case next_char
+          when 'e'
+            check_ident_or_keyword("else", start)
+          else
+            consume_ident(start)
+          end
+        else
+          consume_ident(start)
+        end
+      else
+        consume_ident(start)
+      end
+    when 'f'
+      case next_char
+      when 'u'
+        case next_char
+        when 'n'
+          case next_char
+          when 'c'
+            check_ident_or_keyword("func", start)
+          else
+            consume_ident(start)
+          end
+        else
+          consume_ident(start)
+        end
+      else
+        consume_ident(start)
+      end
+    when 'i'
+      case next_char
+      when 'f'
+        check_ident_or_keyword("if", start)
+      else
+        consume_ident(start)
+      end
+    when 'l'
+      case next_char
+      when 'e'
+        case next_char
+        when 't'
+          check_ident_or_keyword("let", start)
+        else
+          consume_ident(start)
+        end
+      else
+        consume_ident(start)
+      end
+    when 'n'
+      case next_char
+      when 'e'
+        case next_char
+        when 'w'
+          check_ident_or_keyword("new", start)
+        else
+          consume_ident(start)
+        end
+      else
+        consume_ident(start)
+      end
+    when 'w'
+      case next_char
+      when 'h'
+        case next_char
+        when 'i'
+          case next_char
+          when 'l'
+            case next_char
+            when 'e'
+              check_ident_or_keyword("while", start)
+            else
+              consume_ident(start)
+            end
+          else
+            consume_ident(start)
+          end
+        else
+          consume_ident(start)
+        end
+      else
+        consume_ident(start)
+      end
+    when 'c'
+      case next_char
+      when 'l'
+        case next_char
+        when 'a'
+          case next_char
+          when 's'
+            case next_char
+            when 's'
+              check_ident_or_keyword("class", start)
+            else
+              consume_ident(start)
+            end
+          else
+            consume_ident(start)
+          end
+        else
+          consume_ident(start)
+        end
+      else
+        consume_ident(start)
+      end
     else
       if ident_start(current_char)
-        consume_ident
+        consume_ident(start)
       else
         unknown_token
       end
@@ -150,9 +302,8 @@ class Lexer
   end
 
   # Consumes Integer and Float values
-  def consume_numeric
+  def consume_numeric(start)
     @token.type = TokenType::Numeric
-    start = @reader.pos
     has_underscore = false
     is_float = false
 
@@ -171,9 +322,53 @@ class Lexer
     @token.value = number_value.tr("_", "")
   end
 
+  # Consume a string literal
+  def consume_string(start)
+    start = start + 1
+    io = MemoryIO.new
+    while true
+      char = next_char
+      case char
+      when '\\'
+        char = next_char
+        case char
+        when 'b'
+          io << "\u{8}"
+        when 'n'
+          io << "\n"
+        when 'r'
+          io << "\r"
+        when 't'
+          io << "\t"
+        when 'v'
+          io << "\v"
+        when 'f'
+          io << "\f"
+        when 'e'
+          io << "\e"
+        when '\n'
+          io << "\n"
+        when '"'
+          io << "\""
+        when '\0'
+          raise "Unterminated quoted string"
+        end
+      when '"'
+        break
+      when '\0'
+        raise "Unterminated quoted string"
+      else
+        io << char
+      end
+    end
+    @token.type = TokenType::String
+    @token.value = io.to_s
+    next_char
+    @token.raw = string_range(start - 2)
+  end
+
   # Starts consuming an identifier
-  def consume_ident
-    start = @reader.pos
+  def consume_ident(start)
     while ident_part(current_char)
       next_char
     end
@@ -191,6 +386,19 @@ class Lexer
     ident_start(char) || char.digit?
   end
 
+  # Checks if the current buffer is a keyword or an identifier
+  def check_ident_or_keyword(symbol, start)
+    if ident_part(peek_char)
+      consume_ident(start)
+    else
+      next_char
+      @token.type = TokenType::Keyword
+      @token.value = string_range(start)
+      @token.raw = @token.value
+    end
+  end
+
+  # Called when a unknown token is received
   def unknown_token
     raise "Unknown token: #{current_char.inspect}"
   end

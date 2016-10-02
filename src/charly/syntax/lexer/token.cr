@@ -5,8 +5,10 @@ enum TokenType
   # Literals
   Numeric
   Identifier
+  String
+  Keyword
 
-  # Operators
+  # Arithmetic Operators
   Plus
   Minus
   Mult
@@ -14,9 +16,24 @@ enum TokenType
   Mod
   Pow
 
+  # Misc Operators
+  Assignment
+
+  # Comparison operators
+  Equal
+  Not
+  Less
+  Greater
+  LessEqual
+  GreaterEqual
+
   # Structural
   LeftParen, RightParen
+  LeftCurly, RightCurly
+  LeftBracket, RightBracket
   Semicolon
+  Comma
+  Point
 
   # Whitespace
   Whitespace
@@ -27,13 +44,16 @@ enum TokenType
   Unknown
 end
 
-# Token
 # A single token with a type and a value
 class Token
   property type : TokenType
   property value : String
+  property raw : String
 
-  def initialize(@type = TokenType::Unknown, @value = "")
+  def initialize(type = TokenType::Unknown, value = "", raw = "")
+    @type = type
+    @value = value
+    @raw = raw
   end
 
   def to_s(io)
