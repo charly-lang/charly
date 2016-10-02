@@ -1,5 +1,5 @@
 require "./charly/file.cr"
-require "./charly/syntax/lexer/lexer.cr"
+require "./charly/syntax/parser/parser.cr"
 
 module Charly
 
@@ -11,13 +11,11 @@ module Charly
     # Create a new virtualfile
     input = RealFile.new filename
 
-    # Create a new lexer
-    lexer = Lexer.new input
-    tokens = lexer.all_tokens
+    # Parse the file
+    parser = Parser.new input
+    program = parser.parse
 
-    tokens.each do |token|
-      puts token
-    end
+    puts program
   else
     puts "No filename passed!"
   end

@@ -1,5 +1,2 @@
-# nice
-okay # what
-#2232
-#
-asdasd
+if (false) {} else if () {};
+if (false) {} else if () {} else {};

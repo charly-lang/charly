@@ -234,13 +234,6 @@ class Lexer
       end
     when 'n'
       case next_char
-      when 'e'
-        case next_char
-        when 'w'
-          check_ident_or_keyword(TokenType::Keyword, start)
-        else
-          consume_ident(start)
-        end
       when 'u'
         case next_char
         when 'l'

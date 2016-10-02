@@ -1,5 +1,4 @@
 # The different types of tokens
-@[Flags]
 enum TokenType
 
   # Literals
