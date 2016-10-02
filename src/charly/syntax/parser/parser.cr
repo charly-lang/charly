@@ -1,5 +1,6 @@
 require "../ast/ast.cr"
 require "../lexer/lexer.cr"
+require "./structure.cr"
 
 # Parses a list of tokens into a program
 class Parser
@@ -8,7 +9,7 @@ class Parser
   alias Prod = Proc(Bool)
   alias Production = Prod | Bool
   property tokens : Array(Token)
-  property tree : ASTNode
+  property tree : Program
   property node : ASTNode
   property next : UInt32
 
@@ -34,7 +35,8 @@ class Parser
     end
 
     # Initialize the tree
-    @tree = Program.new file
+    @tree = Program.new nil
+    @tree.file = file
     @node = @tree
   end
 
@@ -43,6 +45,17 @@ class Parser
 
     # Every program is just the body of a block
     block_body
+
+    # Check if the whole program was parsed
+    if @next < @tokens.size - 1
+      raise "Could not parse whole file!"
+    end
+
+    # Re-Structure the tree
+    structure = Structure.new @tree
+    structure.start
+
+    # Return the tree
     @tree
   end
 
@@ -71,13 +84,17 @@ class Parser
     end
   end
 
+  def token(type, value = false)
+    add_token(type, value, true)
+  end
+
   # Returns true if the next token is equal to *type*
   # and optionally to *value*
   # Increments the @next pointer if the token was found
-  def token(type, value = false)
+  def add_token(type, value = false, add_to_tree = true)
     match = peek_token(type, value)
 
-    if match
+    if match && add_to_tree
       case type
       when TokenType::Null
         @node << produce NullLiteral
@@ -138,7 +155,9 @@ class Parser
       else
         puts "Unknown token found (#{type})"
       end
+    end
 
+    if match
       @next += 1
     end
 
@@ -152,8 +171,14 @@ class Parser
   # If the token was not found, the next pointer is not incremented
   # but the method still returns true
   def optional_token(type, value = false)
-    token(type, value)
+    add_token(type, value, true)
     true
+  end
+
+  # Behaves the same as token(type, value)
+  # except that a matched node is not added to the tree
+  def skip_token(type, value = false)
+    add_token(type, value, false)
   end
 
   # Runs each proc in *productions*
@@ -227,9 +252,9 @@ class Parser
   end
 
   def block
-    token(TokenType::LeftCurly) &&
+    skip_token(TokenType::LeftCurly) &&
     block_body &&
-    token(TokenType::RightCurly)
+    skip_token(TokenType::RightCurly)
   end
 
   def block_body
@@ -247,23 +272,23 @@ class Parser
       match = false
       if token(TokenType::Keyword, "let") && token(TokenType::Identifier)
         match = check_each([->{
-          token(TokenType::Assignment) && expression && token(TokenType::Semicolon)
+          token(TokenType::Assignment) && expression && skip_token(TokenType::Semicolon)
         }, ->{
-          token(TokenType::Semicolon)
+          skip_token(TokenType::Semicolon)
         }])
       end
       match
     }, ->{
-      expression && token(TokenType::Semicolon)
+      expression && skip_token(TokenType::Semicolon)
     }, ->{
-      if_statement && token(TokenType::Semicolon)
+      if_statement && skip_token(TokenType::Semicolon)
     }, ->{
       token(TokenType::Keyword, "while") &&
-      token(TokenType::LeftParen) &&
+      skip_token(TokenType::LeftParen) &&
       expression &&
-      token(TokenType::RightParen) &&
+      skip_token(TokenType::RightParen) &&
       block &&
-      token(TokenType::Semicolon)
+      skip_token(TokenType::Semicolon)
     })
   end
 
@@ -271,9 +296,9 @@ class Parser
     node_production(IfStatement, ->{
       match = false
       if token(TokenType::Keyword, "if") &&
-          token(TokenType::LeftParen) &&
+          skip_token(TokenType::LeftParen) &&
           expression &&
-          token(TokenType::RightParen) &&
+          skip_token(TokenType::RightParen) &&
           block
 
         # Parse the else or else if clause
@@ -301,7 +326,7 @@ class Parser
           found_at_least_one = false
 
           # We are peeking before because we are expanding two different nodes
-          while peek_token(TokenType::Comma) && token(TokenType::Comma) && expression
+          while peek_token(TokenType::Comma) && skip_token(TokenType::Comma) && expression
             found_at_least_one = true unless found_at_least_one
           end
           found_at_least_one
@@ -319,7 +344,7 @@ class Parser
           found_at_least_one = false
 
           # We are peeking before because we are expanding two different nodes
-          while peek_token(TokenType::Comma) && token(TokenType::Comma) && token(TokenType::Comma)
+          while peek_token(TokenType::Comma) && skip_token(TokenType::Comma) && token(TokenType::Identifier)
             found_at_least_one = true unless found_at_least_one
           end
           found_at_least_one
@@ -359,8 +384,9 @@ class Parser
         }, ->{
           token(TokenType::Assignment) && expression
         }])
+        return true
       end
-      true
+      return false
     })
   end
 
@@ -388,9 +414,9 @@ class Parser
     }, ->{
       token(TokenType::Identifier) && consume_postfix
     }, ->{
-      token(TokenType::LeftParen) &&
+      skip_token(TokenType::LeftParen) &&
       expression &&
-      token(TokenType::RightParen) && consume_postfix
+      skip_token(TokenType::RightParen) && consume_postfix
     }, ->{
       array_literal && consume_postfix
     }, ->{
@@ -404,18 +430,18 @@ class Parser
     node_production(FunctionLiteral, ->{
       token(TokenType::Keyword, "func") &&
       optional_token(TokenType::Identifier) &&
-      token(TokenType::LeftParen) &&
+      skip_token(TokenType::LeftParen) &&
       identifier_list &&
-      token(TokenType::RightParen) &&
+      skip_token(TokenType::RightParen) &&
       block
     })
   end
 
   def array_literal
     node_production(ArrayLiteral, ->{
-      token(TokenType::LeftBracket) &&
+      skip_token(TokenType::LeftBracket) &&
       expression_list &&
-      token(TokenType::RightBracket)
+      skip_token(TokenType::RightBracket)
     })
   end
 
@@ -440,13 +466,13 @@ class Parser
       @node = @node.parent
 
       match = node_production(CallExpression, ->{
-        left_side = node_save
+        left_side = node_save.class.new(node_save)
         left_side.children = children_save
         @node << left_side
 
-        token(TokenType::LeftParen) &&
+        skip_token(TokenType::LeftParen) &&
         expression_list &&
-        token(TokenType::RightParen) &&
+        skip_token(TokenType::RightParen) &&
         consume_postfix
       })
       @node = node_save
@@ -464,11 +490,11 @@ class Parser
       @node = @node.parent
 
       match = node_production(MemberExpression, ->{
-        left_side = node_save
+        left_side = node_save.class.new(node_save)
         left_side.children = children_save
         @node << left_side
 
-        token(TokenType::Point) &&
+        skip_token(TokenType::Point) &&
         token(TokenType::Identifier) &&
         consume_postfix
       })

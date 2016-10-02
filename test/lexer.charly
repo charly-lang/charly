@@ -1,2 +1,4 @@
-if (false) {} else if () {};
-if (false) {} else if () {} else {};
+if (true) {};
+if (true) {} else {};
+if (true) {} else if (true) {};
+if (true) {} else if (true) {} else {};

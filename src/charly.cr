@@ -15,7 +15,7 @@ module Charly
     parser = Parser.new input
     program = parser.parse
 
-    puts program
+    puts program if ARGV.includes?("--ast")
   else
     puts "No filename passed!"
   end

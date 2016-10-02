@@ -14,34 +14,22 @@ abstract class ASTNode
   # Appends *node* to the children of this node
   def <<(node)
     @children << node
-    self
-  end
-
-  # Returns true if the current node matches at least one *types*
-  def is(*types)
-    match = false
-    types.each do |type|
-      if !match
-        match = self.kind_of? type
-      end
-    end
-    match
-  end
-
-  # Returns true if the current node is an instance of at least one *types*
-  def is_exact(*types)
-    match = false
-    types.each do |type|
-      if !match
-        match = self.instance_of? type
-      end
-    end
-    match
+    node.parent = self
   end
 
   # Render the current node
   def to_s(io)
-    io << "#: #{self.class.name}\n"
+    io << "#: #{self.class.name}"
+
+    if @value.is_a?(String | Float64 | Bool)
+      io << " - #{@value}"
+    end
+
+    if @children.size > 0
+      io << " - #{@children.size} children"
+    end
+
+    io << "\n"
 
     children.each do |child|
       lines = child.to_s.each_line.each
@@ -67,15 +55,9 @@ class Block < ASTNode
 end
 
 # A single program with no parent nodes
-class Program < Block
-  property file : VirtualFile
-  property should_execute : Bool
-
-  def initialize(file)
-    super(nil)
-    @file = file
-    @should_execute = true
-  end
+class Program < ASTNode
+  property file : VirtualFile?
+  property should_execute = true
 end
 
 # A single statement in a block
@@ -83,14 +65,14 @@ class Statement < ASTNode
 end
 
 # An if statement
-class IfStatement < Statement
+class IfStatement < ASTNode
   property test : ASTNode?
   property consequent : ASTNode?
   property alternate : ASTNode?
 end
 
 # While loops
-class WhileStatement < Statement
+class WhileStatement < ASTNode
   property test : ASTNode?
   property consequent : ASTNode?
 end
@@ -100,68 +82,68 @@ class Expression < ASTNode
 end
 
 # A single unary expression
-class UnaryExpression < Expression
+class UnaryExpression < ASTNode
   property operator : ASTNode?
   property right : ASTNode?
 end
 
 # A single binary expression
-class BinaryExpression < Expression
+class BinaryExpression < ASTNode
   property operator : ASTNode?
   property left : ASTNode?
   property right : ASTNode?
 end
 
 # A single comparison expression
-class ComparisonExpression < Expression
+class ComparisonExpression < ASTNode
   property operator : ASTNode?
   property left : ASTNode?
   property right : ASTNode?
 end
 
 # A variable declaration
-class VariableDeclaration < Statement
+class VariableDeclaration < ASTNode
   property identifier : ASTNode?
 end
 
 # A variable initialisation
-class VariableInitialisation < Statement
+class VariableInitialisation < ASTNode
   property identifier : ASTNode?
   property expression : ASTNode?
 end
 
 # A variable assignment
-class VariableAssignment < Expression
+class VariableAssignment < ASTNode
   property identifier : ASTNode?
   property expression : ASTNode?
 end
 
 # A class literal
-class ClassLiteral < Expression
+class ClassLiteral < ASTNode
   property identifier : ASTNode?
   property constructor : ASTNode?
   property block : ASTNode?
 end
 
 # A class definition
-class ClassDefinition < Statement
+class ClassDefinition < ASTNode
   property classliteral : ASTNode?
 end
 
 # A single call expression
-class CallExpression < Expression
+class CallExpression < ASTNode
   property identifier : ASTNode?
   property argumentlist : ASTNode?
 end
 
 # A single member expression
-class MemberExpression < Expression
+class MemberExpression < ASTNode
   property identifier : ASTNode?
   property member : ASTNode?
 end
 
 # A single function definition
-class FunctionDefinition < Expression
+class FunctionDefinition < ASTNode
   property function : ASTNode?
 end
 
@@ -184,14 +166,14 @@ end
 
 # Literals
 class LiteralValue < Terminal; end
-class NullLiteral < Terminal; end
-class IdentifierLiteral < Terminal; end
-class StringLiteral < Terminal; end
+class NullLiteral < LiteralValue; end
+class IdentifierLiteral < LiteralValue; end
+class StringLiteral < LiteralValue; end
 class NumericLiteral < LiteralValue; end
 class KeywordLiteral < LiteralValue; end
 class BooleanLiteral < LiteralValue; end
-class ArrayLiteral < Expression; end
-class FunctionLiteral < Expression
+class ArrayLiteral < ASTNode; end
+class FunctionLiteral < ASTNode
   property identifier : ASTNode?
   property argumentlist : ASTNode?
   property block : ASTNode?
