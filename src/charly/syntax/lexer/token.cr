@@ -36,6 +36,7 @@ enum TokenType
   Semicolon
   Comma
   Point
+  Comment
 
   # Whitespace
   Whitespace

@@ -295,6 +295,8 @@ class Lexer
       else
         consume_ident(start)
       end
+    when '#'
+      consume_comment(start)
     else
       if ident_start(current_char)
         consume_ident(start)
@@ -429,6 +431,15 @@ class Lexer
     @token.type = TokenType::String
     @token.value = io.to_s
     next_char
+  end
+
+  # Consumes a comment
+  def consume_comment(start)
+    while current_char != '\n'
+      next_char
+    end
+    @token.type = TokenType::Comment
+    @token.value = string_range(start)
   end
 
   # Starts consuming an identifier
