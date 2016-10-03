@@ -50,6 +50,10 @@ class Interpreter
         return self.exec_variable_initialisation(node, stack)
       end
 
+      if node.is_a? VariableAssignment
+        return self.exec_variable_assignment(node, stack)
+      end
+
       if node.is_a? BinaryExpression
         return self.exec_binary_expression(node, stack)
       end
@@ -90,6 +94,29 @@ class Interpreter
         end
       end
       return value
+    end
+
+    # Assign the result of an expression to a variable
+    # in the current stack
+    def self.exec_variable_assignment(node, stack)
+
+      # Resolve the expression
+      value = self.exec_expression(node.expression, stack)
+
+      # Check if this is a member expression
+      if node.identifier.is_a? MemberExpression
+        raise "Member expressions are not yet supported"
+      else
+        identifier = node.identifier
+        if identifier.is_a? IdentifierLiteral
+          identifier_value = identifier.value
+          if identifier_value.is_a? String
+            stack.write(identifier_value, value)
+          end
+        end
+      end
+
+      value
     end
 
     def self.exec_binary_expression(node, stack)

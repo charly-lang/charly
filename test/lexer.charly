@@ -1,3 +1,5 @@
 let test;
 let myvar = 25;
 let lool = ":D";
+
+test = 25;
