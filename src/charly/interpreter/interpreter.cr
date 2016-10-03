@@ -62,6 +62,10 @@ class Interpreter
         return self.exec_binary_expression(node, stack)
       end
 
+      if node.is_a? IdentifierLiteral
+        return self.exec_identifier_literal(node, stack)
+      end
+
       if node.is_a? NumericLiteral | StringLiteral | BooleanLiteral
         return self.exec_literal(node, stack)
       end
@@ -121,6 +125,11 @@ class Interpreter
       end
 
       value
+    end
+
+    # Extracts the value of a variable from the current stack
+    def self.exec_identifier_literal(node, stack)
+      return stack.get(node.value)
     end
 
     def self.exec_unary_expression(node, stack)
@@ -198,7 +207,7 @@ class Interpreter
         return TNull.new
       end
 
-      raise "Invalid literal found"
+      raise "Invalid literal found #{node.class}"
     end
 
     # Returns the boolean representation of a value
