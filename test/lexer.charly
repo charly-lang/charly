@@ -1,3 +1,3 @@
-let myvar;
-let othervar;
-let looool;
+let test;
+let myvar = 25;
+let lool = ":D";

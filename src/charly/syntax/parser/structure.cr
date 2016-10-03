@@ -97,7 +97,7 @@ class Structure
       if node.children[0].is_a? KeywordLiteral && node.children[0].value == "let"
         if node.children[2].is_a? AssignmentOperator
           @finished = false
-          new_node = VariableDeclaration.new(node)
+          new_node = VariableInitialisation.new(node)
           new_node << node.children[1]
           new_node << node.children[3]
           return new_node

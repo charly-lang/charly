@@ -46,6 +46,10 @@ class Interpreter
         return self.exec_variable_declaration(node, stack)
       end
 
+      if node.is_a? VariableInitialisation
+        return self.exec_variable_initialisation(node, stack)
+      end
+
       if node.is_a? BinaryExpression
         return self.exec_binary_expression(node, stack)
       end
@@ -57,12 +61,31 @@ class Interpreter
       raise "Unknown node encountered #{node.class} #{stack}"
     end
 
+    # Initializes a variable in the current stack
+    # The value is set to TNull
     def self.exec_variable_declaration(node, stack)
       value = TNull.new
       identifier = node.identifier
       if identifier.is_a?(IdentifierLiteral)
         identifier_value = identifier.value
         if identifier_value.is_a?(String)
+          stack.write(identifier_value, value, true)
+        end
+      end
+      return value
+    end
+
+    # Saves value to a given variable in the current stack
+    def self.exec_variable_initialisation(node, stack)
+
+      # Resolve the value
+      value = self.exec_expression(node.expression, stack)
+
+      # Check for the identifier
+      identifier = node.identifier
+      if identifier.is_a? IdentifierLiteral
+        identifier_value = identifier.value
+        if identifier_value.is_a? String
           stack.write(identifier_value, value, true)
         end
       end

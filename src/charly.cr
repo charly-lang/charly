@@ -25,6 +25,8 @@ module Charly
     interpreter = InterpreterFascade.new
     result = interpreter.execute_files(files)
 
+    puts interpreter.top
+
   else
     puts "No filename passed!"
   end
