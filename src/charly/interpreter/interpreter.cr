@@ -34,7 +34,6 @@ class Interpreter
       last_result = TNull.new
       node.children.each do |expression|
         last_result = self.exec_expression(expression, stack)
-        puts last_result
       end
       last_result
     end
@@ -64,6 +63,10 @@ class Interpreter
 
       if node.is_a? IdentifierLiteral
         return self.exec_identifier_literal(node, stack)
+      end
+
+      if node.is_a? CallExpression
+        return self.exec_call_expression(node, stack)
       end
 
       if node.is_a? NumericLiteral | StringLiteral | BooleanLiteral | FunctionLiteral
@@ -98,7 +101,10 @@ class Interpreter
       if identifier.is_a? IdentifierLiteral
         identifier_value = identifier.value
         if identifier_value.is_a? String
-          stack.write(identifier_value, value, true)
+
+          if value.is_a? BaseType
+            stack.write(identifier_value, value, true)
+          end
         end
       end
       return value
@@ -115,11 +121,17 @@ class Interpreter
       if node.identifier.is_a? MemberExpression
         raise "Member expressions are not yet supported"
       else
+
         identifier = node.identifier
-        if identifier.is_a? IdentifierLiteral
+        if identifier.is_a?(IdentifierLiteral)
+
           identifier_value = identifier.value
-          if identifier_value.is_a? String
-            stack.write(identifier_value, value)
+          if identifier_value.is_a?(String)
+
+            # Check that the value is a BaseType
+            if value.is_a? BaseType
+              stack.write(identifier_value, value)
+            end
           end
         end
       end
@@ -129,7 +141,7 @@ class Interpreter
 
     # Extracts the value of a variable from the current stack
     def self.exec_identifier_literal(node, stack)
-      return stack.get(node.value)
+      stack.get(node.value)
     end
 
     def self.exec_unary_expression(node, stack)
@@ -184,6 +196,89 @@ class Interpreter
       end
 
       raise "Invalid types or values inside binary expression"
+    end
+
+    # Executes a call expression
+    def self.exec_call_expression(node, stack)
+
+      # Resolve all arguments
+      arguments = [] of BaseType
+      argumentlist = node.argumentlist
+      if argumentlist.is_a? ExpressionList
+        argumentlist.each do |argument|
+          arguments << self.exec_expression(argument, stack)
+        end
+      end
+
+      # Get the identifier of the call expression
+      # If the identifier is an IdentifierLiteral we first check
+      # if it's a call to "call_internal"
+      # we are redirecting this
+      identifier = node.identifier
+      if identifier.is_a? IdentifierLiteral
+
+        # Check for the "call_internal" name
+        if identifier.value == "call_internal"
+          raise "Calls to call_internal are not yet supported!"
+        else
+          function = stack.get(identifier.value)
+        end
+      else
+        function = self.exec_expression(node.identifier, stack)
+      end
+
+      # Check if a function was found
+      unless function.is_a? TFunc
+        raise "#{identifier} is not a function!"
+      end
+
+      # Execute the function
+      return self.exec_function(function, arguments, stack)
+    end
+
+    # Executes *function*, passing it *arguments*
+    # inside *stack*
+    # *function* is of type TFunc
+    # *arguments* is an actual array of RunTimeType values
+    def self.exec_function(function, arguments, stack)
+
+      # Create the new stack for the function to run in
+      if stack.is_a? Stack
+        function_stack = Stack.new(stack, stack.session)
+      else
+
+        # Check if there is a parent stack
+        parent_stack = function.block.parent_stack
+        if parent_stack.is_a? Stack
+          function_stack = Stack.new(parent_stack, parent_stack.session)
+        else
+          raise "Could not find a valid stack for the function to run in"
+        end
+      end
+
+      # Get the identities of the arguemnts that are required
+      argument_ids = function.argumentlist.map { |argument|
+        if argument.is_a? IdentifierLiteral && argument.value.is_a? String
+          result = argument.value
+        end
+      }.compact
+
+      # Write the argument to the function stack
+      arguments.each_with_index do |arg, index|
+        id = argument_ids[index]
+
+        if id.is_a? String
+          function_stack.write(id, arg, true)
+        end
+      end
+
+      # Check if the correct amount of arguments was passed
+      if arguments.size < argument_ids.size
+        raise "Function expected #{argument_ids.size} arguments, got #{arguments.size}"
+      end
+
+      # Execute the block
+      return self.exec_block(function.block, function_stack)
     end
 
     def self.exec_literal(node, stack)

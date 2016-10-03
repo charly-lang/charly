@@ -1,2 +1,5 @@
-func test1() {};
-let test2 = func() {};
+func add(left, right) {
+  left + right;
+};
+
+let a = add(200, "okay");
