@@ -1,14 +1,17 @@
 require "../../helper.cr"
 require "../../interpreter/stack.cr"
+require "../../file.cr"
 
 abstract class ASTNode
   property children : Array(ASTNode)
   property! parent : ASTNode
-  property! value : String | Float64 | Bool
+  property! value : Bool | Float64 | String
+  property linked : Bool
 
   def initialize(parent)
     @parent = parent
     @children = [] of ASTNode
+    @linked = false
   end
 
   # Appends *node* to the children of this node
@@ -162,6 +165,7 @@ end
 
 # A terminal node
 class Terminal < ASTNode
+  property raw : String?
 end
 
 # Literals

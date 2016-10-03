@@ -1,6 +1,7 @@
 require "../ast/ast.cr"
 require "../lexer/lexer.cr"
 require "./structure.cr"
+require "./linker.cr"
 
 # Parses a list of tokens into a program
 class Parser
@@ -55,6 +56,15 @@ class Parser
     structure = Structure.new @tree
     structure.start
 
+    # Link the tree
+    linker = Linker.new @tree
+    linker.start
+
+    # If the *--ast* cli option was passed, display the tree
+    if ARGV.includes? "--ast"
+      puts @tree
+    end
+
     # Return the tree
     @tree
   end
@@ -63,6 +73,7 @@ class Parser
   def produce(type)
     new_node = type.new(@node)
     new_node.value = @tokens[@next].value
+    new_node.raw = @tokens[@next].raw
     new_node
   end
 

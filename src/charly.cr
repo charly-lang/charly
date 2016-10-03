@@ -1,5 +1,5 @@
 require "./charly/file.cr"
-require "./charly/syntax/parser/parser.cr"
+require "./charly/interpreter/fascade.cr"
 
 module Charly
 
@@ -8,14 +8,23 @@ module Charly
 
   if filename.is_a? String
 
-    # Create a new virtualfile
-    input = RealFile.new filename
+    # Collection of all top-level files that will be executed
+    files = [] of RealFile
 
-    # Parse the file
-    parser = Parser.new input
-    program = parser.parse
+    # Create a new virtualfile for the input
+    files << RealFile.new filename
 
-    puts program if ARGV.includes?("--ast")
+    # Unless the prelude is disabled, include it too
+    unless ARGV.includes? "--noprelude"
+
+      # TODO: Figure out how to find the std-library at runtime
+      files.unshift RealFile.new "./src/charly/std-lib/prelude.charly"
+    end
+
+    # Execute the file using the fascade
+    interpreter = InterpreterFascade.new
+    result = interpreter.execute_files(files)
+
   else
     puts "No filename passed!"
   end
