@@ -68,16 +68,6 @@ module CharlyTypes
     end
   end
 
-  class TArray < BaseType
-    property value : Array(BaseType)
-
-    def value_to_s(io)
-      io << value.join(", ")
-    end
-  end
-
-  # class TObject < BaseType; end
-  # class TClass < BaseType; end
   class TFunc < BaseType
     property argumentlist : Array(ASTNode)
     property block : Block
@@ -95,4 +85,7 @@ module CharlyTypes
       io << "Function"
     end
   end
+
+  # class TObject < BaseType; end
+  # class TClass < BaseType; end
 end
