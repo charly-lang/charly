@@ -62,7 +62,7 @@ class Interpreter
         return self.exec_binary_expression(node, stack)
       end
 
-      if node.is_a? NumericLiteral | StringLiteral | BooleanLiteral | ArrayLiteral
+      if node.is_a? NumericLiteral | StringLiteral | BooleanLiteral
         return self.exec_literal(node, stack)
       end
 
@@ -196,14 +196,6 @@ class Interpreter
         end
       when NullLiteral
         return TNull.new
-      when ArrayLiteral
-
-        # Resolve all children
-        values = node.children.map do |child|
-          self.exec_expression(child, stack).as BaseType
-        end
-
-        return TArray.new(values)
       end
 
       raise "Invalid literal found"
