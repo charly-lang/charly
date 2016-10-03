@@ -1,5 +1,1 @@
-let test;
-let myvar = 25;
-let lool = ":D";
-
-test = 25;
+let myvar = -5 + 13.33;

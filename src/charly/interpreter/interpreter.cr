@@ -54,6 +54,10 @@ class Interpreter
         return self.exec_variable_assignment(node, stack)
       end
 
+      if node.is_a? UnaryExpression
+        return self.exec_unary_expression(node, stack)
+      end
+
       if node.is_a? BinaryExpression
         return self.exec_binary_expression(node, stack)
       end
@@ -117,6 +121,22 @@ class Interpreter
       end
 
       value
+    end
+
+    def self.exec_unary_expression(node, stack)
+
+      # Resolve the right side
+      right = self.exec_expression(node.right, stack)
+
+      case node.operator
+      when MinusOperator
+        if right.is_a? TNumeric
+          return TNumeric.new(-right.value)
+        end
+      when NotOperator
+      end
+
+      raise "Invalid operator or right-hand-side in unary expression"
     end
 
     def self.exec_binary_expression(node, stack)
