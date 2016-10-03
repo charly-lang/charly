@@ -134,6 +134,7 @@ class Interpreter
           return TNumeric.new(-right.value)
         end
       when NotOperator
+        return TBoolean.new(!self.eval_bool(right, stack))
       end
 
       raise "Invalid operator or right-hand-side in unary expression"
@@ -206,6 +207,24 @@ class Interpreter
       end
 
       raise "Invalid literal found"
+    end
+
+    # Returns the boolean representation of a value
+    def self.eval_bool(value, stack)
+      case value
+      when TNumeric
+        return value.value != 0
+      when TBoolean
+        return value.value
+      when TString
+        return true
+      when TNull
+        return false
+      when Bool
+        return value
+      else
+        return false
+      end
     end
   end
 end
