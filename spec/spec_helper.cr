@@ -1,2 +1,2 @@
 require "spec"
-require "../src/charly"
+require "../src/charly/interpreter/stack.cr"

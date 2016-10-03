@@ -3,12 +3,13 @@ require "../syntax/ast/ast.cr"
 module CharlyTypes
 
   # Internal representations of the types
+  alias HashKey = String | Float64
   alias RunTimeType =
     String |
     Float64 |
     Bool |
     Array(RunTimeType) |
-    Hash(String | Float64, RunTimeType) |
+    Hash(HashKey, RunTimeType) |
     ASTNode |
     Nil
 
