@@ -3,5 +3,6 @@
 /.crystal/
 /.shards/
 /bin/
+charly
 *.swp
 .DS_Store

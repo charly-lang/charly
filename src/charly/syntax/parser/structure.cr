@@ -147,8 +147,10 @@ class Structure
     # A function literal inside a block is a function definition
     if node.is_a?(FunctionLiteral) && node.parent.is_a?(Block)
       @finished = false
-      new_node = FunctionDefinition.new(node.parent)
+      new_node = VariableInitialisation.new(node.parent)
+      new_node << node.children[0]
       new_node << node
+      node.children.shift
       return new_node
     end
 

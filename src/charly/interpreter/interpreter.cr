@@ -66,7 +66,7 @@ class Interpreter
         return self.exec_identifier_literal(node, stack)
       end
 
-      if node.is_a? NumericLiteral | StringLiteral | BooleanLiteral
+      if node.is_a? NumericLiteral | StringLiteral | BooleanLiteral | FunctionLiteral
         return self.exec_literal(node, stack)
       end
 
@@ -202,6 +202,13 @@ class Interpreter
         value = node.value
         if value.is_a?(String)
           return TBoolean.new(value == "true")
+        end
+      when FunctionLiteral
+        argumentlist = node.argumentlist
+        block = node.block
+
+        if argumentlist.is_a? ASTNode && block.is_a? Block
+          return TFunc.new(argumentlist.children, block, stack)
         end
       when NullLiteral
         return TNull.new

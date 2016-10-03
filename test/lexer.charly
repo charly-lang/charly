@@ -1,5 +1,2 @@
-let lol = "okay";
-let a = 25;
-let b = a + 5;
-let f = lol;
-lol = "nice";
+func test1() {};
+let test2 = func() {};

@@ -78,5 +78,21 @@ module CharlyTypes
 
   # class TObject < BaseType; end
   # class TClass < BaseType; end
-  # class TFunc < BaseType; end
+  class TFunc < BaseType
+    property argumentlist : Array(ASTNode)
+    property block : Block
+    property parent_stack : Stack
+
+    def initialize(argumentlist, block, parent_stack)
+      @value = false
+      @argumentlist = argumentlist
+      @block = block
+      @block.parent_stack = parent_stack
+      @parent_stack = parent_stack
+    end
+
+    def value_to_s(io)
+      io << "Function"
+    end
+  end
 end
