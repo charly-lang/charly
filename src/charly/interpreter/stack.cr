@@ -106,6 +106,23 @@ class Stack
     end
   end
 
+  # Deletes a key from the stack
+  # Also checks the parents
+  def delete(key, check_parent = true)
+
+    # Check if the current stack contains the key
+    parent = @parent
+    if contains key
+      old_value = @values[key]
+      @values.delete key
+      return old_value
+    elsif check_parent && parent.is_a? Stack
+      return parent.delete(key, check_parent)
+    else
+      raise "Could not delete variable '#{key}', not found!"
+    end
+  end
+
   # Get a key from the stack
   # If the key doesn't exist, check the parent stack
   # unless *check_parent* is passed
