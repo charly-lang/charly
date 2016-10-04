@@ -29,6 +29,10 @@ class InterpreterFascade
     program = parser.tree
 
     # Execute the file in the interpreter
-    Interpreter.new [program], stack
+    unless ARGV.includes? "--noexec"
+      return Interpreter.new [program], stack
+    else
+      CharlyTypes::TNull.new
+    end
   end
 end
