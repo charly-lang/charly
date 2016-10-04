@@ -61,11 +61,10 @@ class Linker
 
     if node.is_a? ClassLiteral
       node.linked = true
-      node.identifier = node.children[0]
-      node.block = node.children[1]
+      node.block = node.children[0]
 
       # Search for the constructor in the block
-      node.children[1].children.each do |child|
+      node.children[0].children.each do |child|
         if child.is_a? FunctionDefinition
           if child.children[0].children[0].is_a? IdentifierLiteral
             if child.children[0].children[0].value == "constructor"
@@ -97,7 +96,6 @@ class Linker
 
       # Check if this is an anonymous function
       if node.children.size == 3
-        node.identifier = node.children[0]
         node.argumentlist = node.children[1]
         node.block = node.children[2]
       else

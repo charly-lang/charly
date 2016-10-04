@@ -144,8 +144,18 @@ class Structure
       end
     end
 
-    # A function literal inside a block is a function definition
+    # A function literal inside a block is a variable initialisation
     if node.is_a?(FunctionLiteral) && node.parent.is_a?(Block)
+      @finished = false
+      new_node = VariableInitialisation.new(node.parent)
+      new_node << node.children[0]
+      new_node << node
+      node.children.shift
+      return new_node
+    end
+
+    # A class literal inside a block is a variable initialisation
+    if node.is_a?(ClassLiteral) && node.parent.is_a?(Block)
       @finished = false
       new_node = VariableInitialisation.new(node.parent)
       new_node << node.children[0]
@@ -179,14 +189,6 @@ class Structure
 
       # Remove the class keyword
       node.children.shift
-    end
-
-    # A class literal inside a block is a class definition
-    if node.is_a?(ClassLiteral) && node.parent.is_a?(Block)
-      @finished = false
-      new_node = ClassDefinition.new(node.parent)
-      new_node << node
-      return new_node
     end
 
     # Remove the expressionlist from arrayliterals

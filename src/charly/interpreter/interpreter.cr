@@ -459,6 +459,12 @@ class Interpreter
         if argumentlist.is_a? ASTNode && block.is_a? Block
           return TFunc.new(argumentlist.children, block, stack)
         end
+      when ClassLiteral
+        block = node.block
+
+        if block.is_a? Block
+          return TClass.new(block, stack)
+        end
       when NullLiteral
         return TNull.new
       end

@@ -123,7 +123,6 @@ end
 
 # A class literal
 class ClassLiteral < ASTNode
-  property identifier : ASTNode?
   property constructor : ASTNode?
   property block : ASTNode?
 end
@@ -178,7 +177,6 @@ class KeywordLiteral < LiteralValue; end
 class BooleanLiteral < LiteralValue; end
 class ArrayLiteral < ASTNode; end
 class FunctionLiteral < ASTNode
-  property identifier : ASTNode?
   property argumentlist : ASTNode?
   property block : ASTNode?
 end

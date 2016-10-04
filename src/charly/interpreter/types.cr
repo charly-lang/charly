@@ -84,6 +84,21 @@ module CharlyTypes
     end
   end
 
+  class TClass < BaseType
+    property block : Block
+    property parent_stack : Stack
+
+    def initialize(block, parent_stack)
+      @value = false
+      @block = block
+      @block.parent_stack = parent_stack
+      @parent_stack = parent_stack
+    end
+
+    def value_to_s(io)
+      io << "Class"
+    end
+  end
+
   # class TObject < BaseType; end
-  # class TClass < BaseType; end
 end
