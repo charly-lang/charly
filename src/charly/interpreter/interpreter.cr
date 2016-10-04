@@ -375,19 +375,20 @@ class Interpreter
         if identifier.value == "call_internal"
           raise "Calls to call_internal are not yet supported!"
         else
-          function = stack.get(identifier.value)
+          target = stack.get(identifier.value)
         end
       else
-        function = self.exec_expression(node.identifier, stack)
+        target = self.exec_expression(node.identifier, stack)
       end
 
-      # Check if a function was found
-      unless function.is_a? TFunc
+      # Different handlers for different data types
+      if target.is_a? TClass
+        return self.exec_object_instantiation(target, arguments, stack)
+      elsif target.is_a? TFunc
+        return self.exec_function(target, arguments, stack)
+      else
         raise "#{identifier} is not a function!"
       end
-
-      # Execute the function
-      return self.exec_function(function, arguments, stack)
     end
 
     # Executes *function*, passing it *arguments*
@@ -395,6 +396,13 @@ class Interpreter
     # *function* is of type TFunc
     # *arguments* is an actual array of RunTimeType values
     def self.exec_function(function, arguments, stack)
+
+      # This needs to be here
+      # altough we are 100% sure it will always be a TFunc here
+      # crystal didn't stop complaining about it
+      unless function.is_a? TFunc
+        raise "Not a function!"
+      end
 
       # Create the new stack for the function to run in
       if stack.is_a? Stack
@@ -410,7 +418,7 @@ class Interpreter
         end
       end
 
-      # Get the identities of the arguemnts that are required
+      # Get the identities of the arguments that are required
       argument_ids = function.argumentlist.map { |argument|
         if argument.is_a? IdentifierLiteral && argument.value.is_a? String
           result = argument.value
@@ -433,6 +441,28 @@ class Interpreter
 
       # Execute the block
       return self.exec_block(function.block, function_stack)
+    end
+
+    # Create an instance of a given class
+    def self.exec_object_instantiation(classliteral, arguments, stack)
+
+      # The stack for the object
+      object_stack = Stack.new(classliteral.parent_stack, classliteral.parent_stack.session)
+
+      # Execute the class block inside the object_stack
+      self.exec_block(classliteral.block, object_stack)
+
+      # Search for the constructor of the class
+      # and execute it in the object_stack if it was found
+      if object_stack.contains("constructor")
+        self.exec_function(object_stack.get("constructor"), arguments, object_stack)
+
+        # Remove the constructor again
+        object_stack.delete("constructor")
+      end
+
+      # Create a new TObject and store the object_stack in it
+      return TObject.new(object_stack)
     end
 
     def self.exec_literal(node, stack)

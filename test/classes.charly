@@ -7,3 +7,5 @@ class Person {
     age = _age;
   };
 };
+
+let leonard = Person("Leonard", 16);

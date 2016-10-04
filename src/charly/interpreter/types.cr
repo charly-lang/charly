@@ -100,5 +100,16 @@ module CharlyTypes
     end
   end
 
-  # class TObject < BaseType; end
+  class TObject < BaseType
+    property stack : Stack
+
+    def initialize(stack)
+      @value = false
+      @stack = stack
+    end
+
+    def value_to_s(io)
+      io << "Object"
+    end
+  end
 end
