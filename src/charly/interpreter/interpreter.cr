@@ -210,12 +210,6 @@ class Interpreter
       right = self.exec_expression(node.right, stack)
       operator = node.operator
 
-      # Make sure that the left side
-      # is of the same type as the right side
-      if left.class != right.class
-        return TBoolean.new(false)
-      end
-
       # When comparing TNumeric's
       if left.is_a?(TNumeric) && right.is_a?(TNumeric)
 
@@ -264,6 +258,36 @@ class Interpreter
         when NotOperator
           return TBoolean.new(left.value != right.value)
         end
+      end
+
+      # When comparing TFunc
+      if left.is_a?(TFunc) && right.is_a?(TFunc)
+        case operator
+        when GreaterOperator, LessOperator, GreaterEqualOperator, LessEqualOperator
+          return TBoolean.new(false)
+        when EqualOperator
+          return TBoolean.new(left == right)
+        when NotOperator
+          return TBoolean.new(left != right)
+        end
+      end
+
+      # If the left side is null
+      if left.is_a? TNull
+        case operator
+        when GreaterOperator, LessOperator, GreaterEqualOperator, LessEqualOperator
+          return TBoolean.new(false)
+        when EqualOperator
+          return TBoolean.new(left.class == right.class)
+        when NotOperator
+          return TBoolean.new(left.class != right.class)
+        end
+      end
+
+      # Make sure that the left side
+      # is of the same type as the right side
+      if left.class != right.class
+        return TBoolean.new(false)
       end
 
       # Raise when an unknown operator is found
