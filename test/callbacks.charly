@@ -1,0 +1,13 @@
+func repeat(amount, callback) {
+  let index = 0;
+
+  while (index < amount) {
+    callback(index);
+    index = index + 1;
+  };
+};
+
+let sum = 0;
+repeat(100, func(index) {
+  sum = sum + index;
+});
