@@ -9,3 +9,7 @@ class Person {
 };
 
 let leonard = Person("Leonard", 16);
+
+let name = leonard.name;
+let age = leonard.age;
+let lol = leonard.lol;

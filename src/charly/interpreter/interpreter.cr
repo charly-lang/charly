@@ -73,6 +73,10 @@ class Interpreter
         return self.exec_call_expression(node, stack)
       end
 
+      if node.is_a? MemberExpression
+        return self.exec_member_expression(node, stack)
+      end
+
       if node.is_a? IfStatement
         return self.exec_if_statement(node, stack)
       end
@@ -389,6 +393,25 @@ class Interpreter
       else
         raise "#{identifier} is not a function!"
       end
+    end
+
+    # Executes a member expression
+    def self.exec_member_expression(node, stack)
+      identifier = self.exec_expression(node.identifier, stack)
+      member = node.member
+
+      # Typecheck
+      if identifier.is_a?(TObject) && member.is_a?(IdentifierLiteral)
+
+        # Check if the objects stack contains the given value
+        if identifier.stack.contains(member.value)
+          return identifier.stack.get(member.value, false)
+        else
+          return TNull.new
+        end
+      end
+
+      raise "#{identifier} is not an object!"
     end
 
     # Executes *function*, passing it *arguments*
