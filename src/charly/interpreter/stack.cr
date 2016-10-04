@@ -16,20 +16,22 @@ class Stack
     @locked = false
   end
 
-  def to_s(io, all = false)
-    stackdump(io, all)
+  def to_s(io)
+    stackdump(io)
   end
 
-  def stackdump(io, all = false)
-    if all
-      parent = @parent
-      if parent.is_a? Stack
-        parent.stackdump(io, all)
-      end
+  def stackdump(io, head = false)
+
+    # Header
+    io << "## Stackdump\n" if head
+
+    # Print all parent stacks first
+    parent = @parent
+    if parent.is_a? Stack
+      parent.stackdump(io, true)
     end
 
     # Display all values as a table
-    io << "## Stackdump\n"
     @values.each do |key, value|
       io << depth
       io << " "
