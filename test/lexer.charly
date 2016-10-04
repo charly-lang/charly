@@ -1,4 +1,0 @@
-let var = null;
-let num = 25;
-
-let isnull = null == var;

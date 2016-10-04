@@ -73,6 +73,10 @@ class Interpreter
         return self.exec_call_expression(node, stack)
       end
 
+      if node.is_a? IfStatement
+        return self.exec_if_statement(node, stack)
+      end
+
       if node.is_a? NumericLiteral | StringLiteral | BooleanLiteral | FunctionLiteral
         return self.exec_literal(node, stack)
       end
@@ -294,6 +298,38 @@ class Interpreter
       raise "Invalid comparison found #{node}"
     end
 
+    # Execute an if statement
+    def self.exec_if_statement(node, stack)
+
+      # Resolve the test expression
+      test = node.test
+      if test.is_a?(ASTNode)
+        test_result = self.eval_bool(self.exec_expression(node.test, stack), stack)
+      else
+        return TNull.new
+      end
+
+      # Run the respective handler
+      if test_result
+        consequent = node.consequent
+        if consequent.is_a?(Block)
+          return self.exec_block(consequent, Stack.new(stack, stack.session))
+        end
+      else
+        alternate = node.alternate
+        if alternate.is_a?(ASTNode)
+          if alternate.is_a?(IfStatement)
+            return self.exec_if_statement(alternate, stack)
+          elsif node.alternate.is_a?(Block)
+            return self.exec_block(alternate, Stack.new(stack, stack.session))
+          end
+        end
+      end
+
+      # Sanity check
+      return TNull.new
+    end
+
     # Executes a call expression
     def self.exec_call_expression(node, stack)
 
@@ -416,6 +452,8 @@ class Interpreter
       when TBoolean
         return value.value
       when TString
+        return true
+      when TFunc
         return true
       when TNull
         return false
