@@ -25,7 +25,11 @@ module Charly
     interpreter = InterpreterFascade.new
     result = interpreter.execute_files(files)
 
-    puts interpreter.top
+    # If the --stackdump CLI option was passed
+    # display the global stack at the end of execution
+    if ARGV.includes? "--stackdump"
+      puts interpreter.top
+    end
 
   else
     puts "No filename passed!"
