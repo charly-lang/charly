@@ -77,6 +77,10 @@ class Interpreter
         return self.exec_if_statement(node, stack)
       end
 
+      if node.is_a? WhileStatement
+        return self.exec_while_statement(node, stack)
+      end
+
       if node.is_a? NumericLiteral | StringLiteral | BooleanLiteral | FunctionLiteral
         return self.exec_literal(node, stack)
       end
@@ -328,6 +332,24 @@ class Interpreter
 
       # Sanity check
       return TNull.new
+    end
+
+    # Executes a while node
+    def self.exec_while_statement(node, stack)
+
+      # Typecheck
+      test = node.test
+      consequent = node.consequent
+
+      if test.is_a?(ASTNode) && consequent.is_a?(ASTNode)
+        last_result = TNull.new
+        while self.eval_bool(self.exec_expression(test, stack), stack)
+          last_result = self.exec_block(consequent, Stack.new(stack, stack.session))
+        end
+        return last_result
+      else
+        return TNull.new
+      end
     end
 
     # Executes a call expression
