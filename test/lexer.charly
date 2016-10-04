@@ -1,5 +1,23 @@
-func add(left, right) {
-  left + right;
-};
+# Numerics
+let a = 2 > 1;
+let b = 2 < 1;
+let c = 2 >= 1;
+let d = 2 <= 1;
+let e = 2 == 2;
+let f = 2 ! 2;
 
-let a = add(200, "okay");
+# Booleans
+let g = true < false;
+let h = true > false;
+let i = true <= false;
+let j = true >= false;
+let k = true == false;
+let l = true ! false;
+
+# Strings
+let m = "test" < "hello";
+let n = "test" > "hello";
+let o = "test" <= "hello";
+let p = "test" >= "hello";
+let q = "test" == "test";
+let r = "test" ! "töst";

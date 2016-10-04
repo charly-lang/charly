@@ -61,6 +61,10 @@ class Interpreter
         return self.exec_binary_expression(node, stack)
       end
 
+      if node.is_a? ComparisonExpression
+        return self.exec_comparison_expression(node, stack)
+      end
+
       if node.is_a? IdentifierLiteral
         return self.exec_identifier_literal(node, stack)
       end
@@ -196,6 +200,74 @@ class Interpreter
       end
 
       raise "Invalid types or values inside binary expression"
+    end
+
+    # Perform a comparison
+    def self.exec_comparison_expression(node, stack)
+
+      # Resolve the left and right side
+      left = self.exec_expression(node.left, stack)
+      right = self.exec_expression(node.right, stack)
+      operator = node.operator
+
+      # Make sure that the left side
+      # is of the same type as the right side
+      if left.class != right.class
+        return TBoolean.new(false)
+      end
+
+      # When comparing TNumeric's
+      if left.is_a?(TNumeric) && right.is_a?(TNumeric)
+
+        # Different types of operators
+        case operator
+        when GreaterOperator
+          return TBoolean.new(left.value > right.value)
+        when LessOperator
+          return TBoolean.new(left.value < right.value)
+        when GreaterEqualOperator
+          return TBoolean.new(left.value >= right.value)
+        when LessEqualOperator
+          return TBoolean.new(left.value <= right.value)
+        when EqualOperator
+          return TBoolean.new(left.value == right.value)
+        when NotOperator
+          return TBoolean.new(left.value != right.value)
+        end
+      end
+
+      # When comparing TBools
+      if left.is_a?(TBoolean) && right.is_a?(TBoolean)
+        case operator
+        when GreaterOperator, LessOperator, GreaterEqualOperator, LessEqualOperator
+          return TBoolean.new(false)
+        when EqualOperator
+          return TBoolean.new(left.value == right.value)
+        when NotOperator
+          return TBoolean.new(left.value != right.value)
+        end
+      end
+
+      # When comparing strings
+      if left.is_a?(TString) && right.is_a?(TString)
+        case operator
+        when GreaterOperator
+          return TBoolean.new(left.value.size > right.value.size)
+        when LessOperator
+          return TBoolean.new(left.value.size < right.value.size)
+        when GreaterEqualOperator
+          return TBoolean.new(left.value.size >= right.value.size)
+        when LessEqualOperator
+          return TBoolean.new(left.value.size <= right.value.size)
+        when EqualOperator
+          return TBoolean.new(left.value == right.value)
+        when NotOperator
+          return TBoolean.new(left.value != right.value)
+        end
+      end
+
+      # Raise when an unknown operator is found
+      raise "Invalid comparison found #{node}"
     end
 
     # Executes a call expression
