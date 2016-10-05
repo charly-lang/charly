@@ -11,11 +11,12 @@ class Parser
   alias Production = Prod | Bool
   property tokens : Array(Token)
   property tree : Program
+  property file : VirtualFile
   property node : ASTNode
   property next : UInt32
 
   # Create a new parser from a virtualfile
-  def initialize(file)
+  def initialize(@file)
 
     # Get all the tokens from the file
     lexer = Lexer.new file
@@ -62,6 +63,7 @@ class Parser
 
     # If the *--ast* cli option was passed, display the tree
     if ARGV.includes? "--ast"
+      puts "--- AST: #{@file.filename} ---"
       puts @tree
     end
 
