@@ -180,7 +180,9 @@ class FunctionLiteral < ASTNode
   property argumentlist : ASTNode?
   property block : ASTNode?
 end
-class ContainerLiteral < ASTNode; end
+class ContainerLiteral < ASTNode
+  property block : ASTNode?
+end
 
 # Structure
 class LeftParenLiteral < Terminal; end

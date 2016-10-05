@@ -53,6 +53,12 @@ class Linker
       return
     end
 
+    if node.is_a? ContainerLiteral
+      node.linked = true
+      node.block = node.children[0]
+      return
+    end
+
     if node.is_a? ClassDefinition
       node.linked = true
       node.classliteral = node.children[0]

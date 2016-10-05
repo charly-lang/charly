@@ -1,0 +1,10 @@
+class Person {
+  let name;
+
+  func constructor(_name) {
+    name = _name;
+  };
+};
+
+let leonard = Person("Leonard Schütz");
+print(leonard.name);

@@ -1,4 +1,14 @@
-{
+let leonard = {
   let name = "Leonard";
   let age = 16;
+
+  let info = {
+    let hobbys = "Programming, Gaming";
+    let height = 1.83;
+  };
 };
+
+print(leonard.name);
+print(leonard.age);
+print(leonard.info.hobbys);
+print(leonard.info.height);

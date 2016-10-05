@@ -86,8 +86,28 @@ class Interpreter
         return self.exec_while_statement(node, stack)
       end
 
-      if node.is_a? NumericLiteral | StringLiteral | BooleanLiteral | FunctionLiteral
+      if node.is_a? NumericLiteral
         return self.exec_literal(node, stack)
+      end
+
+      if node.is_a? StringLiteral
+        return self.exec_literal(node, stack)
+      end
+
+      if node.is_a? BooleanLiteral
+        return self.exec_literal(node, stack)
+      end
+
+      if node.is_a? FunctionLiteral
+        return self.exec_literal(node, stack)
+      end
+
+      if node.is_a? ClassLiteral
+        return self.exec_literal(node, stack)
+      end
+
+      if node.is_a? ContainerLiteral
+        return self.exec_container_literal(node, stack)
       end
 
       raise "Unknown node encountered #{node.class} #{stack}"
@@ -538,6 +558,26 @@ class Interpreter
       end
 
       raise "Invalid literal found #{node.class}"
+    end
+
+    # Executes a container literal
+    def self.exec_container_literal(node, stack)
+
+      # Check if there is a block
+      block = node.block
+      if block.is_a? Block
+
+        # Create the TClass instance
+        classliteral = TClass.new(block, stack)
+
+        # Create a new object from the class instance
+        object = self.exec_object_instantiation(classliteral, [] of TNull, stack)
+        puts object
+
+        return object
+      end
+
+      return TNull.new
     end
 
     # Returns the boolean representation of a value
