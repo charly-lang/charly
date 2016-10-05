@@ -192,7 +192,7 @@ class Structure
     end
 
     # Remove the expressionlist from arrayliterals
-    if node.is_a?(ArrayLiteral) && node.children[0].is_a?(ExpressionList)
+    if node.is_a?(ArrayLiteral) && (node.children.size > 0) && node.children[0].is_a?(ExpressionList)
       node.children[0].children.each do |child|
         node << child
         child.parent = node
