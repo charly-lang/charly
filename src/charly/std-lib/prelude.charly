@@ -5,3 +5,23 @@ func print(arg) {
 func write(arg) {
   call_internal("write", arg);
 };
+
+func length(arg) {
+  call_internal("length", arg);
+};
+
+func member_read(target, index) {
+  call_internal("member_read", target, index);
+};
+
+func member_write(target, index, value) {
+  call_internal("member_write", target, index, value);
+};
+
+func member_insert(target, index, value) {
+  call_internal("member_insert", target, index, value);
+};
+
+func member_delete(target, index) {
+  call_internal("member_delete", target, index);
+};

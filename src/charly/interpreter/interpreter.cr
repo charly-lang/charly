@@ -102,6 +102,10 @@ class Interpreter
         return self.exec_literal(node, stack)
       end
 
+      if node.is_a? ArrayLiteral
+        return self.exec_literal(node, stack)
+      end
+
       if node.is_a? ClassLiteral
         return self.exec_literal(node, stack)
       end
@@ -407,6 +411,16 @@ class Interpreter
               return InternalFunctions.print(arguments[1..-1], stack)
             when "write"
               return InternalFunctions.write(arguments[1..-1], stack)
+            when "length"
+              return InternalFunctions.length(arguments[1..-1], stack)
+            when "member_read"
+              return InternalFunctions.member_read(arguments[1..-1], stack)
+            when "member_write"
+              return InternalFunctions.member_write(arguments[1..-1], stack)
+            when "member_insert"
+              return InternalFunctions.member_insert(arguments[1..-1], stack)
+            when "member_delete"
+              return InternalFunctions.member_delete(arguments[1..-1], stack)
             else
               raise "Internal function call to '#{name.value}' not implemented!"
             end
@@ -547,6 +561,14 @@ class Interpreter
         if argumentlist.is_a? ASTNode && block.is_a? Block
           return TFunc.new(argumentlist.children, block, stack)
         end
+      when ArrayLiteral
+
+        # Resolve all children first
+        children = [] of BaseType
+        node.children.map do |child|
+          children << self.exec_expression(child, stack)
+        end
+        return TArray.new(children)
       when ClassLiteral
         block = node.block
 
