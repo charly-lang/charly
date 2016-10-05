@@ -2,6 +2,7 @@ require "../syntax/ast/ast.cr"
 require "./stack.cr"
 require "./session.cr"
 require "./types.cr"
+require "./internal-functions.cr"
 
 # Provides a higher-level interface to the executor
 class Interpreter
@@ -377,7 +378,21 @@ class Interpreter
 
         # Check for the "call_internal" name
         if identifier.value == "call_internal"
-          raise "Calls to call_internal are not yet supported!"
+
+          name = arguments[0]
+          if name.is_a? TString
+
+            case name.value
+            when "print"
+              return InternalFunctions.print(arguments[1..-1], stack)
+            when "write"
+              return InternalFunctions.write(arguments[1..-1], stack)
+            else
+              raise "Internal function call to '#{name.value}' not implemented!"
+            end
+          else
+            raise "The first argument to call_internal has to be a string."
+          end
         else
           target = stack.get(identifier.value)
         end

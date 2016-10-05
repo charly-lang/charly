@@ -1,1 +1,7 @@
+func print(arg) {
+  call_internal("print", arg);
+};
 
+func write(arg) {
+  call_internal("write", arg);
+};
