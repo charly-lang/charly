@@ -1,4 +1,10 @@
-.git
+/doc/
+/libs/
+/.crystal/
+/.shards/
+/bin/
+charly
 *.swp
+.DS_Store
+.git
 parser-dump
-test/debugging.charly

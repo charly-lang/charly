@@ -1,5 +1,1 @@
-language: ruby
-script:
-  - ruby main.rb test/main.charly --log
-rvm:
-  - 2.3.0
+language: crystal
