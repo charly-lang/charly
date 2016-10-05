@@ -436,6 +436,8 @@ class Parser
       function_literal && consume_postfix
     }, ->{
       class_literal && consume_postfix
+    }, ->{
+      container_literal && consume_postfix
     })
   end
 
@@ -462,6 +464,12 @@ class Parser
     node_production(ClassLiteral, ->{
       token(TokenType::Keyword, "class") &&
       optional_token(TokenType::Identifier) &&
+      block
+    })
+  end
+
+  def container_literal
+    node_production(ContainerLiteral, ->{
       block
     })
   end
