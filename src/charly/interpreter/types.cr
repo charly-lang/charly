@@ -9,6 +9,7 @@ module CharlyTypes
     Float64 |
     Bool |
     ASTNode |
+    Array(BaseType) |
     Nil
 
   # The base class all charly types depend on
@@ -20,7 +21,7 @@ module CharlyTypes
     def to_s(io)
       string_value = MemoryIO.new
       value_to_s(string_value)
-      io << "[#{self.class} : #{string_value.to_s}]"
+      io << string_value
     end
 
     abstract def value_to_s(io)
@@ -63,6 +64,22 @@ module CharlyTypes
 
     def value_to_s(io)
       io << "null"
+    end
+  end
+
+  class TArray < BaseType
+    property value : Array(BaseType)
+
+    def value_to_s(io)
+      io << "["
+      @value.map_with_index do |child, index|
+        io << child
+
+        if index < @value.size - 1
+          io << ", "
+        end
+      end
+      io << "]"
     end
   end
 

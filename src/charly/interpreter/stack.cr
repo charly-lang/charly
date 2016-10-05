@@ -37,9 +37,9 @@ class Stack
       io << " "
       io << self.object_id
       io << " "
-      io << "[#{key}]"
-      io << " = "
-      io << "[#{value}]"
+      io << "#{key}"
+      io << " : "
+      io << "#{value}"
       io << "\n"
     end
   end
