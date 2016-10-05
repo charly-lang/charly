@@ -1,2 +1,0 @@
-clear
-ruby main.rb $@

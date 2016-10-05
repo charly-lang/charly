@@ -1,8 +1,0 @@
-print("Enter your weight in KG:");
-let weight = Number(gets());
-
-print("Enter your height in Meters:");
-let height = Number(gets());
-
-let BMI = weight / height**2;
-print("Your BMI is: " + String(BMI));
