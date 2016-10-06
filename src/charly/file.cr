@@ -22,8 +22,8 @@ abstract class VirtualFile
     end
   end
 
-  def to_s
-    @content
+  def to_s(io)
+    io << @content
   end
 end
 
