@@ -1,2 +1,6 @@
-let math = include("./external.charly");
-print(math.divide(25, 5));
+let content = require("external.charly");
+print(content.num);
+content.setNum(30);
+
+content = require("external.charly");
+print(content.num);

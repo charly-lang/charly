@@ -1,5 +1,6 @@
 require "./charly/file.cr"
 require "./charly/interpreter/fascade.cr"
+require "./charly/interpreter/session.cr"
 
 module Charly
 
@@ -8,12 +9,15 @@ module Charly
 
   if filename.is_a? String
 
+    # The current session
+    session = Session.new
+
     # Create a stack that contains the results of the standard library
     prelude_stack = Stack.new nil
     userfile_stack = Stack.new prelude_stack
 
     # Get a InterpreterFascade
-    interpreter = InterpreterFascade.new
+    interpreter = InterpreterFascade.new(session)
 
     # Execute the prelude
     unless ARGV.includes? "--noprelude"

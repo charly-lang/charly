@@ -601,7 +601,34 @@ class Interpreter
   # except that the returned object is cached
   # and the next requiring of this file will be served from that cache instead
   def exec_require(arguments, stack)
-    TNull.new
+
+    # Check if a filename was passed
+    # The filename will be resolved relative
+    # to the directory of the current file
+    filename = arguments[0]
+    unless filename.is_a? TString
+      raise "Calls to require expect the first argument to be a string. #{filename.class} given."
+    end
+    filepath = include_file_lookup(filename.value)
+
+    # Check if this path is already cached
+    if stack.top.session.try &.cached_require_calls.has_key?(filepath)
+
+      # Type & sanity check
+      cache = stack.top.session.try &.cached_require_calls[filepath]
+
+      if cache.is_a?(BaseType)
+        return cache
+      else
+        return TNull.new
+      end
+    else
+      result = exec_include(arguments, stack, false)
+
+      # Save the combination in the current session
+      stack.top.session.try &.cached_require_calls[filepath] = result
+      return result
+    end
   end
 
   # Include a file
@@ -614,11 +641,6 @@ class Interpreter
     # Name of the function for error messages
     func = is_include ? "include" : "require"
 
-    # Check if any arguments were passed
-    unless arguments.size > 0
-      raise "Calls to #{func} require at least 1 argument."
-    end
-
     # Check if a filename was passed
     # The filename will be resolved relative
     # to the directory of the current file
@@ -626,34 +648,15 @@ class Interpreter
     unless filename.is_a? TString
       raise "Calls to #{func} expect the first argument to be a string. #{filename.class} given."
     end
-    filename = filename.value
-
-    # Construct the relative path
-    # by combining the current file and the file that's being included
-    currentfile = @initial_stack.file
-    unless currentfile.is_a? VirtualFile
-      return TNull.new
-    end
-
-    # Resolve the filename
-    current_dir = currentfile.fulldirectorypath
-    if filename[0] == '/'
-      filepath = filename
-    else
-      filepath = File.join(current_dir, filename)
-    end
-    filepath = File.expand_path(filepath) # Make it an absolute path
-    filepath = File.real_path(filepath) # Resolve symlinks
+    filepath = include_file_lookup(filename.value)
 
     # Check that the path is readable
     unless File.exists?(filepath) && File.readable?(filepath)
       raise "Could not open file at #{filepath}"
     end
 
-    # Check if the path is a directory or a file
-    if File.directory?(filepath)
-
-    elsif File.file?(filepath)
+    # Check if the path is a file
+    if File.file?(filepath)
 
       # Create a new file from that path
       include_file = RealFile.new(filepath)
@@ -666,7 +669,7 @@ class Interpreter
       # by passing it stack.top
       # it still has access to all the standard library functions
       # but doesn't have access to the current stack
-      interpreter = InterpreterFascade.new
+      interpreter = InterpreterFascade.new(stack.top.session)
       result = interpreter.execute_file(include_file, include_stack)
 
       return include_stack.get("export")
@@ -674,8 +677,30 @@ class Interpreter
       raise "Could not open file at #{filepath}"
     end
 
-
     TNull.new
+  end
+
+  # Returns the absolute filepath to *filename*
+  def include_file_lookup(filename)
+
+    # Construct the relative path
+    # by combining the current file and the file that's being included
+    currentfile = @initial_stack.file
+    unless currentfile.is_a? VirtualFile
+      raise "Could not read current file from stack."
+    end
+
+    # Resolve the filename
+    current_dir = currentfile.fulldirectorypath
+    if filename[0] == '/'
+      filepath = filename
+    else
+      filepath = File.join(current_dir, filename)
+    end
+    filepath = File.expand_path(filepath) # Make it an absolute path
+    filepath = File.real_path(filepath) # Resolve symlinks
+
+    return filepath
   end
 
   # Returns the boolean representation of a value

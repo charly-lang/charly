@@ -29,3 +29,7 @@ func member_delete(target, index) {
 func include(filename) {
   call_internal("include", filename);
 };
+
+func require(filename) {
+  call_internal("require", filename);
+};

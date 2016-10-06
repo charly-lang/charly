@@ -1,14 +1,11 @@
-let leonard = {
-  let name = "Leonard";
-  let age = 16;
+let test = {
+  let num = 0;
 
-  let info = {
-    let hobbys = "Programming, Gaming";
-    let height = 1.83;
+  func changeNum(new) {
+    num = new;
   };
 };
 
-print(leonard.name);
-print(leonard.age);
-print(leonard.info.hobbys);
-print(leonard.info.height);
+print(test.num);
+test.changeNum(25);
+print(test.num);

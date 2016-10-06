@@ -1,5 +1,7 @@
 export = {
-  func divide(left, right) {
-    left / right;
+  let num = 5;
+
+  func setNum(new) {
+    num = new;
   };
 };

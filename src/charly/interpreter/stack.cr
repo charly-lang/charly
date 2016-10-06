@@ -1,5 +1,6 @@
 require "./types.cr"
 require "../file.cr"
+require "./session.cr"
 
 # A single stack containing variables
 class Stack
@@ -8,6 +9,7 @@ class Stack
   property file : VirtualFile?
   property values : Hash(HashKey, BaseType)
   property locked : Bool
+  property session : Session?
 
   def initialize(parent)
     @parent = parent
