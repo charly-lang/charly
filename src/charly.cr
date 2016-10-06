@@ -8,27 +8,25 @@ module Charly
 
   if filename.is_a? String
 
-    # Collection of all top-level files that will be executed
-    files = [] of RealFile
+    # Create a stack that contains the results of the standard library
+    prelude_stack = Stack.new nil
+    userfile_stack = Stack.new prelude_stack
 
-    # Create a new virtualfile for the input
-    files << RealFile.new filename
+    # Get a InterpreterFascade
+    interpreter = InterpreterFascade.new
 
-    # Unless the prelude is disabled, include it too
+    # Execute the prelude
     unless ARGV.includes? "--noprelude"
-
-      # TODO: Figure out how to find the std-library at runtime
-      files.unshift RealFile.new "./src/charly/std-lib/prelude.charly"
+      interpreter.execute_file(RealFile.new("./src/charly/std-lib/prelude.charly"), prelude_stack)
     end
 
-    # Execute the file using the fascade
-    interpreter = InterpreterFascade.new
-    result = interpreter.execute_files(files)
+    # Execute the userfile
+    result = interpreter.execute_file(RealFile.new(filename), userfile_stack)
 
     # If the --stackdump CLI option was passed
-    # display the global stack at the end of execution
+    # display the userstack at the end of execution
     if ARGV.includes? "--stackdump"
-      puts interpreter.top
+      puts userfile_stack
     end
 
   else

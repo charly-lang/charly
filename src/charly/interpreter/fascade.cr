@@ -1,5 +1,4 @@
 # Interpreter
-require "./session.cr"
 require "./stack.cr"
 require "./interpreter.cr"
 
@@ -7,12 +6,10 @@ require "./interpreter.cr"
 require "../syntax/parser/parser.cr"
 
 class InterpreterFascade
-  property session : Session
   property top : Stack
 
   def initialize
-    @session = Session.new
-    @top = Stack.new nil, @session
+    @top = Stack.new nil
   end
 
   def execute_files(files, stack = @top)
@@ -30,6 +27,7 @@ class InterpreterFascade
 
     # Execute the file in the interpreter
     unless ARGV.includes? "--noexec"
+      stack.file = file
       return Interpreter.new [program], stack
     else
       CharlyTypes::TNull.new

@@ -1,2 +1,0 @@
-class Session
-end

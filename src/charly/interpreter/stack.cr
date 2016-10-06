@@ -1,17 +1,16 @@
-require "./session.cr"
 require "./types.cr"
+require "../file.cr"
 
 # A single stack containing variables
 class Stack
   include CharlyTypes
   property parent : Stack?
-  property session : Session
+  property file : VirtualFile?
   property values : Hash(HashKey, BaseType)
   property locked : Bool
 
-  def initialize(parent, session)
+  def initialize(parent)
     @parent = parent
-    @session = session
     @values = {} of HashKey => BaseType
     @locked = false
   end
@@ -64,12 +63,18 @@ class Stack
     return self
   end
 
-  def session
+  # Returns the stack at a given depth
+  def stack_at_depth(d)
+    if depth == d
+      return self
+    end
+
     parent = @parent
     if parent.is_a? Stack
-      return parent.session
+      return parent.stack_at_depth(d)
     end
-    return @session
+
+    raise "Could not find stack at depth #{d}"
   end
 
   def lock
