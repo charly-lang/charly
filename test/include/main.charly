@@ -1,0 +1,2 @@
+let math = include("./external.charly");
+print(math.divide(25, 5));

@@ -25,3 +25,7 @@ func member_insert(target, index, value) {
 func member_delete(target, index) {
   call_internal("member_delete", target, index);
 };
+
+func include(filename) {
+  call_internal("include", filename);
+};

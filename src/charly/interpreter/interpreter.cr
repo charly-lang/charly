@@ -664,12 +664,18 @@ class Interpreter
       # Create a new file from that path
       include_file = RealFile.new(filepath)
 
+      # Create the stack for the interpreter
+      include_stack = Stack.new(stack.top)
+      include_stack.write("export", TNull.new, true)
+
       # Create a new InterpreterFascade
+      # by passing it stack.top
+      # it still has access to all the standard library functions
+      # but doesn't have access to the current stack
       interpreter = InterpreterFascade.new
-      result = interpreter.execute_file(include_file, stack.top)
+      result = interpreter.execute_file(include_file, include_stack)
 
-      puts result
-
+      return include_stack.get("export")
     else
       raise "Could not open file at #{filepath}"
     end
