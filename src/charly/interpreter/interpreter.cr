@@ -440,7 +440,7 @@ class Interpreter
     if target.is_a? TClass
       return exec_object_instantiation(target, arguments, stack)
     elsif target.is_a? TFunc
-      return exec_function(target, arguments, stack)
+      return exec_function(target, arguments)
     else
       raise "#{identifier} is not a function!"
     end
@@ -469,7 +469,7 @@ class Interpreter
   # inside *stack*
   # *function* is of type TFunc
   # *arguments* is an actual array of RunTimeType values
-  def exec_function(function, arguments, stack)
+  def exec_function(function, arguments)
 
     # This needs to be here
     # altough we are 100% sure it will always be a TFunc here
@@ -478,18 +478,12 @@ class Interpreter
       raise "Not a function!"
     end
 
-    # Create the new stack for the function to run in
-    if stack.is_a? Stack
-      function_stack = Stack.new(stack)
+    # Check if there is a parent stack
+    parent_stack = function.block.parent_stack
+    if parent_stack.is_a? Stack
+      function_stack = Stack.new(parent_stack)
     else
-
-      # Check if there is a parent stack
-      parent_stack = function.block.parent_stack
-      if parent_stack.is_a? Stack
-        function_stack = Stack.new(parent_stack)
-      else
-        raise "Could not find a valid stack for the function to run in"
-      end
+      raise "Could not find a valid stack for the function to run in"
     end
 
     # Get the identities of the arguments that are required
@@ -529,7 +523,7 @@ class Interpreter
     # Search for the constructor of the class
     # and execute it in the object_stack if it was found
     if object_stack.contains("constructor")
-      exec_function(object_stack.get("constructor"), arguments, object_stack)
+      exec_function(object_stack.get("constructor"), arguments)
 
       # Remove the constructor again
       object_stack.delete("constructor")
