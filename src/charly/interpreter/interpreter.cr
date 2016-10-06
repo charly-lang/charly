@@ -158,7 +158,7 @@ class Interpreter
 
     # Check if this is a member expression
     if node.identifier.is_a? MemberExpression
-      raise "Member expressions are not yet supported"
+      raise "Writing with member expressions are not yet supported"
     else
 
       identifier = node.identifier

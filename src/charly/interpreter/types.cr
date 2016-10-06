@@ -84,6 +84,7 @@ module CharlyTypes
   end
 
   class TFunc < BaseType
+    property value : Bool
     property argumentlist : Array(ASTNode)
     property block : Block
     property parent_stack : Stack
@@ -102,6 +103,7 @@ module CharlyTypes
   end
 
   class TClass < BaseType
+    property value : Bool
     property block : Block
     property parent_stack : Stack
 
@@ -118,6 +120,7 @@ module CharlyTypes
   end
 
   class TObject < BaseType
+    property value : Bool
     property stack : Stack
 
     def initialize(stack)

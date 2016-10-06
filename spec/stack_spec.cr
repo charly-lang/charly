@@ -4,7 +4,7 @@ include CharlyTypes
 describe Stack do
 
   it "declare, write and read variables" do
-    top = Stack.new nil, Session.new
+    top = Stack.new nil
     top.write("myvar", TNumeric.new(25_f64), true)
     top.write("othervar", TString.new("Hello World"), true)
 
@@ -13,10 +13,10 @@ describe Stack do
   end
 
   it "writes to variables in a parent stack" do
-    top = Stack.new nil, Session.new
+    top = Stack.new nil
     top.write("myvar", TNull.new, true)
 
-    child = Stack.new top, top.session
+    child = Stack.new top
     child.write("myvar", TNumeric.new(50_f64))
 
     top.get("myvar").value.should eq(50_f64)
@@ -24,8 +24,8 @@ describe Stack do
   end
 
   it "variables defined in children are not accessable to parents" do
-    top = Stack.new nil, Session.new
-    child = Stack.new top, top.session
+    top = Stack.new nil
+    child = Stack.new top
 
     child.write("myvar", TNumeric.new(50_f64), true)
 
@@ -40,8 +40,8 @@ describe Stack do
   end
 
   it "variable type changes work" do
-    top = Stack.new nil, Session.new
-    child = Stack.new top, top.session
+    top = Stack.new nil
+    child = Stack.new top
 
     top.write("myvar", TNumeric.new(50_f64), true)
     child.get("myvar").value.should eq(50_f64)
