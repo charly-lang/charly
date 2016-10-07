@@ -476,7 +476,7 @@ class Parser
 
   # Alias for consume_call_expression && consume_member_expression
   def consume_postfix
-    consume_call_expression && consume_member_expression
+    consume_call_expression && consume_member_expression && consume_index_expression
   end
 
   def consume_call_expression
@@ -503,7 +503,7 @@ class Parser
   end
 
   def consume_member_expression
-    if peek_token(TokenType::Point) || peek_token(TokenType::LeftBracket)
+    if peek_token(TokenType::Point)
 
       node_save = @node
       children_save = @node.children.dup
@@ -515,18 +515,32 @@ class Parser
         left_side.children = children_save
         @node << left_side
 
-        if peek_token(TokenType::Point)
-          return skip_token(TokenType::Point) &&
-          token(TokenType::Identifier) &&
-          consume_postfix
-        elsif peek_token(TokenType::LeftBracket)
-          return skip_token(TokenType::LeftBracket) &&
-          expression &&
-          skip_token(TokenType::RightBracket) &&
-          consume_postfix
-        else
-          return false
-        end
+        skip_token(TokenType::Point) &&
+        token(TokenType::Identifier) &&
+        consume_postfix
+      })
+      @node = node_save
+      return match
+    end
+    true
+  end
+
+  def consume_index_expression
+    if peek_token(TokenType::LeftBracket)
+      node_save = @node
+      children_save = @node.children.dup
+      @node.children.clear
+      @node = @node.parent
+
+      match = node_production(IndexExpression, ->{
+        left_side = node_save.class.new(node_save)
+        left_side.children = children_save
+        @node << left_side
+
+        skip_token(TokenType::LeftBracket) &&
+        expression &&
+        skip_token(TokenType::RightBracket) &&
+        consume_postfix
       })
       @node = node_save
       return match

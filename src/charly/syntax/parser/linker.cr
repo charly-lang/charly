@@ -135,6 +135,13 @@ class Linker
       return
     end
 
+    if node.is_a? IndexExpression
+      node.linked = true
+      node.identifier = node.children[0]
+      node.member = node.children[1]
+      return
+    end
+
     if node.is_a? UnaryExpression
       node.linked = true
       node.operator = node.children[0]

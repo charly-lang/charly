@@ -76,6 +76,10 @@ class Interpreter
       return exec_member_expression(node, stack)
     end
 
+    if node.is_a? IndexExpression
+      return exec_index_expression(node, stack)
+    end
+
     if node.is_a? IfStatement
       return exec_if_statement(node, stack)
     end
@@ -158,7 +162,7 @@ class Interpreter
 
     # Check if this is a member expression
     if node.identifier.is_a? MemberExpression
-      raise "Writing with member expressions are not yet supported"
+      raise "Writing to member-expressions is not implemented yet!"
     else
 
       identifier = node.identifier
@@ -462,6 +466,13 @@ class Interpreter
       end
     end
 
+    raise "Could not perform member expression on #{identifier}!"
+  end
+
+  def exec_index_expression(node, stack)
+    identifier = exec_expression(node.identifier, stack)
+    member = node.member
+
     # Array index lookup
     if identifier.is_a?(TArray)
 
@@ -483,7 +494,7 @@ class Interpreter
       end
     end
 
-    raise "Could not perform member expression on #{identifier}!"
+    raise "Could not perform index expression on #{identifier}"
   end
 
   # Executes *function*, passing it *arguments*

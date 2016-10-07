@@ -144,6 +144,12 @@ class MemberExpression < ASTNode
   property member : ASTNode?
 end
 
+# A single index expression
+class IndexExpression < ASTNode
+  property identifier : ASTNode?
+  property member : ASTNode?
+end
+
 # A single function definition
 class FunctionDefinition < ASTNode
   property function : ASTNode?
