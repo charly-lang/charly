@@ -23,20 +23,56 @@ module InternalFunctions
     TNull.new
   end
 
-  # Interfaces with the native print method
-  def write(arguments, stack)
-    arguments.each do |arg|
-      if arg.is_a?(TString)
-        print arg.value
-      elsif arg.is_a?(TNumeric)
-        print arg.value
-      elsif arg.is_a?(TBoolean)
-        print arg.value
-      else
-        print arg
+  module STDOUT
+    extend self
+
+    def print(arguments, stack)
+      arguments.each do |arg|
+        ::STDOUT.puts arg
+        ::STDOUT.flush
       end
+      TNull.new
     end
-    TNull.new
+
+    def write(arguments, stack)
+      arguments.each do |arg|
+        ::STDOUT.print arg
+        ::STDOUT.flush
+      end
+      TNull.new
+    end
+  end
+
+  module STDERR
+    extend self
+
+    def print(arguments, stack)
+      arguments.each do |arg|
+        ::STDERR.print arg
+        ::STDERR.flush
+      end
+      TNull.new
+    end
+
+    def write(arguments, stack)
+      arguments.each do |arg|
+        ::STDERR.print arg
+        ::STDERR.flush
+      end
+      TNull.new
+    end
+  end
+
+  module STDIN
+    extend self
+
+    def getc
+      return TString.new(::STDIN.read_char.to_s || "")
+    end
+
+    def gets
+      return TString.new(::STDIN.gets || "")
+    end
   end
 
   # Get the length of various types

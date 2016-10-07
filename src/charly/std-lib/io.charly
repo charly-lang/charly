@@ -1,25 +1,35 @@
 let stdout = {
-  func print(arg) {};
-  func write(arg) {};
+  func print() {
+    call_internal("stdout_print", __arguments);
+  };
+
+  func write() {
+    call_internal("stdout_write", __arguments);
+  };
 };
 
 let stderr = {
-  func print(arg) {};
-  func write(arg) {};
+  func print() {
+    call_internal("stderr_print", __arguments);
+  };
+
+  func write() {
+    call_internal("stderr_write", __arguments);
+  };
 };
 
 let stdin = {
-  func gets() {};
-  func getc() {};
-};
+  func gets() {
+    call_internal("stdin_gets");
+  };
 
-let console = {
-  func winsize() {};
+  func getc() {
+    call_internal("stdin_getc");
+  };
 };
 
 export = {
   let stdout = stdout;
   let stderr = stderr;
   let stdin = stdin;
-  let console = console;
 };

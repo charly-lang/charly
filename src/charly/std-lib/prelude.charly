@@ -1,31 +1,3 @@
-func print(arg) {
-  call_internal("print", arg);
-};
-
-func write(arg) {
-  call_internal("write", arg);
-};
-
-func length(arg) {
-  call_internal("length", arg);
-};
-
-func member_read(target, index) {
-  call_internal("member_read", target, index);
-};
-
-func member_write(target, index, value) {
-  call_internal("member_write", target, index, value);
-};
-
-func member_insert(target, index, value) {
-  call_internal("member_insert", target, index, value);
-};
-
-func member_delete(target, index) {
-  call_internal("member_delete", target, index);
-};
-
 func include(filename) {
   call_internal("include", filename);
 };
@@ -33,3 +5,14 @@ func include(filename) {
 func require(filename) {
   call_internal("require", filename);
 };
+
+func length(arg) {
+  call_internal("length", arg);
+};
+
+# Default print and write functions
+let io = require("io");
+let print = io.stdout.print;
+let write = io.stdout.write;
+let gets = io.stdin.gets;
+let getc = io.stdin.getc;

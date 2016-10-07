@@ -459,11 +459,25 @@ class Interpreter
         name = arguments[0]
         if name.is_a? TString
 
+          first_argument = arguments[1]?
+
           case name.value
-          when "print"
-            return InternalFunctions.print(arguments[1..-1], stack)
-          when "write"
-            return InternalFunctions.write(arguments[1..-1], stack)
+          when "stdout_print"
+            raise "Expected array" unless first_argument.is_a?(TArray)
+            return InternalFunctions::STDOUT.print(first_argument.value, stack)
+          when "stdout_write"
+            raise "Expected array" unless first_argument.is_a?(TArray)
+            return InternalFunctions::STDOUT.write(first_argument.value, stack)
+          when "stderr_print"
+            raise "Expected array" unless first_argument.is_a?(TArray)
+            return InternalFunctions::STDERR.print(first_argument.value, stack)
+          when "stderr_write"
+            raise "Expected array" unless first_argument.is_a?(TArray)
+            return InternalFunctions::STDERR.write(first_argument.value, stack)
+          when "stdin_gets"
+            return InternalFunctions::STDIN.gets
+          when "stdin_getc"
+            return InternalFunctions::STDIN.getc
           when "length"
             return InternalFunctions.length(arguments[1..-1], stack)
           when "require"

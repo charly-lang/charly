@@ -1,2 +1,1 @@
-let io = require("io");
-print(io.stdout.print);
+print("hallo", "welt", "asd", 2);
