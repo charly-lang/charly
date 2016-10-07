@@ -184,8 +184,37 @@ class Interpreter
       # Change the value
       identifier.stack.write(member.value.as(String), value, false)
       return value
-    elsif node.identifier.is_a? IndexExpression
+    elsif identifier.is_a? IndexExpression
 
+      # Get some values
+      member = identifier.member.not_nil!
+      identifier = identifier.identifier.not_nil!
+
+      # Resolve the identifier
+      identifier = exec_expression(identifier, stack)
+
+      # Only TArray and TString allowed
+      if identifier.is_a?(TArray)
+
+        # Resolve the member
+        member = exec_expression(member, stack)
+
+        # Typecheck the member
+        if member.is_a?(TNumeric)
+
+          # Out-of-bounds check
+          if member.value < 0 || member.value > identifier.value.size - 1
+            raise "Index out of bounds!"
+          end
+
+          # Write to the index
+          identifier.value[member.value.to_i] = value
+        else
+          raise "Can't use #{member} in index expression."
+        end
+      else
+        raise "Can't write to non-array and non-string #{identifier}"
+      end
     else
 
       if identifier.is_a?(IdentifierLiteral)
@@ -437,14 +466,6 @@ class Interpreter
             return InternalFunctions.write(arguments[1..-1], stack)
           when "length"
             return InternalFunctions.length(arguments[1..-1], stack)
-          when "member_read"
-            return InternalFunctions.member_read(arguments[1..-1], stack)
-          when "member_write"
-            return InternalFunctions.member_write(arguments[1..-1], stack)
-          when "member_insert"
-            return InternalFunctions.member_insert(arguments[1..-1], stack)
-          when "member_delete"
-            return InternalFunctions.member_delete(arguments[1..-1], stack)
           when "require"
             return exec_require(arguments[1..-1], stack)
           when "include"
