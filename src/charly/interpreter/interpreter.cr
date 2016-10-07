@@ -469,7 +469,7 @@ class Interpreter
   # inside *stack*
   # *function* is of type TFunc
   # *arguments* is an actual array of RunTimeType values
-  def exec_function(function, arguments)
+  def exec_function(function, arguments : Array(BaseType))
 
     # This needs to be here
     # altough we are 100% sure it will always be a TFunc here
@@ -493,10 +493,20 @@ class Interpreter
       end
     }.compact
 
+    # Write the __arguments variable into the stack
+    __arguments = TArray.new(arguments)
+    function_stack.write("__arguments", __arguments, true)
+
     # Write the argument to the function stack
     arguments.each_with_index do |arg, index|
-      id = argument_ids[index]
 
+      # Check for index out of bounds
+      unless index < argument_ids.size
+        next
+      end
+
+      # Write the argument into the stack
+      id = argument_ids[index]
       if id.is_a? String
         function_stack.write(id, arg, true)
       end
@@ -589,7 +599,7 @@ class Interpreter
       classliteral = TClass.new(block, stack)
 
       # Create a new object from the class instance
-      return exec_object_instantiation(classliteral, [] of TNull, stack)
+      return exec_object_instantiation(classliteral, [] of BaseType, stack)
     end
 
     return TNull.new
