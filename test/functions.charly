@@ -1,5 +1,0 @@
-func foo() {
-  print(__arguments);
-};
-
-foo(2);

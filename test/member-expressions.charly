@@ -1,2 +1,0 @@
-let names = ["Leonard", "Peter", "Markus"];
-print(names[200 - 198]);
