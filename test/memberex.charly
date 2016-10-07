@@ -1,1 +1,7 @@
-print([1, 2, 3][2]);
+let a = {
+  let name = "Leonard";
+};
+
+a.name = a.name;
+
+print(a.name);

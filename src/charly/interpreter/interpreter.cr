@@ -161,11 +161,33 @@ class Interpreter
     value = exec_expression(node.expression, stack)
 
     # Check if this is a member expression
-    if node.identifier.is_a? MemberExpression
-      raise "Writing to member-expressions is not implemented yet!"
+    identifier = node.identifier
+    if identifier.is_a? MemberExpression
+
+      # Get some values
+      member = identifier.member
+      identifier = identifier.identifier
+
+      # Resolve the identifier
+      identifier = exec_expression(identifier.not_nil!, stack)
+
+      # Only TObjects are allowed
+      unless identifier.is_a?(TObject)
+        raise "Can't write to non-object #{identifier}"
+      end
+
+      # Typecheck the member
+      unless member.is_a?(IdentifierLiteral)
+        raise "Member node is not an identifier. That's a bug"
+      end
+
+      # Change the value
+      identifier.stack.write(member.value.as(String), value, false)
+      return value
+    elsif node.identifier.is_a? IndexExpression
+
     else
 
-      identifier = node.identifier
       if identifier.is_a?(IdentifierLiteral)
 
         identifier_value = identifier.value
