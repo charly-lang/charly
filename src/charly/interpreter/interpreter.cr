@@ -462,7 +462,28 @@ class Interpreter
       end
     end
 
-    raise "#{identifier} is not an object!"
+    # Array index lookup
+    if identifier.is_a?(TArray)
+
+      # Resolve the identifier
+      member = exec_expression(member, stack)
+
+      # Typecheck
+      if member.is_a?(TNumeric)
+
+        # Check for out-of-bounds error
+        if member.value > identifier.value.size - 1 || member.value < 0
+          return TNull.new
+        end
+
+        # Return the value from the index
+        return identifier.value[member.value.to_i]
+      else
+        raise "Invalid type #{member.class} for member expression"
+      end
+    end
+
+    raise "Could not perform member expression on #{identifier}!"
   end
 
   # Executes *function*, passing it *arguments*

@@ -503,7 +503,7 @@ class Parser
   end
 
   def consume_member_expression
-    if peek_token(TokenType::Point)
+    if peek_token(TokenType::Point) || peek_token(TokenType::LeftBracket)
 
       node_save = @node
       children_save = @node.children.dup
@@ -515,9 +515,18 @@ class Parser
         left_side.children = children_save
         @node << left_side
 
-        skip_token(TokenType::Point) &&
-        token(TokenType::Identifier) &&
-        consume_postfix
+        if peek_token(TokenType::Point)
+          return skip_token(TokenType::Point) &&
+          token(TokenType::Identifier) &&
+          consume_postfix
+        elsif peek_token(TokenType::LeftBracket)
+          return skip_token(TokenType::LeftBracket) &&
+          expression &&
+          skip_token(TokenType::RightBracket) &&
+          consume_postfix
+        else
+          return false
+        end
       })
       @node = node_save
       return match
