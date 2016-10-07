@@ -1,0 +1,25 @@
+let stdout = {
+  func print(arg) {};
+  func write(arg) {};
+};
+
+let stderr = {
+  func print(arg) {};
+  func write(arg) {};
+};
+
+let stdin = {
+  func gets() {};
+  func getc() {};
+};
+
+let console = {
+  func winsize() {};
+};
+
+export = {
+  let stdout = stdout;
+  let stderr = stderr;
+  let stdin = stdin;
+  let console = console;
+};

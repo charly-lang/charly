@@ -1,0 +1,2 @@
+let io = require("io");
+print(io.stdout.print);

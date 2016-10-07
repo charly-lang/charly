@@ -780,7 +780,14 @@ class Interpreter
     if filename[0] == '/'
       filepath = filename
     else
-      filepath = File.join(current_dir, filename)
+
+      # Check if a core module is being required
+      case filename
+      when "io"
+        filepath = ENV["CHARLYDIR"] + "/io.charly"
+      else
+        filepath = File.join(current_dir, filename)
+      end
     end
     filepath = File.expand_path(filepath) # Make it an absolute path
     filepath = File.real_path(filepath) # Resolve symlinks
