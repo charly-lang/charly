@@ -1,6 +1,0 @@
-let content = require("external.charly");
-print(content.num);
-content.setNum(30);
-
-content = require("external.charly");
-print(content.num);

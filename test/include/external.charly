@@ -1,7 +1,0 @@
-export = {
-  let num = 5;
-
-  func setNum(new) {
-    num = new;
-  };
-};
