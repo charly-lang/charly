@@ -4,7 +4,7 @@
 
 # The Charly programming language
 
-This is my try at writing an interpreter of a dynamic language from scratch with my bare hands.
+This is my try at writing an interpreter of a dynamic language from scratch with my bare hands. It is implemented in [Crystal](https://crystal-lang.org/) at has no dependencies.
 
 # Syntax
 
@@ -16,16 +16,20 @@ let string = "Hello World";
 let boolean = true;
 let array = [1, "charly", false];
 let nullvalue = null;
+let object = {
+  let name = "leonard";
+  let age = 16;
+};
 ```
 
 __Declaring a function__
 ```charly
 func callback(value, callback) {
-    callback(value);
+  callback(value);
 };
 
 let result = callback(25, func(value) {
-    value * 2;
+  value * 2;
 });
 
 result; # => 50
@@ -34,13 +38,13 @@ result; # => 50
 __Repeat & While loops__
 ```charly
 repeat(5, func() {
-    print("Hello");
+  print("Hello");
 });
 
 let i = 0;
 while (i < 10) {
-    print("In a while loop");
-    i = i + 1;
+  print("In a while loop");
+  i = i + 1;
 };
 ```
 
@@ -62,20 +66,15 @@ typeof(25.5); # => Numeric
 typeof("Charly"); # => String
 typeof([1, 2, 3]); # => Array
 typeof(null); # => Null
-typeof(false); # => Bool
+typeof(false); # => Boolean
 
 let number = 25;
-print("Number is: " + String(number));
+print("Number is: " + number);
 ```
-
-Note: The charly interpreter doesn't automatically convert Numerics to Strings.
 
 __Including other files__
 ```charly
 require("external.charly"); # Include a file in the current directory
-require("somelibrary"); # Include the main.charly file in the folder somelibrary
-
-# Note: This is not implemented yet, see Issue #21
 require("someotherlibrary"); # Include the someotherlibrary from the standard library
 ```
 
@@ -89,21 +88,19 @@ print(array); # => 1, 2, 3, 4
 __Classes & Objects__
 ```charly
 class Person {
-    let name;
-    let age;
+  let name;
+  let age;
 
-    func constructor(_name, _age) {
-        name = _name;
-        age = _age;
-    };
+  func constructor(_name, _age) {
+    name = _name;
+    age = _age;
+  };
 };
 
 let leonard = new(Person, "Leonard", 16);
 print(leonard.name); # "Leonard"
 print(leonard.age); # 16
 ```
-
-Note: More documentation about Array methods will work
 
 # CLI options
 ```
@@ -127,6 +124,7 @@ ruby main.rb filename [options...]
 # Inspired by
 - Javascript
 - C
+- Ruby
 
 # License
 The MIT License (MIT)
