@@ -32,4 +32,8 @@ export = {
   let stdout = stdout;
   let stderr = stderr;
   let stdin = stdin;
+
+  let time_ms = func() {
+    call_internal("time_ms");
+  };
 };

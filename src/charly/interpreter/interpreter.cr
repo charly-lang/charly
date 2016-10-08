@@ -488,6 +488,8 @@ class Interpreter
             return exec_include(arguments[1..-1], stack)
           when "unpack"
             return InternalFunctions.unpack(arguments[1..-1], stack)
+          when "time_ms"
+            return TNumeric.new(Time.now.epoch_ms.to_f64)
           else
             raise "Internal function call to '#{name.value}' not implemented!"
           end
