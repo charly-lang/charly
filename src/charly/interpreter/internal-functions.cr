@@ -92,7 +92,7 @@ module InternalFunctions
       default = arguments[1]
 
       if count.is_a?(TNumeric)
-        return TArray.new(Array.new(count.value.to_i, default))
+        return TArray.new(Array.new(count.value.to_i64, default))
       else
         raise "array_of_size expected argument 1 to be of type TNumeric, got #{count.class}"
       end
@@ -142,7 +142,7 @@ module InternalFunctions
         raise "colorize expected second argument to be of type TNumeric"
       end
 
-      return TString.new("\e[#{color_code.value.to_i}m#{text}\e[0m")
+      return TString.new("\e[#{color_code.value.to_i64}m#{text}\e[0m")
     end
     return TNull.new
   end
@@ -183,7 +183,8 @@ module InternalFunctions
       arg = arguments[0]
 
       if arg.is_a?(TString)
-        num = arg.value.to_f?(strict: false)
+        num = arg.value.to_f64?(strict: false)
+        puts num.class
 
         if num.is_a? Float64
           return TNumeric.new(num)

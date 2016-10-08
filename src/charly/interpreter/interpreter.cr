@@ -218,7 +218,7 @@ class Interpreter
           end
 
           # Write to the index
-          identifier.value[member.value.to_i] = value
+          identifier.value[member.value.to_i64] = value
         else
           raise "Can't use #{member} in index expression."
         end
@@ -292,7 +292,7 @@ class Interpreter
         if right.value == 0
           return TNull.new
         end
-        return TNumeric.new(left.value.to_i % right.value.to_i)
+        return TNumeric.new(left.value.to_i64 % right.value.to_i64)
       when PowOperator
         return TNumeric.new(left.value ** right.value)
       end
@@ -313,7 +313,7 @@ class Interpreter
 
         # Check if the right side is a TNumeric
         if right.is_a?(TNumeric)
-          return TString.new(left.value * right.value.to_i)
+          return TString.new(left.value * right.value.to_i64)
         end
       end
     end
@@ -326,7 +326,7 @@ class Interpreter
 
         # Check if the left side is a TNumeric
         if left.is_a?(TNumeric)
-          return TString.new(right.value * left.value.to_i)
+          return TString.new(right.value * left.value.to_i64)
         end
       end
     end
@@ -627,7 +627,7 @@ class Interpreter
         end
 
         # Return the value from the index
-        return identifier.value[member.value.to_i]
+        return identifier.value[member.value.to_i64]
       else
         raise "Invalid type #{member.class} for member expression"
       end

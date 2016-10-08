@@ -22,7 +22,7 @@ class Stack
   end
 
   def dump_values
-    collection = [] of Tuple(Int32, HashKey, BaseType)
+    collection = [] of Tuple(Int64, HashKey, BaseType)
 
     # Add all parent values first
     parent = @parent
@@ -76,10 +76,10 @@ class Stack
     @values.clear
   end
 
-  def depth(n = 0)
+  def depth(n = 0_i64)
     parent = @parent
     if parent.is_a? Stack
-      return parent.depth(n + 1)
+      return parent.depth(n + 1_i64)
     end
     return n
   end

@@ -13,7 +13,7 @@ class Parser
   property tree : Program
   property file : VirtualFile
   property node : ASTNode
-  property next : UInt32
+  property next : UInt64
 
   # Create a new parser from a virtualfile
   def initialize(@file)
@@ -21,7 +21,7 @@ class Parser
     # Get all the tokens from the file
     lexer = Lexer.new file
     @tokens = lexer.all_tokens
-    @next = 0_u32
+    @next = 0_u64
 
     # Remove whitespace, newlines and comments from the tokens
     @tokens.select! do |token|
