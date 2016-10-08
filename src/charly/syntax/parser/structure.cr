@@ -141,18 +141,17 @@ class Structure
         identifier_is_present = node.children.size == 4
 
         @finished = false
-        node.children.shift
+        node.children.shift # Remove the func keyword
         return node
       end
     end
 
     # A function literal inside a block is a variable initialisation
-    if node.is_a?(FunctionLiteral) && node.parent.is_a?(Block)
+    if node.is_a?(FunctionLiteral) && node.children.size == 3 && node.parent.is_a?(Block)
       @finished = false
       new_node = VariableInitialisation.new(node.parent)
-      new_node << node.children[0]
+      new_node << node.children.shift
       new_node << node
-      node.children.shift
       return new_node
     end
 
@@ -168,6 +167,7 @@ class Structure
 
     # A class literal as an expression shouldn't have a name
     if node.is_a?(ClassLiteral) && node.children.size == 2
+      @finished = false
       node.children.shift
       return node
     end
