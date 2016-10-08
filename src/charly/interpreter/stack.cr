@@ -21,26 +21,53 @@ class Stack
     stackdump(io)
   end
 
+  def dump_values
+    collection = [] of Tuple(Int32, HashKey, BaseType)
+
+    # Add all parent values first
+    parent = @parent
+    if parent.is_a? Stack
+      collection += parent.dump_values
+    end
+
+    # Add the values of this stack
+    @values.each do |key, value|
+      collection << {depth, key, value}
+    end
+
+    return collection
+  end
+
   def stackdump(io, head = false)
 
     # Header
     io << "## Stackdump\n" if head
 
-    # Print all parent stacks first
-    parent = @parent
-    if parent.is_a? Stack
-      parent.stackdump(io, true)
+    # Display all values as a table
+    max_depth = 0
+    max_id = 0
+    max_val = 0
+    max_type = 0
+    dump_values.each do |(depth, key, value)|
+      depth = "#{depth}"
+      key = "#{key}"
+      value = "#{value}"
+      type = "#{value.class}"
+
+      max_depth = depth.size if depth.size > max_depth
+      max_id = key.size if key.size > max_id
+      max_val = value.size if value.size > max_val
+      max_type = type.size if type.size > max_type
     end
 
-    # Display all values as a table
-    @values.each do |key, value|
-      io << depth
+    dump_values.each do |(depth, key, value)|
+      io << "#{depth}".ljust(max_depth, ' ')
       io << " "
-      io << self.object_id
-      io << " "
-      io << "#{key}"
+      io << "#{key}".ljust(max_id, ' ')
       io << " : "
-      io << "#{value}"
+      io << "#{value}".ljust(max_val, ' ')
+      io << " : "
+      io << "#{value.class}".ljust(max_type, ' ')
       io << "\n"
     end
   end
