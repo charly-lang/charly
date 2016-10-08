@@ -1,0 +1,19 @@
+# Calculates the n fibonacci number
+func fib(n) {
+  let last = 0;
+  let curr = 1;
+
+  let tmp;
+  repeat(n, func(i) {
+    tmp = curr;
+    curr = last + curr;
+    last = tmp;
+  });
+
+  curr;
+};
+
+write("The nth fibonacci number do you want?: ");
+let n = to_numeric(gets());
+let result = fib(n);
+print(result);
