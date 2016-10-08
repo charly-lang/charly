@@ -1,0 +1,18 @@
+let index = 0;
+let width = 20;
+
+write("How wide should the pyramid be: ");
+width = to_numeric(gets());
+
+while (index < width) {
+  repeat(width - index, func() {
+    write(" ");
+  });
+
+  repeat(index, func() {
+    write(" *");
+  });
+
+  print("");
+  index = index + 1;
+};
