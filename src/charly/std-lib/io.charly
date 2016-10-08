@@ -28,10 +28,16 @@ let stdin = {
   };
 };
 
+func colorize(string, colorcode) {
+  call_internal("colorize", string, colorcode);
+};
+
 export = {
   let stdout = stdout;
   let stderr = stderr;
   let stdin = stdin;
+
+  let colorize = colorize;
 
   let time_ms = func() {
     call_internal("time_ms");

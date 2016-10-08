@@ -490,6 +490,8 @@ class Interpreter
             return InternalFunctions.unpack(arguments[1..-1], stack)
           when "time_ms"
             return TNumeric.new(Time.now.epoch_ms.to_f64)
+          when "colorize"
+            return InternalFunctions.colorize(arguments[1..-1], stack)
           else
             raise "Internal function call to '#{name.value}' not implemented!"
           end

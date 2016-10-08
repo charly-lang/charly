@@ -124,4 +124,26 @@ module InternalFunctions
     end
     return TNull.new
   end
+
+  # Colorize a string with a given color code
+  def colorize(arguments, stack)
+
+    # Check if there are two arguments
+    unless arguments.size > 0
+      return TNull.new
+    end
+
+    if arguments.size >= 2
+      text = arguments[0]
+      color_code = arguments[1]
+
+      # Typecheck
+      unless color_code.is_a?(TNumeric)
+        raise "colorize expected second argument to be of type TNumeric"
+      end
+
+      return TString.new("\e[#{color_code.value.to_i}m#{text}\e[0m")
+    end
+    return TNull.new
+  end
 end
