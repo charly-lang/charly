@@ -1,4 +1,14 @@
+func repeat(amount, callback) {
+  let i = 0;
+  while (i < amount) {
+    callback(i);
+    i = i + 1;
+  };
+};
+
 export = {
+  let repeat = repeat;
+
   func typeof(arg) {
     call_internal("typeof", arg);
   };

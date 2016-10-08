@@ -622,6 +622,15 @@ UnitTest("Charly").begin(func(describe) {
       assert(typeof(null), "Null");
     });
 
+    it("repeats a function n times", func(assert) {
+      let sum = 0;
+      repeat(500, func(i) {
+        sum = sum + i;
+      });
+
+      assert(sum, 124750);
+    });
+
   });
 
 });
