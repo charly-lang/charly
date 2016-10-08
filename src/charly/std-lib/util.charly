@@ -1,0 +1,5 @@
+export = {
+  func typeof(arg) {
+    call_internal("typeof", arg);
+  };
+};

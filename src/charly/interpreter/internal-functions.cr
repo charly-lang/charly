@@ -162,4 +162,16 @@ module InternalFunctions
 
     exit 0
   end
+
+  # Returns the type of a literal as a string
+  def typeof(arguments, stack)
+
+    # Check if there is at least 1 argument
+    if arguments.size > 0
+      arg = arguments[0]
+      return TString.new("#{arg.class}")
+    end
+
+    raise "typeof expected at least 1 argument"
+  end
 end

@@ -607,4 +607,21 @@ UnitTest("Charly").begin(func(describe) {
 
   });
 
+  describe("Misc. standard library functions", func(it) {
+
+    it("returns the type of a variable", func(assert) {
+      assert(typeof(false), "Boolean");
+      assert(typeof(true), "Boolean");
+      assert(typeof("test"), "String");
+      assert(typeof(25), "Numeric");
+      assert(typeof(25.5), "Numeric");
+      assert(typeof([1, 2, 3]), "Array");
+      assert(typeof(class Test {}), "Class");
+      assert(typeof(func() {}), "Function");
+      assert(typeof({}), "Object");
+      assert(typeof(null), "Null");
+    });
+
+  });
+
 });

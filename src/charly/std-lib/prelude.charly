@@ -10,6 +10,9 @@ func unpack(object) {
   call_internal("unpack", object);
 };
 
+# Util functions
+unpack(require("util"));
+
 # Array functions
 unpack(require("array"));
 

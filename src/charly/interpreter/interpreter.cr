@@ -562,6 +562,8 @@ class Interpreter
             return InternalFunctions.colorize(arguments[1..-1], stack)
           when "exit"
             return InternalFunctions.exit(arguments[1..-1], stack)
+          when "typeof"
+            return InternalFunctions.typeof(arguments[1..-1], stack)
           else
             raise "Internal function call to '#{name.value}' not implemented!"
           end
@@ -881,6 +883,8 @@ class Interpreter
         filepath = ENV["CHARLYDIR"] + "/unit-test.charly"
       when "array"
         filepath = ENV["CHARLYDIR"] + "/array.charly"
+      when "util"
+        filepath = ENV["CHARLYDIR"] + "/util.charly"
       else
         filepath = File.join(current_dir, filename)
       end
