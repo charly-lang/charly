@@ -174,4 +174,27 @@ module InternalFunctions
 
     raise "typeof expected at least 1 argument"
   end
+
+  # Converts a value to a numeric
+  def to_numeric(arguments, stack)
+
+    # Check if there is at least 1 argument
+    if arguments.size > 0
+      arg = arguments[0]
+
+      if arg.is_a?(TString)
+        num = arg.value.to_f?(strict: false)
+
+        if num.is_a? Float64
+          return TNumeric.new(num)
+        else
+          return TNull.new
+        end
+      else
+        raise "to_numeric expected a string, got #{arg.class}"
+      end
+    end
+
+    raise "to_numeric expected at least 1 argument"
+  end
 end

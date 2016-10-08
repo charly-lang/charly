@@ -631,6 +631,24 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(sum, 124750);
     });
 
+    it("casts string to numeric", func(assert) {
+      assert(to_numeric("25"), 25);
+      assert(to_numeric("25.5"), 25.5);
+      assert(to_numeric("0"), 0);
+      assert(to_numeric("100029"), 100029);
+      assert(to_numeric("-89.2"), -89.2);
+
+      assert(to_numeric("hello"), null);
+      assert(to_numeric("25test"), 25);
+      assert(to_numeric("ermokay30"), null);
+      assert(to_numeric("-2.25this"), -2.25);
+
+      assert(to_numeric("123.45e2"), 12345);
+      assert(to_numeric("2e5"), 200_000);
+      assert(to_numeric("25e-5"), 0.00025);
+      assert(to_numeric("9e-2"), 0.09);
+    });
+
   });
 
 });

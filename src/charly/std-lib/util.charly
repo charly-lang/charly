@@ -6,8 +6,13 @@ func repeat(amount, callback) {
   };
 };
 
+func to_numeric(arg) {
+  call_internal("to_numeric", arg);
+};
+
 export = {
   let repeat = repeat;
+  let to_numeric = to_numeric;
 
   func typeof(arg) {
     call_internal("typeof", arg);
