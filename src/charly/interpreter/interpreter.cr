@@ -434,14 +434,7 @@ class Interpreter
       end
     end
 
-    # Make sure that the left side
-    # is of the same type as the right side
-    if left.class != right.class
-      return TBoolean.new(false)
-    end
-
-    # Raise when an unknown operator is found
-    raise "Invalid comparison found #{node}"
+    return TBoolean.new(false)
   end
 
   # Execute an if statement
