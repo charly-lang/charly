@@ -7,22 +7,6 @@ module InternalFunctions
   extend self
   include CharlyTypes
 
-  # Interfaces with the crystal-native puts method
-  def print(arguments, stack)
-    arguments.each do |arg|
-      if arg.is_a?(TString)
-        puts arg.value
-      elsif arg.is_a?(TNumeric)
-        puts arg.value
-      elsif arg.is_a?(TBoolean)
-        puts arg.value
-      else
-        puts arg
-      end
-    end
-    TNull.new
-  end
-
   module STDOUT
     extend self
 
