@@ -73,13 +73,13 @@ class UnitTest {
 
         # Run all tests
         callback(func describe(description, callback) {
-            let current_suite = new(Suite, description);
+            let current_suite = Suite(description);
 
             print(colorize("Suite: " + description, 33));
             callback(func it(description, callback) {
-                let current_test = new(Test, description);
+                let current_test = Test(description);
 
-                dump(colorize("Test: " + description + " ", 37));
+                write(colorize("Test: " + description + " ", 37));
                 callback(func assert(real, expect) {
                     current_test.add_assertion(real, expect);
 
@@ -87,9 +87,9 @@ class UnitTest {
                 });
 
                 if (current_test.passed()) {
-                    dump(colorize("Passed", 32));
+                    write(colorize("Passed", 32));
                 } else {
-                    dump(colorize("Failed", 31));
+                    write(colorize("Failed", 31));
                 };
                 print("");
 
@@ -127,7 +127,7 @@ class UnitTest {
                 each(test.assertions, func(assertion, a_index) {
 
                     assertions_run = assertions_run + 1;
-                    if (assertion(2) == false) {
+                    if (assertion[2] == false) {
                         passed = false;
                     };
                 });
@@ -148,7 +148,7 @@ class UnitTest {
 
                     print("  - " + colorize(test.title, 37));
                     each(test.failed_assertions, func(assertion) {
-                        print("    -" + colorize("Expected: " + String(assertion(1)) + ", got: " + String(assertion(0)), 31));
+                        print("    - " + colorize("Expected: " + assertion[1] + ", got: " + assertion[0], 31));
                     });
                 });
             });
@@ -158,7 +158,7 @@ class UnitTest {
         print("Ran " + colorize(suites_run, 33) + " Suites");
         print("Ran " + colorize(tests_run, 33) + " Tests");
         print("Ran " + colorize(assertions_run, 33) + " Assertions");
-        print("Total time: " + colorize(String(total_time), 33) + " miliseconds");
+        print("Total time: " + colorize(total_time, 33) + " miliseconds");
 
         # Return 0 if all tests passed
         # 1 if at least one failed
@@ -169,3 +169,5 @@ class UnitTest {
         };
     };
 };
+
+export = UnitTest;

@@ -1,7 +1,14 @@
-let array = array_of_size(5, 0);
-print(array);
+let UnitTest = require("unit-test");
 
-unpack({
-  let test = 25;
+UnitTest("Charly").begin(func(describe) {
+
+  describe("Arithmetic operations", func(it) {
+
+    it("adds numbers", func(assert) {
+      assert(2 + 2, 4);
+      assert(200 + 200, 400);
+    });
+
+  });
+
 });
-print(test);
