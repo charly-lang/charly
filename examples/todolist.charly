@@ -1,0 +1,89 @@
+class Todo {
+  let title;
+  let completed = false;
+
+  func constructor(_title) {
+    title = _title;
+  };
+};
+
+let Todos = {
+  let todos = [];
+
+  func add_todo(title) {
+    todos = append(todos, Todo(trim(title)));
+  };
+
+  func toggle_todo(index) {
+
+    # Check for overflow
+    let count = length(todos);
+    if (index >= 0) {
+      if (index < (count)) {
+        todos[index].completed = !todos[index].completed;
+      };
+    };
+  };
+
+  func delete_todo(index) {
+    let new = [];
+
+    each(todos, func(todo, todoindex) {
+      if (todoindex ! index) {
+        new = append(new, todo);
+      };
+    });
+
+    todos = new;
+  };
+};
+
+# Helper function to get user input
+func question(title) {
+    print("");
+    write(title);
+    gets();
+};
+
+# Input loop
+let should_exit = false;
+while (!should_exit) {
+
+  # Display all todos
+  each(Todos.todos, func(todo, index) {
+    if (todo.completed) {
+      write("[" + colorize("✓", 32) + "] ");
+    } else {
+      write("[" + colorize("✗", 31) + "] ");
+    };
+    print(index + ": " + todo.title);
+  });
+
+  # Print the menu
+  print("");
+  print("-- Todo List written in Charly --");
+  print("-- 1: Add todo");
+  print("-- 2: Toggle todo");
+  print("-- 3: Delete todo");
+  print("-- 4: Quit application");
+
+  # Input
+  let menu = to_numeric(question("> "));
+
+  # Add a todo
+  if (menu == 1) {
+    Todos.add_todo(question("Title: "));
+  };
+
+  if (menu == 2) {
+    Todos.toggle_todo(to_numeric(question("Index: ")));
+  };
+
+  if (menu == 3) {
+    Todos.delete_todo(to_numeric(question("Index: ")));
+  };
+
+  if (menu == 4) {
+    should_exit = true;
+  };
+};
