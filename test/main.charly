@@ -420,4 +420,119 @@ UnitTest("Charly").begin(func(describe) {
 
   });
 
+  describe("Functions", func(it) {
+
+    it("calls a function", func(assert) {
+      let called = false;
+      func call_me() {
+        called = true;
+      };
+      call_me();
+
+      assert(called, true);
+    });
+
+    it("passes arguments to a function", func(assert) {
+      let arg1;
+      let arg2;
+      func call_me(_arg1, _arg2) {
+        arg1 = _arg1;
+        arg2 = _arg2;
+      };
+      call_me("hello", 25);
+
+      assert(arg1, "hello");
+      assert(arg2, 25);
+    });
+
+    it("creates the __argument variable", func(assert) {
+      let args_received;
+      func call_me() {
+        args_received = __arguments;
+      };
+      call_me("hello", "world", "this", "should", "work");
+
+      assert(args_received[0], "hello");
+      assert(args_received[2], "this");
+      assert(args_received[4], "work");
+    });
+
+    it("__argument variable can be overwritten", func(assert) {
+      let args_received;
+      func call_me(__arguments) {
+        args_received = __arguments;
+      };
+      call_me("hello", "world", "this", "should", "work");
+
+      assert(args_received, "hello");
+    });
+
+    it("can access the parent scope", func(assert) {
+      let change_me = false;
+      func call_me() {
+        change_me = true;
+      };
+      call_me();
+
+      assert(change_me, true);
+    });
+
+    it("writes to arguments instead of parent scope", func(assert) {
+      let dont_change_me = false;
+      func call_me(dont_change_me) {
+        dont_change_me = true;
+      };
+      call_me(true);
+
+      assert(dont_change_me, false);
+    });
+
+    it("runs callbacks in the right scope", func(assert) {
+      let change_me = false;
+
+      func call_me(callback) {
+        let change_me = 25;
+        callback();
+      };
+
+      call_me(func() {
+        change_me = true;
+      });
+
+      assert(change_me, true);
+    });
+
+    it("consecutive call expressions", func(assert) {
+      func call_me() {
+        func() {
+          func() {
+            25;
+          };
+        };
+      };
+
+      assert(call_me()()(), 25);
+    });
+
+    it("passes arguments in the right order", func(assert) {
+      let f1;
+      let f2;
+      let f3;
+
+      func(a1) {
+        func(a2) {
+          func(a3) {
+            f1 = a1;
+            f2 = a2;
+            f3 = a3;
+          };
+        };
+      }(1)(2)(3);
+
+      assert(f1, 1);
+      assert(f2, 2);
+      assert(f3, 3);
+    });
+  });
+
 });
