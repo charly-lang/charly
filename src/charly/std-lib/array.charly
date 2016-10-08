@@ -16,7 +16,15 @@ func array_of_size(count, default) {
 
 func append(array, item) {
   let count = length(array);
-  let new = array_of_size(count + 1);
+  let new = array_of_size(count + 1, false);
+
+  # Copy all values
+  each(array, func(v, i) {
+    new[i] = v;
+  });
+  new[count] = item;
+
+  new;
 };
 
 func length(arg) {
