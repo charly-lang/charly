@@ -487,7 +487,7 @@ class Parser
       @node = @node.parent
 
       match = node_production(CallExpression, ->{
-        left_side = node_save.class.new(node_save)
+        left_side = node_save.class.new(node_save.parent)
         left_side.children = children_save
         @node << left_side
 
@@ -504,14 +504,13 @@ class Parser
 
   def consume_member_expression
     if peek_token(TokenType::Point)
-
       node_save = @node
       children_save = @node.children.dup
       @node.children.clear
       @node = @node.parent
 
       match = node_production(MemberExpression, ->{
-        left_side = node_save.class.new(node_save)
+        left_side = node_save.class.new(node_save.parent)
         left_side.children = children_save
         @node << left_side
 
@@ -533,7 +532,7 @@ class Parser
       @node = @node.parent
 
       match = node_production(IndexExpression, ->{
-        left_side = node_save.class.new(node_save)
+        left_side = node_save.class.new(node_save.parent)
         left_side.children = children_save
         @node << left_side
 

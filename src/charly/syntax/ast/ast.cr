@@ -20,6 +20,14 @@ abstract class ASTNode
     node.parent = self
   end
 
+  # Correct the parent pointers of all children
+  def children=(new_children)
+    new_children.each do |child|
+      child.parent = self
+    end
+    @children = new_children
+  end
+
   # Render the current node
   def to_s(io)
     io << "#: #{self.class.name}"

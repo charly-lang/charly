@@ -41,6 +41,8 @@ class Structure
     if node.is_a?(Expression) ||
         node.is_a?(UnaryExpression) ||
         node.is_a?(MemberExpression) ||
+        node.is_a?(IndexExpression) ||
+        node.is_a?(CallExpression) ||
         node.is_a?(Statement)
 
       # Check the size of the children
