@@ -1,3 +1,0 @@
-func increment(value) {
-    value + 1;
-};

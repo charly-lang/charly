@@ -1,600 +1,638 @@
-new(UnitTest, "Charly Language").begin(func(describe) {
+let UnitTest = require("unit-test");
 
-    describe("File require & load", func(it) {
+let testResult = UnitTest("Charly").begin(func(describe) {
 
-        it("Loads the contents of an external file", func(assert) {
-            assert(load("external.charly"), 25);
-            assert(load("external.charly"), 25);
-            assert(__external__test__function__(), 30);
-            assert(require("external.charly"), 25);
-        });
+  describe("Including external files", func(it) {
 
+    it("includes a file", func(assert) {
+      assert(include("external.charly").num, 25);
+      assert(include("external.charly").num, 25);
+
+      assert(include("external.charly").increment(0), 1);
+      assert(include("external.charly").increment(0), 1);
     });
 
-    describe("Variables", func(it) {
+    it("requires a file", func(assert) {
+      assert(require("external.charly").num, 25);
+      assert(require("external.charly").num, 25);
 
-        it("Assigns a value to a variable", func(assert) {
-            let my_string = "Hello World";
-            let my_number = 25;
-            let my_bool = false;
-            let my_array = [1, "Whatsup", false];
-            let my_null = null;
+      let external = require("external.charly");
+      external.num = 50;
 
-            assert(my_string, "Hello World");
-            assert(my_number, 25);
-            assert(my_bool, false);
-            assert(my_array, [1, "Whatsup", false]);
-            assert(my_null, null);
-        });
+      assert(require("external.charly").num, 50);
 
-        it("resolves variables in calculations", func(assert) {
-            let first_number = 25;
-            let second_number = 5;
-
-            assert(first_number + second_number, 30);
-        });
-
-        it("concats strings", func(assert) {
-            let left_string = "Hello";
-            let right_string = "World";
-
-            assert(left_string + right_string, "HelloWorld");
-        });
-
+      # Reset for further tests
+      external.num = 25;
     });
 
-    describe("Arithmetics", func(it) {
+    it("includes a file that's already required", func(assert) {
+      let external = require("external.charly");
+      external.num = 50;
 
-        it("adds numbers", func(assert) {
-            assert(2 + 2, 4);
-            assert(10 + -50, -40);
-            assert(2.5 + 9.7, 12.2);
-            assert(-20.5 + 20.5, 0);
-            assert(999.999 + 999.999, 1999.998);
-        });
+      assert(require("external.charly") == external, true);
+      assert(require("external.charly").num, 50);
+      assert(include("external.charly").num, 25);
 
-        it("subtracts numbers", func(assert) {
-            assert(20 - 5, 15);
-            assert(3 - 3, 0);
-            assert(-5 - 9, -14);
-            assert(-0 - -0, 0);
-            assert(-20 - -90, 70);
-        });
-
-        it("multiplies numbers", func(assert) {
-            assert(2 * 0, 0);
-            assert(2 * 5, 10);
-            assert(3 * 25, 75);
-            assert(9 * -50, -450);
-            assert(0.5 * 5, 2.5);
-        });
-
-        it("divides numbers", func(assert) {
-            assert(5 / 0, null);
-            assert(5 / -2, -2.5);
-            assert(10 / 4, 2.5);
-            assert(100 / 8, 12.5);
-            assert(1 / 2, 0.5);
-        });
-
-        it("modulus operator", func(assert) {
-            assert(6 % 3, 0);
-            assert(0 % 0, null);
-            assert(177 % 34, 7);
-            assert(700 % 200, 100);
-            assert(20 % 3, 2);
-        });
-
-        it("pow operator", func(assert) {
-            assert(2**8, 256);
-            assert(50**3, 125000);
-            assert(2**4, 16);
-            assert(50**1, 50);
-            assert(50**0, 1);
-        });
-
+      # Reset for further tests
+      external.num = 25;
     });
 
-    describe("Comparisons", func(it) {
+    it("includes core modules", func(assert) {
+      let io = include("io");
+      assert(!!io.stdout.print, true);
+      assert(!!io.stderr.write, true);
+      assert(!!io.stdin.getc, true);
 
-        it("compares equal numbers using the :EQ operator", func(assert) {
-            assert(2 == 2, true);
-            assert(20 == 20, true);
-            assert(10 == 10, true);
-            assert(2.2323 == 2.2323, true);
-            assert(9.666 == 9.666, true);
-            assert(-0 == -0, true);
-            assert(-0 == 0, true);
-        });
-
-        it("compares non-equal numbers using the :EQ operator", func(assert) {
-            assert(2 == 4, false);
-            assert(10 == 20, false);
-            assert(2.5 == 2.499999, false);
-            assert(-20 == 20, false);
-            assert(2 == 20, false);
-        });
-
-        it("compares booleans to other types", func(assert) {
-            assert(1 == true, false);
-            assert(0 == true, false);
-            assert(25 == true, false);
-            assert(false == true, false);
-            assert(true == true, true);
-            assert([1, 2] == true, false);
-            assert(null == true, false);
-            assert(null == false, false);
-        });
-
-        it("compares equal numbers using the :NOTEQ operators", func(assert) {
-            assert(2 ! 2, false);
-            assert(2 ! 2, false);
-            assert(-20 ! -20, false);
-            assert(99 ! 99, false);
-            assert(200 ! 200, false);
-        });
-
-        it("compares non-equal numbers using the :NOTEQ operators", func(assert) {
-            assert(2 ! 4, true);
-            assert(10 ! 20, true);
-            assert(2.5 ! 2.499999, true);
-            assert(-20 ! 20, true);
-            assert(2 ! 20, true);
-        });
-
-        it("compares numbers using the :GREATER operator", func(assert) {
-            assert(2 > 5, false);
-            assert(10 > 10, false);
-            assert(20 > -20, true);
-            assert(4 > 3, true);
-            assert(0 > -1, true);
-        });
-
-        it("compares numbers using the :LESS operator", func(assert) {
-            assert(2 < 5, true);
-            assert(10 < 10, false);
-            assert(20 < -20, false);
-            assert(4 < 3, false);
-            assert(0 < -1, false);
-        });
-
-        it("compares numbers using the :GREATEREQ operator", func(assert) {
-            assert(5 >= 2, true);
-            assert(10 >= 10, true);
-            assert(20 >= 20, true);
-            assert(4 >= 3, true);
-            assert(0 >= -1, true);
-        });
-
-        it("compares numbers using the :LESSEQ operator", func(assert) {
-            assert(2 <= 5, true);
-            assert(10 <= 10, true);
-            assert(20 <= -20, false);
-            assert(4 <= 3, false);
-            assert(200 <= 200, true);
-        });
-
-        it("compares strings", func(assert) {
-            assert("test" == "test", true);
-            assert("lool" == "lool", true);
-            assert("täöüp" == "täöüp", true);
-            assert(" hello" == " hello", true);
-            assert(" wassup " == "wassup", false);
-        });
-
-        it("compares arrays", func(assert) {
-            assert([] == [], true);
-            assert([1, 2, 3] == [1, 2, 3], true);
-            assert([1, "test", 3] == [1, "test", 3], true);
-            assert([1, null, false] == [1, null, false], true);
-            assert([1, [2, 3]] == [1, [2, 3]], true);
-        });
-
-        it("inverts a boolean", func(assert) {
-            assert(!false, true);
-            assert(!true, false);
-            assert(!25, false);
-            assert(!0, true);
-            assert(![1, 2], false);
-        });
-
+      let array = include("array");
+      assert(!!array.each, true);
     });
 
-    describe("Arrays", func(it) {
+  });
 
-        it("member expressions on arrays", func(assert) {
-            assert([1, 2, 3](1), 2);
-            assert([1, 2, 3](0), 1);
-            assert([1, 2, 3](3), null);
-            assert([1, 2, 3](-1), null);
-        });
+  describe("Variables", func(it) {
 
-        it("multi-level member expressions on arrays", func(assert) {
-            assert([1, [2, [3]]](0), 1);
-            assert([1, [2, [3]]](1, 0), 2);
-            assert([1, [2, [3]]](1, 1, 0), 3);
-            assert([1, [2, [3]]](1, 1, 1), null);
-        });
+    it("assigns a value to a variable", func(assert) {
+      let my_string = "Hello World";
+      let my_number = 25;
+      let my_bool = false;
+      let my_array = [1, "Whatsup", false];
+      let my_null = null;
 
-        it("writes to a array index", func(assert) {
-            let my_array = [1, 2, 3];
-            my_array(0) = 2;
-            my_array(1) = 4;
-            my_array(2) = 6;
-
-            assert(my_array, [2, 4, 6]);
-        });
-
-        it("writes to a nested array", func(assert) {
-            let my_array = [1, [2, 3], 4];
-            my_array(0) = 2;
-            my_array(1, 0) = 4;
-            my_array(1, 1) = 6;
-            my_array(2) = 8;
-
-            assert(my_array, [2, [4, 6], 8]);
-        });
-
-        it("length function", func(assert) {
-            assert(length([1, 2, 3]), 3);
-            assert(length([1, 2]), 2);
-            assert(length([1]), 1);
-            assert(length([]), 0);
-        });
-
-        it("works with the each function", func(assert) {
-            let sum = 0;
-            each([1, 2, 3, 4], func(v) {
-                sum = sum + v;
-            });
-
-            assert(sum, 10);
-        });
-
-        it("creates a new array using array_of_size", func(assert) {
-            let my_array = array_of_size(5);
-
-            assert(length(my_array), 5);
-            assert(my_array(1), null);
-        });
-
-        it("appends to the array", func(assert) {
-            let my_array = [1, 2];
-            my_array = append(my_array, 3);
-            my_array = append(my_array, [1, 2]);
-            my_array = append(my_array, "test");
-
-            assert(my_array(0), 1);
-            assert(my_array(2), 3);
-            assert(my_array(3), [1, 2]);
-            assert(my_array(4), "test");
-        });
-
-        it("map function", func(assert) {
-            let my_array = [1, 2, 3];
-            my_array = map(my_array, func(e, i) {
-                e * i;
-            });
-
-            assert(my_array, [0, 2, 6]);
-        });
-
-        it("filter function", func(assert) {
-            let my_array = [1, 2, 3, 4, 5, 6];
-            my_array = filter(my_array, func(e, i) {
-                e < 5;
-            });
-
-            assert(my_array, [1, 2, 3, 4]);
-        });
-
-        it("last & first functions", func(assert) {
-            let my_array = [1, 2, 3];
-
-            assert(first(my_array), 1);
-            assert(last(my_array), 3);
-        });
-
-        it("compact function", func(assert) {
-            let my_array = [1, 2, 3, null, 6, [null]];
-            my_array = compact(my_array);
-
-            assert(my_array, [1, 2, 3, 6, [null]]);
-        });
-
-        it("concat function", func(assert) {
-            let my_array = [1, 2];
-            my_array = concat(my_array, [3, 4]);
-
-            assert(my_array, [1, 2, 3, 4]);
-        });
-
-        it("reverse function", func(assert) {
-            let my_array = [1, 2, 3];
-            my_array = reverse(my_array);
-
-            assert(my_array, [3, 2, 1]);
-        });
-
-        it("empty function", func(assert) {
-            assert(empty([1, 2]), false);
-            assert(empty([1]), false);
-            assert(empty([]), true);
-            assert(empty(""), true);
-        });
-
+      assert(my_string, "Hello World");
+      assert(my_number, 25);
+      assert(my_bool, false);
+      assert(my_array[1], "Whatsup");
+      assert(my_null, null);
     });
 
-    describe("Numerics", func(it) {
+    it("resolves variables in calculations", func(assert) {
+      let first_number = 25;
+      let second_number = 5;
 
-        it("turns integers into floats", func(assert) {
-            assert(2 == 2.0, true);
-            assert(20 == 20.0, true);
-            assert(0.0 == 0.0, true);
-        });
-
+      assert(first_number + second_number, 30);
     });
 
-    describe("Strings", func(it) {
+    it("primitives are always passed by value", func(assert) {
+      let a = 5;
+      let b = a;
+      a = 30;
 
-        it("length function", func(assert) {
-            assert(length("hello world"), 11);
-            assert(length("hello"), 5);
-            assert(length("ä"), 1);
-            assert(length(""), 0);
-        });
-
-        it("can be multiplied", func(assert) {
-            assert("test" * 3, "testtesttest");
-            assert(" " * 3, "   ");
-            assert("a" * 10, "aaaaaaaaaa");
-            assert("a" * 1.5, "a");
-        });
-
+      assert(a, 30);
+      assert(b, 5);
     });
 
-    describe("Functions", func(it) {
+  });
 
-        it("calls a function", func(assert) {
-            let called = false;
-            func call_me() {
-                called = true;
-            };
-            call_me();
+  describe("Arithmetic operations", func(it) {
 
-            assert(called, true);
-        });
-
-        it("passes arguments to a function", func(assert) {
-            let arg1;
-            let arg2;
-            func call_me(_arg1, _arg2) {
-                arg1 = _arg1;
-                arg2 = _arg2;
-            };
-            call_me("hello", 25);
-
-            assert(arg1, "hello");
-            assert(arg2, 25);
-        });
-
-        it("creates the __argument__ variable", func(assert) {
-            let args_received;
-            func call_me() {
-                args_received = __arguments__;
-            };
-            call_me("hello", "world", "this", "should", "work");
-
-            assert(args_received, ["hello", "world", "this", "should", "work"]);
-        });
-
-        it("__argument__ variable can be overwritten", func(assert) {
-            let args_received;
-            func call_me(__arguments__) {
-                args_received = __arguments__;
-            };
-            call_me("hello", "world", "this", "should", "work");
-
-            assert(args_received, "hello");
-        });
-
-        it("can access the parent scope", func(assert) {
-            let change_me = false;
-            func call_me() {
-                change_me = true;
-            };
-            call_me();
-
-            assert(change_me, true);
-        });
-
-        it("writes to arguments instead of parent scope", func(assert) {
-            let dont_change_me = false;
-            func call_me(dont_change_me) {
-                dont_change_me = true;
-            };
-            call_me(true);
-
-            assert(dont_change_me, false);
-        });
-
-        it("runs callbacks in the right scope", func(assert) {
-            let change_me = false;
-
-            func call_me(callback) {
-                let change_me = 25;
-                callback();
-            };
-
-            call_me(func() {
-                change_me = true;
-            });
-
-            assert(change_me, true);
-        });
-
-        it("consecutive call expressions", func(assert) {
-            func call_me() {
-                func() {
-                    func() {
-                        25;
-                    };
-                };
-            };
-
-            assert(call_me()()(), 25);
-        });
-
-        it("passes arguments in the right order", func(assert) {
-            let f1;
-            let f2;
-            let f3;
-
-            func(a1) {
-                func(a2) {
-                    func(a3) {
-                        f1 = a1;
-                        f2 = a2;
-                        f3 = a3;
-                    };
-                };
-            }(1)(2)(3);
-
-            assert(f1, 1);
-            assert(f2, 2);
-            assert(f3, 3);
-        });
-
+    it("adds numbers", func(assert) {
+      assert(2 + 2, 4);
+      assert(10 + -50, -40);
+      assert(2.5 + 9.7, 12.2);
+      assert(-20.5 + 20.5, 0);
+      assert(999.999 + 999.999, 1999.998);
     });
 
-    describe("Misc. standard library functions", func(it) {
-
-        it("is_null function", func(assert) {
-            assert(is_null(null), true);
-            assert(is_null(25), false);
-        });
-
-        it("typeof function", func(assert) {
-
-            class TestClass {};
-
-            assert(typeof(25), "Numeric");
-            assert(typeof("test"), "String");
-            assert(typeof(false), "Bool");
-            assert(typeof(null), "Null");
-            assert(typeof([1, 2]), "Array");
-            assert(typeof(func() {}), "Function");
-            assert(typeof(class ignore {}), "Class");
-            assert(typeof(new(TestClass)), "Object");
-        });
-
-        it("eval function", func(assert) {
-            assert(eval("20 + 5;"), 25);
-            assert(eval("5 < 20;"), true);
-            assert(eval("5 / 0;"), null);
-            assert(eval("[1, 2];"), [1, 2]);
-        });
-
+    it("subtracts numbers", func(assert) {
+      assert(20 - 5, 15);
+      assert(3 - 3, 0);
+      assert(-5 - 9, -14);
+      assert(-0 - -0, 0);
+      assert(-20 - -90, 70);
     });
 
-    describe("Math functions", func(it) {
-
-        it("rand function", func(assert) {
-            assert(typeof(rand()), "Numeric");
-            assert(typeof(rand()), "Numeric");
-            assert(typeof(rand()), "Numeric");
-            assert(typeof(rand()), "Numeric");
-
-            assert(rand() < 1, true);
-            assert(rand() < 1, true);
-            assert(rand() < 1, true);
-
-            assert(rand() > 0, true);
-            assert(rand() > 0, true);
-            assert(rand() > 0, true);
-        });
-
+    it("multiplies numbers", func(assert) {
+      assert(2 * 0, 0);
+      assert(2 * 5, 10);
+      assert(3 * 25, 75);
+      assert(9 * -50, -450);
+      assert(0.5 * 5, 2.5);
     });
 
-    describe("Classes", func(it) {
-
-        it("creates a new class", func(assert) {
-            class Person {
-                let name;
-                let age;
-
-                func constructor(_name, _age) {
-                    name = _name;
-                    age = _age;
-                };
-            };
-
-            let leonard = new(Person, "Leonard", 16);
-            let peter = new(Person, "Peter", 20);
-
-            assert(leonard.name, "Leonard");
-            assert(leonard.age, 16);
-            assert(peter.name, "Peter");
-            assert(peter.age, 20);
-        });
-
-        it("calls functions inside classes", func(assert) {
-            class Box {
-                let value = null;
-                func set(_value) {
-                    value = _value;
-                };
-            };
-
-            let myBox = new(Box);
-            assert(myBox.value, null);
-            myBox.set("this works");
-            assert(myBox.value, "this works");
-        });
-
-        it("member expressions are boxed in the object", func(assert) {
-            class Box {};
-            let myBox = new(Box);
-
-            let changed = false;
-            myBox.changed = true;
-
-            assert(changed, false);
-        });
-
+    it("divides numbers", func(assert) {
+      assert(5 / 0, null);
+      assert(5 / -2, -2.5);
+      assert(10 / 4, 2.5);
+      assert(100 / 8, 12.5);
+      assert(1 / 2, 0.5);
     });
 
-    describe("While loops", func(it) {
-
-        it("runs for the specified amount of time", func(assert) {
-            let sum = 0;
-            let index = 0;
-            while (index < 500) {
-                sum = sum + index;
-                index = index + 1;
-            };
-
-            assert(sum, 124750);
-        });
-
-        it("works in the repeat function", func(assert) {
-            let sum = 0;
-            repeat(50, func(i) {
-                sum = sum + i;
-            });
-
-            assert(sum, 1225);
-        });
-
-        it("works in the range function", func(assert) {
-            let sum = 0;
-            range(50, 150, func(i) {
-                sum = sum + i;
-            });
-
-            assert(sum, 9950);
-        });
-
+    it("modulus operator", func(assert) {
+      assert(6 % 3, 0);
+      assert(0 % 0, null);
+      assert(177 % 34, 7);
+      assert(700 % 200, 100);
+      assert(20 % 3, 2);
     });
+
+    it("pow operator", func(assert) {
+      assert(2**8, 256);
+      assert(50**3, 125000);
+      assert(2**4, 16);
+      assert(50**1, 50);
+      assert(50**0, 1);
+    });
+
+  });
+
+  describe("Comparisons", func(it) {
+
+    it("compares numerics", func(assert) {
+      assert(2 == 2, true);
+      assert(20 == 20, true);
+      assert(-200 == -200, true);
+      assert(2.2323 == 2.2323, true);
+      assert(9.666 == 9.666, true);
+      assert(-0 == -0, true);
+      assert(-0 == 0, true);
+    });
+
+    it("compares booleans", func(assert) {
+      assert(false == false, true);
+      assert(false == true, false);
+      assert(true == false, false);
+      assert(true == true, true);
+
+      assert(0 == false, true);
+      assert(1 == true, true);
+      assert(-1 == true, true);
+      assert("" == true, true);
+      assert("test" == true, true);
+      assert([] == true, true);
+      assert([1, 2] == true, true);
+      assert(null == false, true);
+      assert({ let name = "leonard"; } == true, true);
+      assert(func(){} == true, true);
+      assert(class Test {} == true, true);
+    });
+
+    it("compares strings", func(assert) {
+      assert("test" == "test", true);
+      assert("" == "", true);
+      assert("leeöäüp" == "leeöäüp", true);
+      assert("2002" == "2002", true);
+      assert("asdlkasd" == "asdlkasd", true);
+    });
+
+    it("compares objects", func(assert) {
+      assert({} == {}, false);
+      assert({ let a = 1; } == {}, false);
+      assert({} == { let a = 1; }, false);
+      assert({ let a = 1; } == { let a = 1; }, false);
+
+      let me = {
+        let name = "Leonard";
+      };
+
+      assert(me == me, true);
+      assert(me.name == me.name, true);
+    });
+
+    it("compares functions", func(assert) {
+      assert(func(){} == func(){}, false);
+      assert(func(arg){} == func(arg){}, false);
+      assert(func(arg){ arg + 1; } == func(arg){ arg + 1; }, false);
+      assert(func(){ 2; } == func(){ 2; }, false);
+    });
+
+    it("does misc. comparisons", func(assert) {
+      assert(null == null, true);
+      assert(null ! null, false);
+    });
+
+    it("compares non equals", func(assert) {
+      assert(2 == 4, false);
+      assert(10 == 20, false);
+      assert(2.5 == 2.499999, false);
+      assert(-20 == 20, false);
+      assert(2 == 20, false);
+
+      assert(2 ! 4, true);
+      assert(10 ! 20, true);
+      assert(2.5 ! 2.499999, true);
+      assert(-20 ! 20, true);
+      assert(2 ! 20, true);
+    });
+
+    it("compares using >", func(assert) {
+      assert(2 > 5, false);
+      assert(10 > 10, false);
+      assert(20 > -20, true);
+      assert(4 > 3, true);
+      assert(0 > -1, true);
+
+      assert("test" > "test", false);
+      assert("whatsup" > "whatsu", true);
+      assert("test" > 2, false);
+      assert("test" > "tes", true);
+      assert(2 > "asdadasd", false);
+      assert("" > "", false);
+      assert(false > true, false);
+      assert(25000 > false, false);
+      assert(000.222 > "000.222", false);
+      assert(null > "lol", false);
+    });
+
+    it("compares using <", func(assert) {
+      assert(2 < 5, true);
+      assert(10 < 10, false);
+      assert(20 < -20, false);
+      assert(4 < 3, false);
+      assert(0 < -1, false);
+
+      assert("test" < "test", false);
+      assert("whatsup" < "whatsu", false);
+      assert("test" < 2, false);
+      assert("test" < "tes", false);
+      assert(2 < "asdadasd", false);
+      assert("" < "", false);
+      assert(false < true, false);
+      assert(25000 < false, false);
+      assert(000.222 < "000.222", false);
+      assert(null < "lol", false);
+    });
+
+    it("compares using >=", func(assert) {
+      assert(5 >= 2, true);
+      assert(10 >= 10, true);
+      assert(20 >= 20, true);
+      assert(4 >= 3, true);
+      assert(0 >= -1, true);
+
+      assert("test" >= "test", true);
+      assert("whaaatsup" >= "whatsup", true);
+      assert("lol" >= "lol", true);
+      assert("abc" >= "def", true);
+      assert("small" >= "reaaalllybiiig", false);
+    });
+
+    it("compares using <=", func(assert) {
+      assert(2 <= 5, true);
+      assert(10 <= 10, true);
+      assert(20 <= -20, false);
+      assert(4 <= 3, false);
+      assert(200 <= 200, true);
+
+      assert("test" <= "test", true);
+      assert("whaaatsup" <= "whatsup", false);
+      assert("lol" <= "lol", true);
+      assert("abc" <= "def", true);
+      assert("small" <= "reaaalllybiiig", true);
+    });
+
+    it("not operator inverts a value", func(assert) {
+      assert(!false, true);
+      assert(!true, false);
+      assert(!0, true);
+      assert(!25, false);
+      assert(!"test", false);
+    });
+
+  });
+
+  describe("Arrays", func(it) {
+
+    it("does member expressions", func(assert) {
+      let nums = [1, 2, 3, 4];
+
+      assert(nums[0], 1);
+      assert(nums[3], 4);
+      assert(nums[10], null);
+      assert(nums[-10], null);
+    });
+
+    it("does multilevel member expressions", func(assert) {
+      let nums = [[1, 2], [3, 4, "test"], [5, 6]];
+
+      assert(nums[0][1], 2);
+      assert(nums[2][0], 5);
+      assert(nums[1][2], "test");
+      assert(nums[1][-2], null);
+    });
+
+    it("write to an index", func(assert) {
+      let nums = [1, 2, 3, 4];
+
+      nums[0] = 2;
+      nums[1] = 3;
+      nums[2] = 4;
+
+      assert(nums[0], 2);
+      assert(nums[1], 3);
+      assert(nums[2], 4);
+      assert(nums[3], 4);
+    });
+
+    it("writes to a nested index", func(assert) {
+      let nums = [1, 2, [3, 4]];
+
+      nums[0] = 2;
+      nums[1] = 3;
+      nums[2][0] = 4;
+      nums[2][1] = 5;
+
+      assert(nums[0], 2);
+      assert(nums[1], 3);
+      assert(nums[2][0], 4);
+      assert(nums[2][1], 5);
+    });
+
+    it("gives back the length of an array", func(assert) {
+      assert(length([]), 0);
+      assert(length([1, 2]), 2);
+      assert(length([1, 2, [3, 4]]), 3);
+      assert(length([1, 2, 3, [4, 5]][3]), 2);
+      assert(length(["test"]), 1);
+    });
+
+    it("creates a new array using array_of_size", func(assert) {
+      let new_array = array_of_size(100, "whaaaaaaaaaaaaaaaaaat");
+      assert(length(new_array), 100);
+    });
+
+    it("appends to an array", func(assert) {
+      let nums = [1, 2];
+      nums = append(nums, 3);
+      nums = append(nums, 4);
+      nums = append(nums, 5);
+      nums = append(nums, 6);
+
+      assert(length(nums), 6);
+      assert(nums[0], 1);
+      assert(nums[1], 2);
+      assert(nums[2], 3);
+      assert(nums[3], 4);
+      assert(nums[4], 5);
+      assert(nums[5], 6);
+    });
+
+  });
+
+  describe("Numerics", func(it) {
+
+    it("implicitly casts integers to floats", func(assert) {
+      assert(2 == 2.0, true);
+      assert(2000.0000 == 2000, true);
+      assert(-289 == -289.0, true);
+      assert(0 == 0.0, true);
+      assert(0000000000.000000000 == 0, true);
+    });
+
+  });
+
+  describe("Strings", func(it) {
+
+    it("returns the length of a string", func(assert) {
+      assert(length("hello world"), 11);
+      assert(length("hello"), 5);
+      assert(length("ääöü"), 4);
+      assert(length(""), 0);
+    });
+
+    it("concatenates strings", func(assert) {
+      assert("hello" + "world", "helloworld");
+      assert("hello" + " wonderful " + "world", "hello wonderful world");
+      assert("öö" + "üä", "ööüä");
+      assert("" + "", "");
+    });
+
+    it("concatenates strings and numerics", func(assert) {
+      assert("test" + 16, "test16");
+      assert("test" + 16.263723762, "test16.263723762");
+      assert("test" + 0.001, "test0.001");
+      assert("test" + 2.5, "test2.5");
+      assert("test" + 2.0, "test2");
+
+      assert(2 + "test", "2test");
+      assert(2.5 + "test", "2.5test");
+      assert(0.010 + "test", "0.01test");
+      assert(28.2 + "test", "28.2test");
+      assert(50 + "test" + 25, "50test25");
+    });
+
+    it("multiplies strings", func(assert) {
+      assert("test" * 3, "testtesttest");
+      assert(" " * 3, "   ");
+      assert("a" * 10, "aaaaaaaaaa");
+      assert("a" * 1.5, "a");
+      assert("a" * 1.999, "a");
+    });
+
+  });
+
+  describe("Functions", func(it) {
+
+    it("calls a function", func(assert) {
+      let called = false;
+      func call_me() {
+        called = true;
+      };
+      call_me();
+
+      assert(called, true);
+    });
+
+    it("passes arguments to a function", func(assert) {
+      let arg1;
+      let arg2;
+      func call_me(_arg1, _arg2) {
+        arg1 = _arg1;
+        arg2 = _arg2;
+      };
+      call_me("hello", 25);
+
+      assert(arg1, "hello");
+      assert(arg2, 25);
+    });
+
+    it("creates the __argument variable", func(assert) {
+      let args_received;
+      func call_me() {
+        args_received = __arguments;
+      };
+      call_me("hello", "world", "this", "should", "work");
+
+      assert(args_received[0], "hello");
+      assert(args_received[2], "this");
+      assert(args_received[4], "work");
+    });
+
+    it("__argument variable can be overwritten", func(assert) {
+      let args_received;
+      func call_me(__arguments) {
+        args_received = __arguments;
+      };
+      call_me("hello", "world", "this", "should", "work");
+
+      assert(args_received, "hello");
+    });
+
+    it("can access the parent scope", func(assert) {
+      let change_me = false;
+      func call_me() {
+        change_me = true;
+      };
+      call_me();
+
+      assert(change_me, true);
+    });
+
+    it("writes to arguments instead of parent scope", func(assert) {
+      let dont_change_me = false;
+      func call_me(dont_change_me) {
+        dont_change_me = true;
+      };
+      call_me(true);
+
+      assert(dont_change_me, false);
+    });
+
+    it("runs callbacks in the right scope", func(assert) {
+      let change_me = false;
+
+      func call_me(callback) {
+        let change_me = 25;
+        callback();
+      };
+
+      call_me(func() {
+        change_me = true;
+      });
+
+      assert(change_me, true);
+    });
+
+    it("consecutive call expressions", func(assert) {
+      func call_me() {
+        func() {
+          func() {
+            25;
+          };
+        };
+      };
+
+      assert(call_me()()(), 25);
+    });
+
+    it("passes arguments in the right order", func(assert) {
+      let f1;
+      let f2;
+      let f3;
+
+      func(a1) {
+        func(a2) {
+          func(a3) {
+            f1 = a1;
+            f2 = a2;
+            f3 = a3;
+          };
+        };
+      }(1)(2)(3);
+
+      assert(f1, 1);
+      assert(f2, 2);
+      assert(f3, 3);
+    });
+
+  });
+
+  describe("Classes", func(it) {
+
+    it("creates a new class", func(assert) {
+      class Person {
+        let name;
+        let age;
+
+        func constructor(_name, _age) {
+          name = _name;
+          age = _age;
+        };
+      };
+
+      let leonard = Person("Leonard", 16);
+      let peter = Person("Peter", 20);
+
+      assert(leonard.name, "Leonard");
+      assert(leonard.age, 16);
+      assert(peter.name, "Peter");
+      assert(peter.age, 20);
+    });
+
+    it("calls functions inside classes", func(assert) {
+      class Box {
+        let value;
+        func set(_value) {
+          value = _value;
+        };
+      };
+
+      let myBox = Box();
+      assert(myBox.value, null);
+      myBox.set("this works");
+      assert(myBox.value, "this works");
+    });
+
+    it("doesn't read from the parent stack", func(assert) {
+      class Box {};
+      let myBox = Box();
+
+      let changed = false;
+      assert(myBox.changed, null);
+    });
+
+    it("doesn't write into the parent stack", func(assert) {
+      class Box {};
+      let myBox = Box();
+
+      let changed = false;
+      myBox.changed = true;
+
+      assert(changed, false);
+    });
+
+  });
+
+  describe("While loops", func(it) {
+
+    it("runs for the specified count", func(assert) {
+      let sum = 0;
+      let index = 0;
+      while (index < 500) {
+        sum = sum + index;
+        index = index + 1;
+      };
+
+      assert(sum, 124750);
+    });
+
+  });
+
+  describe("Misc. standard library functions", func(it) {
+
+    it("returns the type of a variable", func(assert) {
+      assert(typeof(false), "Boolean");
+      assert(typeof(true), "Boolean");
+      assert(typeof("test"), "String");
+      assert(typeof(25), "Numeric");
+      assert(typeof(25.5), "Numeric");
+      assert(typeof([1, 2, 3]), "Array");
+      assert(typeof(class Test {}), "Class");
+      assert(typeof(func() {}), "Function");
+      assert(typeof({}), "Object");
+      assert(typeof(null), "Null");
+    });
+
+    it("repeats a function n times", func(assert) {
+      let sum = 0;
+      repeat(500, func(i) {
+        sum = sum + i;
+      });
+
+      assert(sum, 124750);
+    });
+
+  });
 
 });
+
+exit(testResult);

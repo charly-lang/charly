@@ -1,0 +1,50 @@
+func each(array, callback) {
+  let i = 0;
+  let count = length(array);
+
+  while (i < count) {
+    callback(array[i], i);
+    i = i + 1;
+  };
+
+  array;
+};
+
+func array_of_size(count, default) {
+  call_internal("array_of_size", count, default);
+};
+
+func append(array, item) {
+  let count = length(array);
+  let new = array_of_size(count + 1, false);
+
+  # Copy all values
+  each(array, func(v, i) {
+    new[i] = v;
+  });
+  new[count] = item;
+
+  new;
+};
+
+func length(arg) {
+  call_internal("length", arg);
+};
+
+func first(array) {
+  array[0];
+};
+
+func last(array) {
+  array[length(array) - 1];
+};
+
+export = {
+  let each = each;
+  let array_of_size = array_of_size;
+  let append = append;
+  let length = length;
+
+  let first = first;
+  let last = last;
+};

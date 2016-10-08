@@ -1,4 +1,8 @@
-.git
+/doc/
+/libs/
+/.crystal/
+/.shards/
+/bin/
 *.swp
-parser-dump
-test/debugging.charly
+.DS_Store
+.git

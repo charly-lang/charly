@@ -1,2 +1,0 @@
-require("api.charly");
-print(increment(1));

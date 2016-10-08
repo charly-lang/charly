@@ -1,3 +1,7 @@
-# This file is used to check if the require and load functions work correctly
-func __external__test__function__() { 30; };
-25;
+export = {
+  let num = 25;
+
+  func increment(arg) {
+    arg + 1;
+  };
+};

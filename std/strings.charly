@@ -1,8 +1,0 @@
-# Strip all whitespaces from the beginning of the string and the end
-func chomp(string) {
-    call_internal("chomp", string);
-};
-
-func colorize(string, colorcode) {
-    call_internal("colorize", string, colorcode);
-};

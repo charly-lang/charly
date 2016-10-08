@@ -1,0 +1,49 @@
+let stdout = {
+  func print() {
+    call_internal("stdout_print", __arguments);
+  };
+
+  func write() {
+    call_internal("stdout_write", __arguments);
+  };
+};
+
+let stderr = {
+  func print() {
+    call_internal("stderr_print", __arguments);
+  };
+
+  func write() {
+    call_internal("stderr_write", __arguments);
+  };
+};
+
+let stdin = {
+  func gets() {
+    call_internal("stdin_gets");
+  };
+
+  func getc() {
+    call_internal("stdin_getc");
+  };
+};
+
+func colorize(string, colorcode) {
+  call_internal("colorize", string, colorcode);
+};
+
+export = {
+  let stdout = stdout;
+  let stderr = stderr;
+  let stdin = stdin;
+
+  let colorize = colorize;
+
+  func exit(code) {
+    call_internal("exit", code);
+  };
+
+  func time_ms() {
+    call_internal("time_ms");
+  };
+};
