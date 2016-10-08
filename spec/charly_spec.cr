@@ -14,7 +14,8 @@ describe Interpreter do
       "src/charly.cr",
       "--release",
       "--stats",
-      "-o bin/charly"
+      "-o",
+      "bin/charly"
     ], output: STDOUT, input: STDIN, error: STDERR)
 
     # Set the environment variable for the std-lib
