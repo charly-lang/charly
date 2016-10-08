@@ -414,13 +414,32 @@ class Interpreter
       end
     end
 
-    # If the left side is null
-    if left.is_a? TNull
+    # If both sides are TNull
+    if left.is_a?(TNull) && right.is_a?(TNull)
       case operator
       when EqualOperator
-        return TBoolean.new(left.class == right.class)
+        return TBoolean.new(true)
       when NotOperator
-        return TBoolean.new(left.class != right.class)
+        return TBoolean.new(false)
+      end
+    end
+
+    # If the left side is bool
+    if left.is_a?(TBoolean) && !right.is_a?(TBoolean)
+      case operator
+      when EqualOperator
+        return TBoolean.new(left.value == eval_bool(right, stack))
+      when NotOperator
+        return TBoolean.new(left.value != eval_bool(right, stack))
+      end
+    end
+
+    if !left.is_a?(TBoolean) && right.is_a?(TBoolean)
+      case operator
+      when EqualOperator
+        return TBoolean.new(right.value == eval_bool(left, stack))
+      when NotOperator
+        return TBoolean.new(right.value != eval_bool(left, stack))
       end
     end
 
@@ -685,29 +704,29 @@ class Interpreter
 
   def exec_literal(node, stack)
     case node
-    when NumericLiteral
+    when .is_a? NumericLiteral
       value = node.value
       if value.is_a?(String)
         return TNumeric.new(value.to_f)
       end
-    when StringLiteral
+    when .is_a? StringLiteral
       value = node.value
       if value.is_a?(String)
         return TString.new(value)
       end
-    when BooleanLiteral
+    when .is_a? BooleanLiteral
       value = node.value
       if value.is_a?(String)
         return TBoolean.new(value == "true")
       end
-    when FunctionLiteral
+    when .is_a? FunctionLiteral
       argumentlist = node.argumentlist
       block = node.block
 
       if argumentlist.is_a? ASTNode && block.is_a? Block
         return TFunc.new(argumentlist.children, block, stack)
       end
-    when ArrayLiteral
+    when .is_a? ArrayLiteral
 
       # Resolve all children first
       children = [] of BaseType
@@ -715,13 +734,13 @@ class Interpreter
         children << exec_expression(child, stack)
       end
       return TArray.new(children)
-    when ClassLiteral
+    when .is_a? ClassLiteral
       block = node.block
 
       if block.is_a? Block
         return TClass.new(block, stack)
       end
-    when NullLiteral
+    when .is_a? NullLiteral
       return TNull.new
     end
 
@@ -866,21 +885,28 @@ class Interpreter
 
   # Returns the boolean representation of a value
   def eval_bool(value, stack)
+
+    bool = false
     case value
-    when TNumeric
-      return value.value != 0
-    when TBoolean
-      return value.value
-    when TString
-      return true
-    when TFunc
-      return true
-    when TNull
-      return false
-    when Bool
-      return value
-    else
-      return false
+    when .is_a? TNumeric
+      bool = value.value != 0_f64
+    when .is_a? TBoolean
+      bool = value.value
+    when .is_a? TString
+      bool = true
+    when .is_a? TFunc
+      bool = true
+    when .is_a? TObject
+      bool = true
+    when .is_a? TClass
+      bool = true
+    when .is_a? TArray
+      bool = true
+    when .is_a? TNull
+      bool = false
+    when .is_a? Bool
+      bool = value
     end
+    bool
   end
 end
