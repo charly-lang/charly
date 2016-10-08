@@ -1,0 +1,13 @@
+# Initialize some vars
+let weight = 0;
+let height = 0;
+let bmi = 0;
+
+write("Enter your weight in KG: ");
+weight = to_numeric(gets());
+
+write("Enter your height in meters: ");
+height = to_numeric(gets());
+
+bmi = weight / height**2;
+print("Your BMI is: " + bmi);
