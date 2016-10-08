@@ -398,6 +398,30 @@ class Interpreter
       end
     end
 
+    # When comparing TClass
+    if left.is_a?(TClass) && right.is_a?(TClass)
+      case operator
+      when GreaterOperator, LessOperator, GreaterEqualOperator, LessEqualOperator
+        return TBoolean.new(false)
+      when EqualOperator
+        return TBoolean.new(left == right)
+      when NotOperator
+        return TBoolean.new(left != right)
+      end
+    end
+
+    # When comparing TObject
+    if left.is_a?(TObject) && right.is_a?(TObject)
+      case operator
+      when GreaterOperator, LessOperator, GreaterEqualOperator, LessEqualOperator
+        return TBoolean.new(false)
+      when EqualOperator
+        return TBoolean.new(left == right)
+      when NotOperator
+        return TBoolean.new(left != right)
+      end
+    end
+
     # If the left side is null
     if left.is_a? TNull
       case operator
