@@ -592,4 +592,19 @@ UnitTest("Charly").begin(func(describe) {
 
   });
 
+  describe("While loops", func(it) {
+
+    it("runs for the specified count", func(assert) {
+      let sum = 0;
+      let index = 0;
+      while (index < 500) {
+        sum = sum + index;
+        index = index + 1;
+      };
+
+      assert(sum, 124750);
+    });
+
+  });
+
 });
