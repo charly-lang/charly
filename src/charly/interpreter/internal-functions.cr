@@ -184,7 +184,6 @@ module InternalFunctions
 
       if arg.is_a?(TString)
         num = arg.value.to_f64?(strict: false)
-        puts num.class
 
         if num.is_a? Float64
           return TNumeric.new(num)
