@@ -166,6 +166,12 @@ class Structure
       return new_node
     end
 
+    # A class literal as an expression shouldn't have a name
+    if node.is_a?(ClassLiteral) && node.children.size == 2
+      node.children.shift
+      return node
+    end
+
     # If statements
     if node.is_a?(IfStatement)
 

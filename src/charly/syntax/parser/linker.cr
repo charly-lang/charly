@@ -59,27 +59,9 @@ class Linker
       return
     end
 
-    if node.is_a? ClassDefinition
-      node.linked = true
-      node.classliteral = node.children[0]
-      return
-    end
-
     if node.is_a? ClassLiteral
       node.linked = true
       node.block = node.children[0]
-
-      # Search for the constructor in the block
-      node.children[0].children.each do |child|
-        if child.is_a? FunctionDefinition
-          if child.children[0].children[0].is_a? IdentifierLiteral
-            if child.children[0].children[0].value == "constructor"
-              node.constructor = child.children[0].children[0]
-            end
-          end
-        end
-      end
-
       return
     end
 
@@ -88,12 +70,6 @@ class Linker
       node.operator = node.children[1]
       node.left = node.children[0]
       node.right = node.children[2]
-      return
-    end
-
-    if node.is_a? FunctionDefinition
-      node.linked = true
-      node.function = node.children[0]
       return
     end
 

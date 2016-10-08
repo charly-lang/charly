@@ -131,13 +131,7 @@ end
 
 # A class literal
 class ClassLiteral < ASTNode
-  property constructor : ASTNode?
   property block : ASTNode?
-end
-
-# A class definition
-class ClassDefinition < ASTNode
-  property classliteral : ASTNode?
 end
 
 # A single call expression
@@ -156,11 +150,6 @@ end
 class IndexExpression < ASTNode
   property identifier : ASTNode?
   property member : ASTNode?
-end
-
-# A single function definition
-class FunctionDefinition < ASTNode
-  property function : ASTNode?
 end
 
 # A list of expressions seperated by commas
