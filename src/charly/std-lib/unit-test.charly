@@ -20,7 +20,7 @@ class UnitTest {
             ]);
 
             if (match ! true) {
-                failed_assertions = append(failed_assertions, last(assertions));
+                failed_assertions = append(failed_assertions, [length(assertions) - 1, last(assertions)]);
             };
         };
 
@@ -79,7 +79,7 @@ class UnitTest {
             callback(func it(description, callback) {
                 let current_test = Test(description);
 
-                write(colorize("Test: " + description + " ", 37));
+                write(colorize("it " + description + " ", 37));
                 callback(func assert(real, expect) {
                     current_test.add_assertion(real, expect);
 
@@ -148,7 +148,7 @@ class UnitTest {
 
                     print("  - " + colorize(test.title, 37));
                     each(test.failed_assertions, func(assertion) {
-                        print("    - " + colorize("Expected: " + assertion[1] + ", got: " + assertion[0], 31));
+                        print("    " + (assertion[0] + 1) + ": " + colorize("Expected: " + assertion[1][1] + ", got: " + assertion[1][0], 31));
                     });
                 });
             });
