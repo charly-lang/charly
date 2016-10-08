@@ -533,6 +533,63 @@ UnitTest("Charly").begin(func(describe) {
       assert(f2, 2);
       assert(f3, 3);
     });
+
+  });
+
+  describe("Classes", func(it) {
+
+    it("creates a new class", func(assert) {
+      class Person {
+        let name;
+        let age;
+
+        func constructor(_name, _age) {
+          name = _name;
+          age = _age;
+        };
+      };
+
+      let leonard = Person("Leonard", 16);
+      let peter = Person("Peter", 20);
+
+      assert(leonard.name, "Leonard");
+      assert(leonard.age, 16);
+      assert(peter.name, "Peter");
+      assert(peter.age, 20);
+    });
+
+    it("calls functions inside classes", func(assert) {
+      class Box {
+        let value;
+        func set(_value) {
+          value = _value;
+        };
+      };
+
+      let myBox = Box();
+      assert(myBox.value, null);
+      myBox.set("this works");
+      assert(myBox.value, "this works");
+    });
+
+    it("doesn't read from the parent stack", func(assert) {
+      class Box {};
+      let myBox = Box();
+
+      let changed = false;
+      assert(myBox.changed, null);
+    });
+
+    it("doesn't write into the parent stack", func(assert) {
+      class Box {};
+      let myBox = Box();
+
+      let changed = false;
+      myBox.changed = true;
+
+      assert(changed, false);
+    });
+
   });
 
 });
