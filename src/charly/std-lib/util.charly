@@ -10,9 +10,14 @@ func to_numeric(arg) {
   call_internal("to_numeric", arg);
 };
 
+func trim(arg) {
+  call_internal("trim", arg);
+};
+
 export = {
   let repeat = repeat;
   let to_numeric = to_numeric;
+  let trim = trim;
 
   func typeof(arg) {
     call_internal("typeof", arg);

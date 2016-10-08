@@ -566,6 +566,8 @@ class Interpreter
             return InternalFunctions.typeof(arguments[1..-1], stack)
           when "to_numeric"
             return InternalFunctions.to_numeric(arguments[1..-1], stack)
+          when "trim"
+            return InternalFunctions.trim(arguments[1..-1], stack)
           else
             raise "Internal function call to '#{name.value}' not implemented!"
           end

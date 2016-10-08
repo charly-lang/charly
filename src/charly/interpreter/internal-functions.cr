@@ -197,4 +197,21 @@ module InternalFunctions
 
     raise "to_numeric expected at least 1 argument"
   end
+
+  # Trim a string
+  def trim(arguments, stack)
+
+    # Check if there is at least 1 argument
+    if arguments.size > 0
+      arg = arguments[0]
+
+      if arg.is_a?(TString)
+        return TString.new(arg.value.chomp)
+      else
+        raise "trim expected a string, got #{arg.class}"
+      end
+    end
+
+    raise "trim expected at least 1 argument"
+  end
 end
