@@ -116,6 +116,10 @@ class Interpreter
       return exec_container_literal(node, stack)
     end
 
+    if node.is_a? NullLiteral
+      return TNull.new
+    end
+
     raise "Unknown node encountered #{node.class} #{stack}"
   end
 
@@ -262,30 +266,62 @@ class Interpreter
     left = exec_expression(node.left, stack)
     right = exec_expression(node.right, stack)
 
-    case node.operator
-    when PlusOperator
-      if left.is_a?(TNumeric) && right.is_a?(TNumeric)
+    if left.is_a?(TNumeric) && right.is_a?(TNumeric)
+      case operator
+      when PlusOperator
         return TNumeric.new(left.value + right.value)
-      end
-    when MinusOperator
-      if left.is_a?(TNumeric) && right.is_a?(TNumeric)
+      when MinusOperator
         return TNumeric.new(left.value - right.value)
-      end
-    when MultOperator
-      if left.is_a?(TNumeric) && right.is_a?(TNumeric)
+      when MultOperator
+        if left.value == 0 || right.value == 0
+          return TNumeric.new(0)
+        end
         return TNumeric.new(left.value * right.value)
-      end
-    when DivdOperator
-      if left.is_a?(TNumeric) && right.is_a?(TNumeric)
+      when DivdOperator
+        if left.value == 0 || right.value == 0
+          return TNull.new
+        end
         return TNumeric.new(left.value / right.value)
-      end
-    when ModOperator
-      if left.is_a?(TNumeric) && right.is_a?(TNumeric)
-        return TNumeric.new(left.value % right.value)
-      end
-    when PowOperator
-      if left.is_a?(TNumeric) && right.is_a?(TNumeric)
+      when ModOperator
+        if right.value == 0
+          return TNull.new
+        end
+        return TNumeric.new(left.value.to_i % right.value.to_i)
+      when PowOperator
         return TNumeric.new(left.value ** right.value)
+      end
+    end
+
+    if left.is_a?(TString) && right.is_a?(TString)
+      case operator
+      when PlusOperator
+        return TString.new("#{left}" + "#{right}")
+      end
+    end
+
+    if left.is_a?(TString) && !right.is_a?(TString)
+      case operator
+      when PlusOperator
+        return TString.new("#{left}" + "#{right}")
+      when MultOperator
+
+        # Check if the right side is a TNumeric
+        if right.is_a?(TNumeric)
+          return TString.new(left.value * right.value.to_i)
+        end
+      end
+    end
+
+    if !left.is_a?(TString) && right.is_a?(TString)
+      case operator
+      when PlusOperator
+        return TString.new("#{left}" + "#{right}")
+      when MultOperator
+
+        # Check if the left side is a TNumeric
+        if left.is_a?(TNumeric)
+          return TString.new(right.value * left.value.to_i)
+        end
       end
     end
 
