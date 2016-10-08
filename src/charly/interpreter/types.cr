@@ -33,6 +33,10 @@ module CharlyTypes
     def value_to_s(io)
       io << value
     end
+
+    def self.to_s(io)
+      io << "String"
+    end
   end
 
   class TNumeric < BaseType
@@ -49,6 +53,10 @@ module CharlyTypes
         io << value
       end
     end
+
+    def self.to_s(io)
+      io << "Numeric"
+    end
   end
 
   class TBoolean < BaseType
@@ -61,6 +69,10 @@ module CharlyTypes
         io << "false"
       end
     end
+
+    def self.to_s(io)
+      io << "Boolean"
+    end
   end
 
   class TNull < BaseType
@@ -72,6 +84,10 @@ module CharlyTypes
 
     def value_to_s(io)
       io << "null"
+    end
+
+    def self.to_s(io)
+      io << "Null"
     end
   end
 
@@ -88,6 +104,10 @@ module CharlyTypes
         end
       end
       io << "]"
+    end
+
+    def self.to_s(io)
+      io << "Array"
     end
   end
 
@@ -108,6 +128,10 @@ module CharlyTypes
     def value_to_s(io)
       io << "Function"
     end
+
+    def self.to_s(io)
+      io << "Function"
+    end
   end
 
   class TClass < BaseType
@@ -125,6 +149,10 @@ module CharlyTypes
     def value_to_s(io)
       io << "Class"
     end
+
+    def self.to_s(io)
+      io << "Class"
+    end
   end
 
   class TObject < BaseType
@@ -137,6 +165,10 @@ module CharlyTypes
     end
 
     def value_to_s(io)
+      io << "Object"
+    end
+
+    def self.to_s(io)
       io << "Object"
     end
   end
