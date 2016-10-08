@@ -38,8 +38,16 @@ module CharlyTypes
   class TNumeric < BaseType
     property value : Float64
 
+    def initialize(value)
+      @value = value.to_f64
+    end
+
     def value_to_s(io)
-      io << value
+      if value % 1 == 0
+        io << value.to_i
+      else
+        io << value
+      end
     end
   end
 
