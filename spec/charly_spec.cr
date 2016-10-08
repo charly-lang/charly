@@ -3,6 +3,11 @@ require "./spec_helper"
 describe Interpreter do
   it "runs the spec suite" do
 
+    # Create the bin directory
+    Process.run("mkdir", [
+      "bin"
+    ])
+
     # Build the interpreter
     Process.run("crystal", [
       "build",
