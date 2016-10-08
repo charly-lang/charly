@@ -31,9 +31,20 @@ func length(arg) {
   call_internal("length", arg);
 };
 
+func first(array) {
+  array[0];
+};
+
+func last(array) {
+  array[length(array) - 1];
+};
+
 export = {
   let each = each;
   let array_of_size = array_of_size;
   let append = append;
   let length = length;
+
+  let first = first;
+  let last = last;
 };
