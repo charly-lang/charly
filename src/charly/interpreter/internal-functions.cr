@@ -72,4 +72,56 @@ module InternalFunctions
       return TNull.new
     end
   end
+
+  # Get an array of a given size
+  # First argument has to be a numeric
+  # An optional second argument can be used for the default value
+  # All other arguments are ignored
+  def array_of_size(arguments, stack)
+
+    # Check if there are 2 arguments
+    unless arguments.size > 0
+      return TNull.new
+    end
+
+    # An array filled with TNull
+    if arguments.size >= 2
+
+      # Typecheck
+      count = arguments[0]
+      default = arguments[1]
+
+      if count.is_a?(TNumeric)
+        return TArray.new(Array.new(count.value.to_i, default))
+      else
+        raise "array_of_size expected argument 1 to be of type TNumeric, got #{count.class}"
+      end
+    end
+
+    return TNull.new
+  end
+
+  # Dump all values from an object into it's parent stack
+  def unpack(arguments, stack)
+
+    # Check if there is at least 1 argument
+    unless arguments.size > 0
+      return TNull.new
+    end
+
+    object = arguments[0]
+    if object.is_a?(TObject)
+
+      # Get the correct stack
+      # We assume this is called via the unpack method and not
+      # call_internal("unpack", ...)
+      #
+      # This means we have to go up two stacks in order to
+      # be able to write to the correct one
+      object.stack.not_nil!.values.each do |key, value|
+        stack.parent.not_nil!.write(key, value, true)
+      end
+    end
+    return TNull.new
+  end
 end

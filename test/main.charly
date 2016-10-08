@@ -1,1 +1,7 @@
-a().b;
+let array = array_of_size(5, 0);
+print(array);
+
+unpack({
+  let test = 25;
+});
+print(test);

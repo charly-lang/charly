@@ -480,10 +480,14 @@ class Interpreter
             return InternalFunctions::STDIN.getc
           when "length"
             return InternalFunctions.length(arguments[1..-1], stack)
+          when "array_of_size"
+            return InternalFunctions.array_of_size(arguments[1..-1], stack)
           when "require"
             return exec_require(arguments[1..-1], stack)
           when "include"
             return exec_include(arguments[1..-1], stack)
+          when "unpack"
+            return InternalFunctions.unpack(arguments[1..-1], stack)
           else
             raise "Internal function call to '#{name.value}' not implemented!"
           end
@@ -799,6 +803,10 @@ class Interpreter
       case filename
       when "io"
         filepath = ENV["CHARLYDIR"] + "/io.charly"
+      when "unit-test"
+        filepath = ENV["CHARLYDIR"] + "/unit-test.charly"
+      when "array"
+        filepath = ENV["CHARLYDIR"] + "/array.charly"
       else
         filepath = File.join(current_dir, filename)
       end
