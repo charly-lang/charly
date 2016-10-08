@@ -146,4 +146,20 @@ module InternalFunctions
     end
     return TNull.new
   end
+
+  # Exit the program
+  # If the first argument is a TNumeric
+  # It will be casted to an integer and used as the exit code
+  def exit(arguments, stack)
+
+    if arguments.size > 0
+      code = arguments[0]
+
+      if code.is_a? TNumeric
+        exit code.value.to_i
+      end
+    end
+
+    exit 0
+  end
 end

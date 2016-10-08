@@ -39,7 +39,11 @@ export = {
 
   let colorize = colorize;
 
-  let time_ms = func() {
+  func exit(code) {
+    call_internal("exit", code);
+  };
+
+  func time_ms() {
     call_internal("time_ms");
   };
 };
