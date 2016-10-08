@@ -1,6 +1,6 @@
 let UnitTest = require("unit-test");
 
-UnitTest("Charly").begin(func(describe) {
+let testResult = UnitTest("Charly").begin(func(describe) {
 
   describe("Including external files", func(it) {
 
@@ -634,3 +634,5 @@ UnitTest("Charly").begin(func(describe) {
   });
 
 });
+
+exit(testResult);
