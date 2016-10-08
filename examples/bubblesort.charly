@@ -1,0 +1,37 @@
+# This modifies the array in place
+func sort(array) {
+  let sorted = false;
+  while (!sorted) {
+    sorted = true;
+    each(array, func(current, i) {
+      if (i ! length(array) - 1) {
+        let next = array[i + 1];
+
+        if (current > next) {
+          let tmp = next;
+          array[i + 1] = current;
+          array[i] = tmp;
+
+          sorted = false;
+        };
+      };
+    });
+  };
+};
+
+let amount = 0;
+let numbers = [];
+
+write("How many numbers do you want to sort: ");
+amount = to_numeric(gets());
+
+print("Enter " + colorize(amount, 32) + " numbers: ");
+
+numbers = array_of_size(amount, null);
+numbers = each(numbers, func(e, i) {
+  numbers[i] = to_numeric(gets());
+});
+
+sort(numbers);
+
+print(numbers);
