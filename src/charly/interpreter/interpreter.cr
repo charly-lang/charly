@@ -359,8 +359,6 @@ class Interpreter
     # When comparing TBools
     if left.is_a?(TBoolean) && right.is_a?(TBoolean)
       case operator
-      when GreaterOperator, LessOperator, GreaterEqualOperator, LessEqualOperator
-        return TBoolean.new(false)
       when EqualOperator
         return TBoolean.new(left.value == right.value)
       when NotOperator
@@ -389,8 +387,6 @@ class Interpreter
     # When comparing TFunc
     if left.is_a?(TFunc) && right.is_a?(TFunc)
       case operator
-      when GreaterOperator, LessOperator, GreaterEqualOperator, LessEqualOperator
-        return TBoolean.new(false)
       when EqualOperator
         return TBoolean.new(left == right)
       when NotOperator
@@ -401,8 +397,6 @@ class Interpreter
     # When comparing TClass
     if left.is_a?(TClass) && right.is_a?(TClass)
       case operator
-      when GreaterOperator, LessOperator, GreaterEqualOperator, LessEqualOperator
-        return TBoolean.new(false)
       when EqualOperator
         return TBoolean.new(left == right)
       when NotOperator
@@ -413,8 +407,6 @@ class Interpreter
     # When comparing TObject
     if left.is_a?(TObject) && right.is_a?(TObject)
       case operator
-      when GreaterOperator, LessOperator, GreaterEqualOperator, LessEqualOperator
-        return TBoolean.new(false)
       when EqualOperator
         return TBoolean.new(left == right)
       when NotOperator
@@ -425,8 +417,6 @@ class Interpreter
     # If the left side is null
     if left.is_a? TNull
       case operator
-      when GreaterOperator, LessOperator, GreaterEqualOperator, LessEqualOperator
-        return TBoolean.new(false)
       when EqualOperator
         return TBoolean.new(left.class == right.class)
       when NotOperator
