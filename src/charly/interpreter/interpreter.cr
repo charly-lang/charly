@@ -185,8 +185,14 @@ class Interpreter
         raise "Member node is not an identifier. That's a bug"
       end
 
-      # Change the value
-      identifier.stack.write(member.value.as(String), value, false)
+      # Check if the stack contains the value
+      # TODO: Figure out object write behaviour if the key doesn't exist
+      # Should we mimic javascript?
+      if identifier.stack.contains(member.value.as(String))
+        identifier.stack.write(member.value.as(String), value, false, false)
+      else
+        return TNull.new
+      end
       return value
     elsif identifier.is_a? IndexExpression
 
@@ -217,7 +223,7 @@ class Interpreter
           raise "Can't use #{member} in index expression."
         end
       else
-        raise "Can't write to non-array and non-string #{identifier}"
+        raise "Can't write to non-array #{identifier}"
       end
     else
 
