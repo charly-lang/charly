@@ -9,10 +9,12 @@ require "../syntax/parser/parser.cr"
 class InterpreterFascade
   property top : Stack
   property session : Session?
+  property flags : Array(String)
 
-  def initialize(session = nil)
+  def initialize(session = nil, flags = [] of String)
     @session = session
     @top = Stack.new nil
+    @flags = flags
   end
 
   def execute_files(files, stack = @top)
@@ -24,15 +26,15 @@ class InterpreterFascade
   def execute_file(file, stack = @top)
 
     # Parsing
-    parser = Parser.new file
+    parser = Parser.new file, @flags
     parser.parse
     program = parser.tree
 
     # Execute the file in the interpreter
-    unless ARGV.includes? "--noexec"
+    unless @flags.includes? "noexec"
       stack.file = file
       stack.session = @session
-      return Interpreter.new [program], stack
+      return Interpreter.new [program], stack, @flags
     else
       CharlyTypes::TNull.new
     end

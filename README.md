@@ -55,7 +55,7 @@ let input = gets();
 print(input);
 
 # Numbers
-let input_number = Number(gets());
+let input_number = to_numeric(gets());
 print(input_number);
 ```
 
@@ -67,6 +67,9 @@ typeof("Charly"); # => String
 typeof([1, 2, 3]); # => Array
 typeof(null); # => Null
 typeof(false); # => Boolean
+typeof(class Box {}); # => Class
+typeof(func() {}); # => Function
+typeof({ let name = "charly"; }); # => Object
 
 let number = 25;
 print("Number is: " + number);
@@ -82,7 +85,7 @@ __Working with arrays__
 ```charly
 let array = [1, 2, 3];
 array = append(array, 4);
-print(array); # => 1, 2, 3, 4
+print(array); # => [1, 2, 3, 4]
 ```
 
 __Classes & Objects__
@@ -97,20 +100,33 @@ class Person {
   };
 };
 
-let leonard = new(Person, "Leonard", 16);
+let leonard = Person("Leonard", 16);
 print(leonard.name); # "Leonard"
 print(leonard.age); # 16
 ```
 
+# Installation
+I have only tested this on macOS 10.12.
+It should theoretically work on linux systems too.
+
+You will need a working [crystal](http://crystal-lang.org/) installation.
+
+To install the `charly` command and automatically copy it to the `/usr/bin` folder, run `install.sh`.
+You will be prompted for your admin password (used to copy to `/usr/bin`).
+
 # CLI options
 ```
-charly filename [options...]
+$ charly -h
+Usage: charly [options] filename [arguments]
+    -f FLAG, --flag FLAG             Set a flag
+    -h, --help                       Show this help
 
-<options>
- --ast              # Display the abstract syntax tree
- --tokens           # Display a list of tokens found by lexical analysis
- --noexec           # Don't execute the program (Useful if you just want to dump AST's)
- --noprelude        # Don't load the prelude file (You'll have to load your own standard library yourself)
+Flags:
+    ast                              Display AST's of parsed programs
+    tokens                           Display tokens of parsed programs
+    noexec                           Disable execution
+    noprelude                        Don't load the prelude file
+    stackdump                        Dump the top-level stack at the end of execution
 ```
 
 # Contributors

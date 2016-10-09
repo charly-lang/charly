@@ -14,9 +14,10 @@ class Parser
   property file : VirtualFile
   property node : ASTNode
   property next : UInt64
+  property flags : Array(String)
 
   # Create a new parser from a virtualfile
-  def initialize(@file)
+  def initialize(@file, @flags)
 
     # Get all the tokens from the file
     lexer = Lexer.new file
@@ -30,7 +31,7 @@ class Parser
       token.type != TokenType::Comment
     end
 
-    if ARGV.includes? "--tokens"
+    if flags.includes? "tokens"
       @tokens.each do |token|
         puts token
       end
@@ -62,7 +63,7 @@ class Parser
     linker.start
 
     # If the *--ast* cli option was passed, display the tree
-    if ARGV.includes? "--ast"
+    if flags.includes? "ast"
       puts "--- AST: #{@file.filename} ---"
       puts @tree
     end

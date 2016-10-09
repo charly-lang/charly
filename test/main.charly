@@ -651,6 +651,15 @@ let testResult = UnitTest("Charly").begin(func(describe) {
 
   });
 
+  describe("ARGV", func(it) {
+
+    it("receives an argument called ARGV", func(assert) {
+      assert(typeof(ARGV), "Array");
+      assert(length(ARGV), 0);
+    });
+
+  });
+
 });
 
 exit(testResult);
