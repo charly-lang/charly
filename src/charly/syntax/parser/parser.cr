@@ -538,7 +538,7 @@ class Parser
         @node << left_side
 
         skip_token(TokenType::LeftBracket) &&
-        expression &&
+        expression_list &&
         skip_token(TokenType::RightBracket) &&
         consume_postfix
       })

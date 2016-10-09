@@ -817,6 +817,68 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(myBox.mybox.name, "changed as well");
     });
 
+    it("can specify the __member method", func(assert) {
+      class Box {
+        func __member(index) {
+          "received: " + index;
+        };
+      };
+
+      let myBox = Box();
+      assert(myBox[0], "received: 0");
+      assert(myBox[200], "received: 200");
+      assert(myBox[-200], "received: -200");
+      assert(myBox["test"], "received: test");
+      assert(myBox[[1, 2]], "received: [1, 2]");
+    });
+
+    it("calls the __member method with the correct self identifier", func(assert) {
+      class Box {
+        func __member(index) {
+          self;
+        };
+      };
+
+      let myBox = Box();
+      assert(myBox[0] == myBox, true);
+      assert(myBox[200] == myBox, true);
+      assert(myBox[-200] == myBox, true);
+      assert(myBox["test"] == myBox, true);
+      assert(myBox[[1, 2]] == myBox, true);
+    });
+
+    it("can specifiy the __member_write method", func(assert) {
+      class Box {
+        func __member_write(index, value) {
+          "received: " + index + " and " + value;
+        };
+      };
+
+      let myBox = Box();
+
+      assert(myBox[0] = 1, "received: 0 and 1");
+      assert(myBox[200] = 20, "received: 200 and 20");
+      assert(myBox[-200] = 500, "received: -200 and 500");
+      assert(myBox["test"] = "hello", "received: test and hello");
+      assert(myBox[[1, 2]] = false, "received: [1, 2] and false");
+    });
+
+    it("calls the __member_write method with the correct self identifier", func(assert) {
+      class Box {
+        func __member_write(index, value) {
+          self;
+        };
+      };
+
+      let myBox = Box();
+
+      assert((myBox[0] = 1) == myBox, true);
+      assert((myBox[200] = 20) == myBox, true);
+      assert((myBox[-200] = 500) == myBox, true);
+      assert((myBox["test"] = "hello") == myBox, true);
+      assert((myBox[[1, 2]] = false) == myBox, true);
+    });
+
   });
 
   describe("While loops", func(it) {

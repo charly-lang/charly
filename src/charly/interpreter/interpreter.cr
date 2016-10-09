@@ -122,7 +122,7 @@ class Interpreter
       return TNull.new
     end
 
-    raise "Unknown node encountered #{node.class} #{stack}"
+    raise "Unknown node encountered #{node} #{stack}"
   end
 
   # Initializes a variable in the current stack
@@ -199,10 +199,15 @@ class Interpreter
       identifier = exec_expression(identifier, stack)
 
       # Only TArray and TString allowed
-      if identifier.is_a?(TArray)
+      if identifier.is_a? TArray
+
+        # Check that there is at least 1 expression
+        unless member.children.size > 0
+          raise "Missing index for array index expression"
+        end
 
         # Resolve the member
-        member = exec_expression(member, stack)
+        member = exec_expression(member.children[0], stack)
 
         # Typecheck the member
         if member.is_a?(TNumeric)
@@ -215,10 +220,74 @@ class Interpreter
           # Write to the index
           identifier.value[member.value.to_i64] = value
         else
-          raise "Can't use #{member} in index expression."
+          raise "Can't use #{member} in array index expression."
         end
+      elsif identifier.is_a? TObject
+
+        # Check if the object contains the __member function
+        if identifier.stack.contains("__member_write")
+
+          # Get the function
+          function = identifier.stack.get("__member_write", false)
+
+          # Typecheck
+          if function.is_a? TFunc
+
+            # Bind the self identifier
+            function.bound_stack.write("self", identifier, true)
+
+            # Resolve all children
+            arguments = [] of BaseType
+            member.children.each do |child|
+              arguments << exec_expression(child, stack)
+            end
+            arguments << value
+
+            # Execute the __member function
+            return exec_function(function, arguments)
+          end
+        end
+
+        raise "Could not find __member_write function on #{identifier}"
       else
-        raise "Can't write to non-array #{identifier}"
+
+        # Check the stack for an object specific to the current identifier
+        # For example, if the identifier is of type TNumeric
+        # we will search for an object called Numeric
+        # This is defined in the classname method on CharlyTypes
+        [identifier.class.to_s, "Object"].each do |identifier_name|
+          if stack.defined(identifier_name)
+            primitiveobject = stack.get(identifier_name)
+
+            # Typecheck
+            if primitiveobject.is_a? TObject
+
+              # Check if the object contains the __member function
+              if primitiveobject.stack.contains("__member_write")
+
+                # Get the function
+                function = primitiveobject.stack.get("__member_write", false)
+
+                # Typecheck
+                if function.is_a? TFunc
+
+                  # Bind the self identifier
+                  function.bound_stack.write("self", primitiveobject, true)
+
+                  # Resolve all children
+                  arguments = [] of BaseType
+                  member.children.each do |child|
+                    arguments << exec_expression(child, stack)
+                  end
+                  arguments << value
+
+                  # Execute the __member function
+                  return exec_function(function, arguments)
+                end
+              end
+            end
+          end
+        end
       end
     else
 
@@ -653,24 +722,98 @@ class Interpreter
     identifier = exec_expression(node.identifier, stack)
     member = node.member
 
+    unless member.is_a? ASTNode
+      raise "Index expression without member found. That's a bug in the parser."
+    end
+
     # Array index lookup
-    if identifier.is_a?(TArray)
+    if identifier.is_a? TArray
+
+      # Check if the list contains at least 1 item
+      # The others are simply ignored
+      unless member.children.size > 0
+        raise "Missing index for array index expression"
+      end
 
       # Resolve the identifier
-      member = exec_expression(member, stack)
+      member = exec_expression(member.children[0], stack)
 
       # Typecheck
       if member.is_a?(TNumeric)
 
         # Check for out-of-bounds error
-        if member.value > identifier.value.size - 1 || member.value < 0
+        if member.value.to_i64 > identifier.value.size - 1 || member.value.to_i64 < 0
           return TNull.new
         end
 
         # Return the value from the index
         return identifier.value[member.value.to_i64]
       else
-        raise "Invalid type #{member.class} for member expression"
+        raise "Invalid type #{member.class} for index expression"
+      end
+    elsif identifier.is_a? TObject
+
+      # Check if the object contains the __member function
+      if identifier.stack.contains("__member")
+
+        # Get the function
+        function = identifier.stack.get("__member", false)
+
+        # Typecheck
+        if function.is_a? TFunc
+
+          # Bind the self identifier
+          function.bound_stack.write("self", identifier, true)
+
+          # Resolve all children
+          arguments = [] of BaseType
+          member.children.each do |child|
+            arguments << exec_expression(child, stack)
+          end
+
+          # Execute the __member function
+          return exec_function(function, arguments)
+        end
+      end
+
+      raise "Could not find __member function on #{identifier}"
+    else
+
+      # Check the stack for an object specific to the current identifier
+      # For example, if the identifier is of type TNumeric
+      # we will search for an object called Numeric
+      # This is defined in the classname method on CharlyTypes
+      [identifier.class.to_s, "Object"].each do |identifier_name|
+        if stack.defined(identifier_name)
+          primitiveobject = stack.get(identifier_name)
+
+          # Typecheck
+          if primitiveobject.is_a? TObject
+
+            # Check if the object contains the __member function
+            if primitiveobject.stack.contains("__member")
+
+              # Get the function
+              function = primitiveobject.stack.get("__member", false)
+
+              # Typecheck
+              if function.is_a? TFunc
+
+                # Bind the self identifier
+                function.bound_stack.write("self", primitiveobject, true)
+
+                # Resolve all children
+                arguments = [] of BaseType
+                member.children.each do |child|
+                  arguments << exec_expression(child, stack)
+                end
+
+                # Execute the __member function
+                return exec_function(function, arguments)
+              end
+            end
+          end
+        end
       end
     end
 
