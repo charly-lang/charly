@@ -29,6 +29,10 @@ module Charly
       puts available_flags
       exit
     }
+    opts.on("-v", "--version", "Show the version number") {
+      puts "0.0.0"
+      exit
+    }
     opts.invalid_option {} # ignore
     opts.unknown_args do |before_dash|
       if before_dash.size == 0
