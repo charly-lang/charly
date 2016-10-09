@@ -51,7 +51,15 @@ class Parser
 
     # Check if the whole program was parsed
     if @next < @tokens.size - 1
-      raise "Could not parse whole file!"
+
+      # Display the last 10 tokens that were touched by the parser
+      @tokens.select { |token|
+        token.touched
+      }.last(20).each do |token|
+        puts token
+      end
+
+      raise "Could not parse #{@file.filename}"
     end
 
     # Re-Structure the tree
@@ -89,6 +97,9 @@ class Parser
     if @next >= @tokens.size
       return false
     end
+
+    # Mark the token as touched
+    @tokens[@next].touched = true
 
     # Check for a match
     if value
