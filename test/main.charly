@@ -783,6 +783,40 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(person.name, "world");
     });
 
+    it("has a reference to the correct object", func(assert) {
+      class Box {
+        class SubBox {
+          let name = "test";
+
+          func doStuff() {
+            self.name = "changed as well";
+          };
+        };
+
+        func doStuff() {
+          self.name = "changed";
+        };
+
+        let name = "hello world";
+        let mybox = SubBox();
+      };
+
+      let myBox = Box();
+
+      assert(myBox.name, "hello world");
+      assert(myBox.mybox.name, "test");
+
+      myBox.doStuff();
+
+      assert(myBox.name, "changed");
+      assert(myBox.mybox.name, "test");
+
+      myBox.mybox.doStuff();
+
+      assert(myBox.name, "changed");
+      assert(myBox.mybox.name, "changed as well");
+    });
+
   });
 
   describe("While loops", func(it) {
