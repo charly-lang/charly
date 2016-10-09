@@ -933,6 +933,8 @@ class Interpreter
         filepath = ENV["CHARLYDIR"] + "/array.charly"
       when "util"
         filepath = ENV["CHARLYDIR"] + "/util.charly"
+      when "primitives"
+        filepath = ENV["CHARLYDIR"] + "/primitives.charly"
       else
         filepath = File.join(current_dir, filename)
       end

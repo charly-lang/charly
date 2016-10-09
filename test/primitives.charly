@@ -1,19 +1,6 @@
-let Numeric = {
-  func times(callback) {
-    repeat(self, func(i) {
-      callback(i, self.to_string());
-    });
-  };
+let factorial = 5.factorial();
 
-  func to_string() {
-    "Value: " + self;
-  };
-};
-
-func call_me() {
-  5.times(func(i, value) {
-    print(i, value);
-  });
-};
-
-call_me();
+5.downto(1, func(i) {
+  write(i + ".. ");
+});
+print("Liftoff!");
