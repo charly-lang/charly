@@ -1,23 +1,28 @@
+# Includes a file
+# The content of the *export* variable of the file
+# will be returned by this function
+#
+# Contrary to require this will run the file every time even if it was run before already
 func include(filename) {
   call_internal("include", filename);
 };
 
+# Require a file
+# The content of the *export* variable of the file
+# will be returned by this function
+#
+# If the file was already loaded before, a reference to the reuslt will be returned
 func require(filename) {
   call_internal("require", filename);
 };
 
+# Dumps the objects values into the parent stack
 func unpack(object) {
   call_internal("unpack", object);
 };
 
 # Primitives
-unpack(require("primitives"));
-
-# Util functions
-unpack(require("util"));
-
-# Array functions
-unpack(require("array"));
+unpack(require("./primitives/include.charly"));
 
 # Default print and write functions
 unpack(require("io"));

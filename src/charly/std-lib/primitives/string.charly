@@ -1,0 +1,14 @@
+export = {
+
+  # Returns the numeric representation of this string
+  # Returns null if the string could not be casted to a
+  # numeric
+  func to_n() {
+    call_internal("to_numeric", self);
+  };
+
+  # Trims all whitespace from the beginning and the end of the string
+  func trim() {
+    call_internal("trim", self);
+  };
+};

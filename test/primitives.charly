@@ -1,6 +1,0 @@
-let factorial = 5.factorial();
-
-5.downto(1, func(i) {
-  write(i + ".. ");
-});
-print("Liftoff!");

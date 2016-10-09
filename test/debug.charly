@@ -1,0 +1,13 @@
+let names = [];
+
+gets().to_n().times(func() {
+  names.push(gets().trim());
+});
+
+print(names);
+
+gets().to_n().times(func() {
+  names.delete(gets().trim().to_n());
+});
+
+print(names);
