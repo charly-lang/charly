@@ -286,6 +286,31 @@ class Interpreter
     left = exec_expression(node.left, stack)
     right = exec_expression(node.right, stack)
 
+    # Search for a operator overload on binary expressions
+    operator_name = case operator
+    when PlusOperator
+      "__plus"
+    when MinusOperator
+      "__minus"
+    when MultOperator
+      "__mult"
+    when DivdOperator
+      "__divd"
+    when ModOperator
+      "__mod"
+    when PowOperator
+      "__pow"
+    else
+      nil
+    end
+
+    if operator_name.is_a? String
+      prop = redirect_property(left, operator_name, stack)
+      if prop.is_a? TFunc
+        return exec_function(prop, [right] of BaseType)
+      end
+    end
+
     if left.is_a?(TNumeric) && right.is_a?(TNumeric)
       case operator
       when PlusOperator
@@ -345,32 +370,6 @@ class Interpreter
       end
     end
 
-    # Search for a operator overload on binary expressions
-    # that are not catched before here
-    operator_name = case operator
-    when PlusOperator
-      "__plus"
-    when MinusOperator
-      "__minus"
-    when MultOperator
-      "__mult"
-    when DivdOperator
-      "__divd"
-    when ModOperator
-      "__mod"
-    when PowOperator
-      "__pow"
-    else
-      nil
-    end
-
-    if operator_name.is_a? String
-      prop = redirect_property(left, operator_name, stack)
-      if prop.is_a? TFunc
-        return exec_function(prop, [right] of BaseType)
-      end
-    end
-
     raise "Invalid types or values inside binary expression"
   end
 
@@ -381,6 +380,31 @@ class Interpreter
     left = exec_expression(node.left, stack)
     right = exec_expression(node.right, stack)
     operator = node.operator
+
+    # Search for a operator overload on comparison expressions
+    operator_name = case operator
+    when GreaterOperator
+      "__greater"
+    when LessOperator
+      "__less"
+    when GreaterEqualOperator
+      "__greaterequal"
+    when LessEqualOperator
+      "__lessequal"
+    when EqualOperator
+      "__equal"
+    when NotOperator
+      "__notequal"
+    else
+      nil
+    end
+
+    if operator_name.is_a? String
+      prop = redirect_property(left, operator_name, stack)
+      if prop.is_a? TFunc
+        return exec_function(prop, [right] of BaseType)
+      end
+    end
 
     # When comparing TNumeric's
     if left.is_a?(TNumeric) && right.is_a?(TNumeric)

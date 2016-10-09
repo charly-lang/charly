@@ -862,7 +862,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
     it("can specifiy the __member_write method", func(assert) {
       class Box {
         func __member_write(index, value) {
-          "received: " + index + " and " + value;
+          "received: " + index.to_s() + " and " + value;
         };
       };
 
@@ -872,6 +872,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(myBox[200] = 20, "received: 200 and 20");
       assert(myBox[-200] = 500, "received: -200 and 500");
       assert(myBox["test"] = "hello", "received: test and hello");
+      assert(myBox["test", 2] = "hello", "received: test and 2");
       assert(myBox[[1, 2]] = false, "received: [1, 2] and false");
     });
 
@@ -889,6 +890,42 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert((myBox[-200] = 500) == myBox, true);
       assert((myBox["test"] = "hello") == myBox, true);
       assert((myBox[[1, 2]] = false) == myBox, true);
+    });
+
+    it("redirects arithmetic operators", func(assert) {
+      let myBox = {
+        func __plus(element) { "plus"; };
+        func __minus(element) { "minus"; };
+        func __mult(element) { "mult"; };
+        func __divd(element) { "divd"; };
+        func __mod(element) { "mod"; };
+        func __pow(element) { "pow"; };
+      };
+
+      assert(myBox + 1, "plus");
+      assert(myBox - 1, "minus");
+      assert(myBox * 1, "mult");
+      assert(myBox / 1, "divd");
+      assert(myBox % 1, "mod");
+      assert(myBox ** 1, "pow");
+    });
+
+    it("redirects comparison operators", func(assert) {
+      let myBox = {
+        func __less(element) { "less"; };
+        func __greater(element) { "greater"; };
+        func __lessequal(element) { "lessequal"; };
+        func __greaterequal(element) { "greaterequal"; };
+        func __equal(element) { "equal"; };
+        func __notequal(element) { "notequal"; };
+      };
+
+      assert(myBox < 1, "less");
+      assert(myBox > 1, "greater");
+      assert(myBox <= 1, "lessequal");
+      assert(myBox >= 1, "greaterequal");
+      assert(myBox == 1, "equal");
+      assert(myBox ! 1, "notequal");
     });
 
   });
