@@ -602,51 +602,51 @@ class Interpreter
     identifier = exec_expression(node.identifier, stack)
     member = node.member
 
-    # Typecheck
-    if identifier.is_a?(TObject) && member.is_a?(IdentifierLiteral)
+    if member.is_a?(IdentifierLiteral)
 
-      # Check if the objects stack contains the given value
-      if identifier.stack.contains(member.value)
-        return identifier.stack.get(member.value, false)
-      else
-        return TNull.new
+      # Check if the object itself has a property
+      if identifier.is_a? TObject
+
+        # Check if the objects stack contains the given value
+        if identifier.stack.contains(member.value)
+          return identifier.stack.get(member.value, false)
+        end
       end
-    elsif member.is_a?(IdentifierLiteral)
 
       # Check the stack for an object specific to the current identifier
       # For example, if the identifier is of type TNumeric
       # we will search for an object called Numeric
       # This is defined in the classname method on CharlyTypes
-      if stack.defined(identifier.class.to_s)
-        primitiveobject = stack.get(identifier.class.to_s)
+      [identifier.class.to_s, "Object"].each do |identifier_name|
+        if stack.defined(identifier_name)
+          primitiveobject = stack.get(identifier_name)
 
-        # Check if it's an object
-        if primitiveobject.is_a? TObject
+          # Check if it's an object
+          if primitiveobject.is_a? TObject
 
-          # Search for the member
-          if primitiveobject.stack.contains(member.value)
+            # Search for the member
+            if primitiveobject.stack.contains(member.value)
 
-            # Get the member
-            primitive_member = primitiveobject.stack.get(member.value)
+              # Get the member
+              primitive_member = primitiveobject.stack.get(member.value)
 
-            # If the primitive_member is a function,
-            # we bind the self variable to the current identifier
-            if primitive_member.is_a? TFunc
-              primitive_member.bound_stack.write("self", identifier, true)
+              # If the primitive_member is a function,
+              # we bind the self variable to the current identifier
+              if primitive_member.is_a? TFunc
+                primitive_member.bound_stack.write("self", identifier, true)
+              end
+
+              return primitive_member
             end
-
-            return primitive_member
-          else
-            raise "Could not find method #{member.value} on primitive object #{identifier.class}"
           end
-        else
-          raise "Primitive #{identifier.class} is not an object!"
         end
-      else
-        raise "Could not find primitive class #{identifier.class}!"
       end
+    end
+
+    if member.is_a? IdentifierLiteral
+      raise "Can't find member #{member.value} on #{identifier}"
     else
-      raise "Invalid member expression on #{identifier}"
+      raise "Can't find member #{member} on #{identifier}"
     end
   end
 
