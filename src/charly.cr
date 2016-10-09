@@ -59,6 +59,13 @@ module Charly
   # Write the arguments into the prelude stack
   prelude_stack.write("ARGV", CharlyTypes::TArray.new(arguments), true)
 
+  # Write the flags into the prelude stack
+  iflags = [] of CharlyTypes::BaseType
+  flags.each do |flag|
+    iflags << CharlyTypes::TString.new(flag)
+  end
+  prelude_stack.write("IFLAGS", CharlyTypes::TArray.new(iflags), true)
+
   # Get a InterpreterFascade
   interpreter = InterpreterFascade.new(session, flags)
 
