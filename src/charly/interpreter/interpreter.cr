@@ -607,9 +607,43 @@ class Interpreter
       else
         return TNull.new
       end
-    end
+    elsif member.is_a?(IdentifierLiteral)
 
-    raise "Could not perform member expression on #{identifier}!"
+      # Check the stack for an object specific to the current identifier
+      # For example, if the identifier is of type TNumeric
+      # we will search for an object called Numeric
+      # This is defined in the classname method on CharlyTypes
+      if stack.defined(identifier.class.to_s)
+        primitiveobject = stack.get(identifier.class.to_s)
+
+        # Check if it's an object
+        if primitiveobject.is_a? TObject
+
+          # Search for the member
+          if primitiveobject.stack.contains(member.value)
+
+            # Get the member
+            primitive_member = primitiveobject.stack.get(member.value)
+
+            # If the primitive_member is a function,
+            # we bind the self variable to the current identifier
+            if primitive_member.is_a? TFunc
+              primitive_member.bound_stack.write("self", identifier, true)
+            end
+
+            return primitive_member
+          else
+            raise "Could not find method #{member.value} on primitive object #{identifier.class}"
+          end
+        else
+          raise "Primitive #{identifier.class} is not an object!"
+        end
+      else
+        raise "Could not find primitive class #{identifier.class}!"
+      end
+    else
+      raise "Invalid member expression on #{identifier}"
+    end
   end
 
   def exec_index_expression(node, stack)
@@ -671,6 +705,14 @@ class Interpreter
     # Write the __arguments variable into the stack
     __arguments = TArray.new(arguments)
     function_stack.write("__arguments", __arguments, true)
+
+    # Merge the functions bound stack into the execution_stack
+    bound_stack = function.bound_stack
+    if bound_stack.is_a? Stack
+      bound_stack.values.each do |key, value|
+        function_stack.write(key, value, true)
+      end
+    end
 
     # Write the argument to the function stack
     arguments.each_with_index do |arg, index|
