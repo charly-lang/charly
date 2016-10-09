@@ -273,7 +273,7 @@ module InternalFunctions
       arg = arguments[0]
 
       if arg.is_a?(TString)
-        return TString.new(arg.value.chomp)
+        return TString.new(arg.value.strip)
       else
         raise "trim expected a string, got #{arg.class}"
       end

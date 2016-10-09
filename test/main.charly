@@ -159,7 +159,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert([1, 2] == true, true);
       assert(null == false, true);
       assert({ let name = "leonard"; } == true, true);
-      assert(func(){} == true, true);
+      assert(func() {} == true, true);
       assert(class Test {} == true, true);
     });
 
@@ -186,10 +186,10 @@ let testResult = UnitTest("Charly").begin(func(describe) {
     });
 
     it("compares functions", func(assert) {
-      assert(func(){} == func(){}, false);
-      assert(func(arg){} == func(arg){}, false);
-      assert(func(arg){ arg + 1; } == func(arg){ arg + 1; }, false);
-      assert(func(){ 2; } == func(){ 2; }, false);
+      assert(func() {} == func() {}, false);
+      assert(func(arg) {} == func(arg) {}, false);
+      assert(func(arg) { arg + 1; } == func(arg) { arg + 1; }, false);
+      assert(func() { 2; } == func(){ 2; }, false);
     });
 
     it("does misc. comparisons", func(assert) {
@@ -334,7 +334,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(nums[2][1], 5);
     });
 
-    it("gives back the length of an array", func(assert) {
+    it("gives back the length", func(assert) {
       assert([].length(), 0);
       assert([1, 2].length(), 2);
       assert([1, 2, [3, 4]].length(), 3);
@@ -342,17 +342,56 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(["test"].length(), 1);
     });
 
+    it("iterates via each", func(assert) {
+      let got = [];
+      let nums = [1, 2, 3, 4];
+
+      nums.each(func(v) {
+        got.push(v);
+      });
+
+      assert(got[0], nums[0]);
+      assert(got[1], nums[1]);
+      assert(got[2], nums[2]);
+      assert(got[3], nums[3]);
+    });
+
+    it("iterates via map", func(assert) {
+      let nums = [1, 2, 3, 4];
+
+      nums.map(func(n) {
+        n**2;
+      });
+
+      assert(nums[0], 1);
+      assert(nums[1], 4);
+      assert(nums[2], 9);
+      assert(nums[3], 16);
+    });
+
+    it("converts all items to strings", func(assert) {
+      let nums = [1, 2, 3, 4];
+
+      nums.all_to_s();
+
+      assert(nums[0], "1");
+      assert(nums[1], "2");
+      assert(nums[2], "3");
+      assert(nums[3], "4");
+    });
+
     it("creates a new array using Array.of_size", func(assert) {
       let new_array = Array.of_size(100, "whaaaaaaaaaaaaaaaaaat");
       assert(new_array.length(), 100);
     });
 
-    it("appends to an array", func(assert) {
+    it("appends to the end", func(assert) {
       let nums = [1, 2];
-      nums = append(nums, 3);
-      nums = append(nums, 4);
-      nums = append(nums, 5);
-      nums = append(nums, 6);
+
+      nums.push(3);
+      nums.push(4);
+      nums.push(5);
+      nums.push(6);
 
       assert(nums.length(), 6);
       assert(nums[0], 1);
@@ -363,13 +402,60 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(nums[5], 6);
     });
 
-    it("returns the first element of an array", func(assert) {
+    it("append to the beginning", func(assert) {
+      let nums = [1, 2];
+
+      nums.unshift(3);
+      nums.unshift(4);
+      nums.unshift(5);
+      nums.unshift(6);
+
+      assert(nums.length(), 6);
+      assert(nums[0], 6);
+      assert(nums[1], 5);
+      assert(nums[2], 4);
+      assert(nums[3], 3);
+      assert(nums[4], 1);
+      assert(nums[5], 2);
+    });
+
+    it("inserts at a given index", func(assert) {
+      let nums = [1, 2];
+
+      nums.insert(0, 3);
+      nums.insert(1, 4);
+      nums.insert(-200, 5);
+      nums.insert(1000, 6);
+      nums.insert(4, 7);
+
+      assert(nums.length(), 7);
+      assert(nums[0], 5);
+      assert(nums[1], 3);
+      assert(nums[2], 4);
+      assert(nums[3], 1);
+      assert(nums[4], 7);
+      assert(nums[5], 2);
+    });
+
+    it("deletes a given index", func(assert) {
+      let nums = [1, 2, 3, 4, 5];
+
+      nums.delete(0);
+      nums.delete(3);
+      nums.delete(1);
+
+      assert(nums.length(), 2);
+      assert(nums[0], 2);
+      assert(nums[1], 4);
+    });
+
+    it("returns the first element", func(assert) {
       assert([].first(), null);
       assert([1, 2].first(), 1);
       assert([[1]].first()[0], 1);
     });
 
-    it("returns the last element of an array", func(assert) {
+    it("returns the last element", func(assert) {
       assert([].last(), null);
       assert([1, 2, 3].last(), 3);
       assert([1].last(), 1);
@@ -386,6 +472,24 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(-289 == -289.0, true);
       assert(0 == 0.0, true);
       assert(0000000000.000000000 == 0, true);
+    });
+
+    it("calls times", func(assert) {
+      let sum = 0;
+      500.times(func(i) {
+        sum = sum + i;
+      });
+
+      assert(sum, 124750);
+    });
+
+    it("calls downto", func(assert) {
+      let sum = 0;
+      10.downto(0, func(n) {
+        sum = sum + n;
+      });
+
+      assert(sum, 55);
     });
 
   });
@@ -426,6 +530,13 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert("a" * 10, "aaaaaaaaaa");
       assert("a" * 1.5, "a");
       assert("a" * 1.999, "a");
+    });
+
+    it("trims whitespace off the beginning and end", func(assert) {
+      assert("   hello  ".trim(), "hello");
+      assert("         adad   ".trim(), "adad");
+      assert("    asdadasd\n\nasdasd   ".trim(), "asdadasd\n\nasdasd");
+      assert("äääüö\n\n\nlol".trim(), "äääüö\n\n\nlol");
     });
 
   });
@@ -602,6 +713,26 @@ let testResult = UnitTest("Charly").begin(func(describe) {
 
   });
 
+  describe("Objects", func(it) {
+
+    it("can override native methods", func(assert) {
+      let leonard = {
+        let name;
+        let age;
+
+        func to_s() {
+          name + " is " + age + " years old!";
+        };
+      };
+      leonard.name = "Leonard";
+      leonard.age = 16;
+
+      let text = leonard.to_s();
+      assert(text, "Leonard is 16 years old!");
+    });
+
+  });
+
   describe("While loops", func(it) {
 
     it("runs for the specified count", func(assert) {
@@ -620,52 +751,34 @@ let testResult = UnitTest("Charly").begin(func(describe) {
   describe("Misc. standard library functions", func(it) {
 
     it("returns the type of a variable", func(assert) {
-      assert(typeof(false), "Boolean");
-      assert(typeof(true), "Boolean");
-      assert(typeof("test"), "String");
-      assert(typeof(25), "Numeric");
-      assert(typeof(25.5), "Numeric");
-      assert(typeof([1, 2, 3]), "Array");
-      assert(typeof(class Test {}), "Class");
-      assert(typeof(func() {}), "Function");
-      assert(typeof({}), "Object");
-      assert(typeof(null), "Null");
-    });
-
-    it("repeats a function n times", func(assert) {
-      let sum = 0;
-      repeat(500, func(i) {
-        sum = sum + i;
-      });
-
-      assert(sum, 124750);
-    });
-
-    it("calls times on a numeric", func(assert) {
-      let sum = 0;
-      500.times(func(i) {
-        sum = sum + i;
-      });
-
-      assert(sum, 124750);
+      assert(false.type(), "Boolean");
+      assert(true.type(), "Boolean");
+      assert("test".type(), "String");
+      assert(25.type(), "Numeric");
+      assert(25.5.type(), "Numeric");
+      assert([1, 2, 3].type(), "Array");
+      assert((class Test {}).type(), "Class");
+      assert((func() {}).type(), "Function");
+      assert({}.type(), "Object");
+      assert(null.type(), "Null");
     });
 
     it("casts string to numeric", func(assert) {
-      assert("25".to_numeric(), 25);
-      assert("25.5".to_numeric(), 25.5);
-      assert("0".to_numeric(), 0);
-      assert("100029".to_numeric(), 100029);
-      assert("-89.2".to_numeric(), -89.2);
+      assert("25".to_n(), 25);
+      assert("25.5".to_n(), 25.5);
+      assert("0".to_n(), 0);
+      assert("100029".to_n(), 100029);
+      assert("-89.2".to_n(), -89.2);
 
-      assert("hello".to_numeric(), null);
-      assert("25test".to_numeric(), 25);
-      assert("ermokay30".to_numeric(), null);
-      assert("-2.25this".to_numeric(), -2.25);
+      assert("hello".to_n(), null);
+      assert("25test".to_n(), 25);
+      assert("ermokay30".to_n(), null);
+      assert("-2.25this".to_n(), -2.25);
 
-      assert("123.45e2".to_numeric(), 12345);
-      assert("2e5".to_numeric(), 200_000);
-      assert("25e-5".to_numeric(), 0.00025);
-      assert("9e-2".to_numeric(), 0.09);
+      assert("123.45e2".to_n(), 12345);
+      assert("2e5".to_n(), 200_000);
+      assert("25e-5".to_n(), 0.00025);
+      assert("9e-2".to_n(), 0.09);
     });
 
   });
@@ -673,7 +786,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
   describe("ARGV", func(it) {
 
     it("receives an argument called ARGV", func(assert) {
-      assert(typeof(ARGV), "Array");
+      assert(ARGV.type(), "Array");
       assert(ARGV.length(), 0);
     });
 
