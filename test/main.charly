@@ -462,6 +462,18 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert([[1, 2]].last()[1], 2);
     });
 
+    it("concatenates two arrays", func(assert) {
+      let num1 = [1, 2];
+      let num2 = [3, 4];
+
+      let num3 = num1 + num2;
+
+      assert(num3[0], 1);
+      assert(num3[1], 2);
+      assert(num3[2], 3);
+      assert(num3[3], 4);
+    });
+
   });
 
   describe("Numerics", func(it) {
