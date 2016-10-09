@@ -265,9 +265,27 @@ class Interpreter
   def exec_unary_expression(node, stack)
 
     # Resolve the right side
+    operator = node.operator
     right = exec_expression(node.right, stack)
 
-    case node.operator
+    # Search for a operator overload on comparison expressions
+    operator_name = case node.operator
+    when MinusOperator
+      "__uminus"
+    when NotOperator
+      "__unot"
+    else
+      nil
+    end
+
+    if operator_name.is_a? String
+      prop = redirect_property(right, operator_name, stack)
+      if prop.is_a? TFunc
+        return exec_function(prop, [] of BaseType)
+      end
+    end
+
+    case operator
     when MinusOperator
       if right.is_a? TNumeric
         return TNumeric.new(-right.value)

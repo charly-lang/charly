@@ -928,6 +928,16 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(myBox ! 1, "notequal");
     });
 
+    it("redirects unary operators", func(assert) {
+      let myBox = {
+        func __uminus() { "uminus"; };
+        func __unot() { "unot"; };
+      };
+
+      assert(-myBox, "uminus");
+      assert(!myBox, "unot");
+    });
+
   });
 
   describe("While loops", func(it) {
