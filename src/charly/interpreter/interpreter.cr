@@ -187,14 +187,7 @@ class Interpreter
         raise "Member node is not an identifier. That's a bug"
       end
 
-      # Check if the stack contains the value
-      # TODO: Figure out object write behaviour if the key doesn't exist
-      # Should we mimic javascript?
-      if identifier.stack.contains(member.value.as(String))
-        identifier.stack.write(member.value.as(String), value, false, false)
-      else
-        return TNull.new
-      end
+      identifier.stack.write(member.value.as(String), value, true, false)
       return value
     elsif identifier.is_a? IndexExpression
 
@@ -609,7 +602,17 @@ class Interpreter
 
         # Check if the objects stack contains the given value
         if identifier.stack.contains(member.value)
-          return identifier.stack.get(member.value, false)
+
+          # Get the member
+          primitive_member = identifier.stack.get(member.value)
+
+          # If the primitive_member is a function,
+          # we bind the self variable to the current identifier
+          if primitive_member.is_a? TFunc
+            primitive_member.bound_stack.write("self", identifier, true)
+          end
+
+          return primitive_member
         end
       end
 

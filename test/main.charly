@@ -731,6 +731,58 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(text, "Leonard is 16 years old!");
     });
 
+    it("adds properties to objects", func(assert) {
+      class Box {};
+      let myBox = Box();
+      myBox.name = "Leonard";
+      myBox.age = 16;
+
+      assert(myBox.name, "Leonard");
+      assert(myBox.age, 16);
+    });
+
+    it("adds functions to objects", func(assert) {
+      class Box {};
+      let myBox = Box();
+      myBox.name = "Leonard";
+      myBox.age = 16;
+      myBox.to_s = func() {
+        assert(self == myBox, true);
+        self.do_stuff = func() {
+          "it works!";
+        };
+
+        self.name + " - " + self.age;
+      };
+
+      assert(myBox.name, "Leonard");
+      assert(myBox.age, 16);
+      assert(myBox.do_stuff, null);
+      assert(myBox.to_s(), "Leonard - 16");
+      assert(myBox.do_stuff(), "it works!");
+    });
+
+    it("overrides the self identifier", func(assert) {
+      class Box {
+        let name = "test";
+
+        func stuff(self) {
+          self.name = "world";
+        };
+      };
+
+      let person = { let name = "hello"; };
+      let myBox = Box();
+
+      assert(myBox.name, "test");
+      assert(person.name, "hello");
+
+      myBox.stuff(person);
+
+      assert(myBox.name, "test");
+      assert(person.name, "world");
+    });
+
   });
 
   describe("While loops", func(it) {
