@@ -219,75 +219,25 @@ class Interpreter
 
           # Write to the index
           identifier.value[member.value.to_i64] = value
+          return value
         else
           raise "Can't use #{member} in array index expression."
         end
-      elsif identifier.is_a? TObject
+      end
 
-        # Check if the object contains the __member function
-        if identifier.stack.contains("__member_write")
+      # Search for the the __member function
+      prop = redirect_property(identifier, "__member_write", stack)
+      if prop.is_a? TFunc
 
-          # Get the function
-          function = identifier.stack.get("__member_write", false)
-
-          # Typecheck
-          if function.is_a? TFunc
-
-            # Bind the self identifier
-            function.bound_stack.write("self", identifier, true)
-
-            # Resolve all children
-            arguments = [] of BaseType
-            member.children.each do |child|
-              arguments << exec_expression(child, stack)
-            end
-            arguments << value
-
-            # Execute the __member function
-            return exec_function(function, arguments)
-          end
+        # Resolve all children
+        arguments = [] of BaseType
+        member.children.each do |child|
+          arguments << exec_expression(child, stack)
         end
+        arguments << value
 
-        raise "Could not find __member_write function on #{identifier}"
-      else
-
-        # Check the stack for an object specific to the current identifier
-        # For example, if the identifier is of type TNumeric
-        # we will search for an object called Numeric
-        # This is defined in the classname method on CharlyTypes
-        [identifier.class.to_s, "Object"].each do |identifier_name|
-          if stack.defined(identifier_name)
-            primitiveobject = stack.get(identifier_name)
-
-            # Typecheck
-            if primitiveobject.is_a? TObject
-
-              # Check if the object contains the __member function
-              if primitiveobject.stack.contains("__member_write")
-
-                # Get the function
-                function = primitiveobject.stack.get("__member_write", false)
-
-                # Typecheck
-                if function.is_a? TFunc
-
-                  # Bind the self identifier
-                  function.bound_stack.write("self", primitiveobject, true)
-
-                  # Resolve all children
-                  arguments = [] of BaseType
-                  member.children.each do |child|
-                    arguments << exec_expression(child, stack)
-                  end
-                  arguments << value
-
-                  # Execute the __member function
-                  return exec_function(function, arguments)
-                end
-              end
-            end
-          end
-        end
+        # Execute the __member function
+        return exec_function(prop, arguments)
       end
     else
 
@@ -304,7 +254,7 @@ class Interpreter
       end
     end
 
-    value
+    return value
   end
 
   # Extracts the value of a variable from the current stack
@@ -665,54 +615,7 @@ class Interpreter
     member = node.member
 
     if member.is_a?(IdentifierLiteral)
-
-      # Check if the object itself has a property
-      if identifier.is_a? TObject
-
-        # Check if the objects stack contains the given value
-        if identifier.stack.contains(member.value)
-
-          # Get the member
-          primitive_member = identifier.stack.get(member.value)
-
-          # If the primitive_member is a function,
-          # we bind the self variable to the current identifier
-          if primitive_member.is_a? TFunc
-            primitive_member.bound_stack.write("self", identifier, true)
-          end
-
-          return primitive_member
-        end
-      end
-
-      # Check the stack for an object specific to the current identifier
-      # For example, if the identifier is of type TNumeric
-      # we will search for an object called Numeric
-      # This is defined in the classname method on CharlyTypes
-      [identifier.class.to_s, "Object"].each do |identifier_name|
-        if stack.defined(identifier_name)
-          primitiveobject = stack.get(identifier_name)
-
-          # Check if it's an object
-          if primitiveobject.is_a? TObject
-
-            # Search for the member
-            if primitiveobject.stack.contains(member.value)
-
-              # Get the member
-              primitive_member = primitiveobject.stack.get(member.value)
-
-              # If the primitive_member is a function,
-              # we bind the self variable to the current identifier
-              if primitive_member.is_a? TFunc
-                primitive_member.bound_stack.write("self", identifier, true)
-              end
-
-              return primitive_member
-            end
-          end
-        end
-      end
+      return redirect_property(identifier, member.value.as(String), stack);
     end
 
     return TNull.new
@@ -751,73 +654,77 @@ class Interpreter
       else
         raise "Invalid type #{member.class} for index expression"
       end
-    elsif identifier.is_a? TObject
-
-      # Check if the object contains the __member function
-      if identifier.stack.contains("__member")
-
-        # Get the function
-        function = identifier.stack.get("__member", false)
-
-        # Typecheck
-        if function.is_a? TFunc
-
-          # Bind the self identifier
-          function.bound_stack.write("self", identifier, true)
-
-          # Resolve all children
-          arguments = [] of BaseType
-          member.children.each do |child|
-            arguments << exec_expression(child, stack)
-          end
-
-          # Execute the __member function
-          return exec_function(function, arguments)
-        end
-      end
-
-      raise "Could not find __member function on #{identifier}"
     else
 
-      # Check the stack for an object specific to the current identifier
-      # For example, if the identifier is of type TNumeric
-      # we will search for an object called Numeric
-      # This is defined in the classname method on CharlyTypes
-      [identifier.class.to_s, "Object"].each do |identifier_name|
-        if stack.defined(identifier_name)
-          primitiveobject = stack.get(identifier_name)
+      # Search for the the __member function
+      prop = redirect_property(identifier, "__member", stack)
+      if prop.is_a? TFunc
 
-          # Typecheck
-          if primitiveobject.is_a? TObject
+        # Resolve all children
+        arguments = [] of BaseType
+        member.children.each do |child|
+          arguments << exec_expression(child, stack)
+        end
 
-            # Check if the object contains the __member function
-            if primitiveobject.stack.contains("__member")
+        # Execute the __member function
+        return exec_function(prop, arguments)
+      end
+    end
 
-              # Get the function
-              function = primitiveobject.stack.get("__member", false)
+    raise "Could not perform index expression on #{identifier}"
+  end
 
-              # Typecheck
-              if function.is_a? TFunc
+  # Redirects a property from a literal to one of the languages primitive classes
+  # The result will be returned
+  def redirect_property(identifier, propname : String, stack)
 
-                # Bind the self identifier
-                function.bound_stack.write("self", primitiveobject, true)
+    # If this is an object
+    if identifier.is_a? TObject
 
-                # Resolve all children
-                arguments = [] of BaseType
-                member.children.each do |child|
-                  arguments << exec_expression(child, stack)
-                end
+      # Check if the object contains the propname
+      if identifier.stack.contains(propname)
 
-                # Execute the __member function
-                return exec_function(function, arguments)
-              end
+        # Get the prop
+        prop = identifier.stack.get(propname, false)
+
+        # Bind the self identifier if the prop is a function
+        if prop.is_a? TFunc
+          prop.bound_stack.write("self", identifier, true)
+        end
+
+        return prop
+      end
+    end
+
+    # Check the stack for an object specific to the current identifier
+    # For example, if the identifier is of type TNumeric
+    # we will search for an object called Numeric
+    # This is defined in the classname method on CharlyTypes
+    [identifier.class.to_s, "Object"].uniq.each do |identifier_name|
+      if stack.defined(identifier_name)
+        primitiveobject = stack.get(identifier_name)
+
+        # Typecheck
+        if primitiveobject.is_a? TObject
+
+          # Check if the object contains the prop
+          if primitiveobject.stack.contains propname
+
+            # Get the prop
+            prop = primitiveobject.stack.get(propname, false)
+
+            # Bind the self identifier if the prop is a function
+            if prop.is_a? TFunc
+              prop.bound_stack.write("self", identifier, true)
             end
+
+            return prop
           end
         end
       end
     end
 
-    raise "Could not perform index expression on #{identifier}"
+    return TNull.new
   end
 
   # Executes *function*, passing it *arguments*
