@@ -8,9 +8,11 @@ class Interpreter
   include CharlyTypes
   property initial_stack : Stack
   property program_result : BaseType
+  property flags : Array(String)
 
-  def initialize(programs, stack)
+  def initialize(programs, stack, flags)
     @initial_stack = stack
+    @flags = flags
     @program_result = exec_programs(programs, stack)
   end
 
@@ -852,7 +854,7 @@ class Interpreter
       # by passing it stack.top
       # it still has access to all the standard library functions
       # but doesn't have access to the current stack
-      interpreter = InterpreterFascade.new(stack.top.session)
+      interpreter = InterpreterFascade.new(stack.top.session, @flags)
       result = interpreter.execute_file(include_file, include_stack)
 
       return include_stack.get("export")

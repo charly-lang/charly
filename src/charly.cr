@@ -1,39 +1,74 @@
 require "./charly/file.cr"
 require "./charly/interpreter/fascade.cr"
 require "./charly/interpreter/session.cr"
+require "option_parser"
 
 module Charly
 
-  # Read the file from ARGV
-  filename = ARGV[0]?
+  flags = [] of String
+  filename = "main.charly" # default name for the input file
+  arguments = [] of CharlyTypes::BaseType
 
-  if filename.is_a? String
+  available_flags = <<-FLAGS
 
-    # The current session
-    session = Session.new
+  Flags:
+      ast                              Display AST's of parsed programs
+      tokens                           Display tokens of parsed programs
+      noexec                           Disable execution
+      noprelude                        Don't load the prelude file
+      stackdump                        Dump the top-level stack at the end of execution
+  FLAGS
 
-    # Create a stack that contains the results of the standard library
-    prelude_stack = Stack.new nil
-    userfile_stack = Stack.new prelude_stack
+  OptionParser.parse! do |opts|
+    opts.banner = "Usage: charly [options] filename [arguments]"
+    opts.on("-f FLAG", "--flag FLAG", "Set a flag") { |flag|
+      flags << flag
+    }
+    opts.on("-h", "--help", "Show this help") {
+      puts opts
+      puts available_flags
+      exit
+    }
+    opts.invalid_option {} # ignore
+    opts.unknown_args do |before_dash|
+      if before_dash.size == 0
+        puts "Missing filename"
+        puts opts
+        puts available_flags
+        exit 1
+      end
 
-    # Get a InterpreterFascade
-    interpreter = InterpreterFascade.new(session)
-
-    # Execute the prelude
-    unless ARGV.includes? "--noprelude"
-      interpreter.execute_file(RealFile.new("./src/charly/std-lib/prelude.charly"), prelude_stack)
+      filename = before_dash.to_a.shift
+      before_dash.each do |arg|
+        arguments << CharlyTypes::TString.new(arg)
+      end
     end
+  end
 
-    # Execute the userfile
-    result = interpreter.execute_file(RealFile.new(filename), userfile_stack)
+  # The current session
+  session = Session.new
 
-    # If the --stackdump CLI option was passed
-    # display the userstack at the end of execution
-    if ARGV.includes? "--stackdump"
-      puts userfile_stack
-    end
+  # Create a stack that contains the results of the standard library
+  prelude_stack = Stack.new nil
+  userfile_stack = Stack.new prelude_stack
 
-  else
-    puts "No filename passed!"
+  # Write the arguments into the prelude stack
+  prelude_stack.write("ARGV", CharlyTypes::TArray.new(arguments), true)
+
+  # Get a InterpreterFascade
+  interpreter = InterpreterFascade.new(session, flags)
+
+  # Execute the prelude
+  unless flags.includes? "noprelude"
+    interpreter.execute_file(RealFile.new("./src/charly/std-lib/prelude.charly"), prelude_stack)
+  end
+
+  # Execute the userfile
+  result = interpreter.execute_file(RealFile.new(filename), userfile_stack)
+
+  # If the stackdump flag was set
+  # display the userstack at the end of execution
+  if flags.includes? "stackdump"
+    puts userfile_stack
   end
 end
