@@ -643,11 +643,7 @@ class Interpreter
       end
     end
 
-    if member.is_a? IdentifierLiteral
-      raise "Can't find member #{member.value} on #{identifier}"
-    else
-      raise "Can't find member #{member} on #{identifier}"
-    end
+    return TNull.new
   end
 
   def exec_index_expression(node, stack)
