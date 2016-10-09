@@ -345,6 +345,32 @@ class Interpreter
       end
     end
 
+    # Search for a operator overload on binary expressions
+    # that are not catched before here
+    operator_name = case operator
+    when PlusOperator
+      "__plus"
+    when MinusOperator
+      "__minus"
+    when MultOperator
+      "__mult"
+    when DivdOperator
+      "__divd"
+    when ModOperator
+      "__mod"
+    when PowOperator
+      "__pow"
+    else
+      nil
+    end
+
+    if operator_name.is_a? String
+      prop = redirect_property(left, operator_name, stack)
+      if prop.is_a? TFunc
+        return exec_function(prop, [right] of BaseType)
+      end
+    end
+
     raise "Invalid types or values inside binary expression"
   end
 
