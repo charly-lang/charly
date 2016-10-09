@@ -101,6 +101,73 @@ module InternalFunctions
     return TNull.new
   end
 
+  # Insert a value at a given index in an array
+  def array_insert(arguments, stack)
+
+    # We need at least 3 arguments
+    if arguments.size >= 3
+      array = arguments[0]
+      index = arguments[1]
+      value = arguments[2]
+
+      # Typecheck
+      if array.is_a?(TArray) && index.is_a?(TNumeric) && value.is_a?(BaseType)
+
+        # If the index is smaller than 0, we shift to the beginning
+        # If the index is bigger than the size of the array
+        # we append to the end
+        if index.value <= 0
+          array.value.unshift(value)
+        elsif index.value >= array.value.size
+          array.value << value
+        else
+          array.value.insert(index.value.to_i64, value)
+        end
+
+        return array
+
+      else
+        raise "array_delete expected array, index, any"
+      end
+
+    end
+
+    raise "array_insert expected at least 3 arguments"
+  end
+
+  # Delete a value at a given index in an array
+  def array_delete(arguments, stack)
+
+    # We need at least 2 arguments
+    if arguments.size >= 2
+      array = arguments[0]
+      index = arguments[1]
+
+      # Typecheck
+      if array.is_a?(TArray) && index.is_a?(TNumeric)
+
+        # If the index is smaller than 0, we delete the first element
+        # If the index is bigger than the size of the array
+        # we delete the last item
+        if index.value <= 0
+          return array.value.shift
+        elsif index.value >= array.value.size
+          return array.value.pop
+        else
+          return array.value.delete_at(index.value.to_i64)
+        end
+
+        return array
+
+      else
+        raise "array_delete expected array, index"
+      end
+
+    end
+
+    raise "array_delete expected at least 2 arguments"
+  end
+
   # Dump all values from an object into it's parent stack
   def unpack(arguments, stack)
 

@@ -552,6 +552,10 @@ class Interpreter
             return InternalFunctions.length(arguments[1..-1], stack)
           when "array_of_size"
             return InternalFunctions.array_of_size(arguments[1..-1], stack)
+          when "array_insert"
+            return InternalFunctions.array_insert(arguments[1..-1], stack)
+          when "array_delete"
+            return InternalFunctions.array_delete(arguments[1..-1], stack)
           when "require"
             return exec_require(arguments[1..-1], stack)
           when "include"
