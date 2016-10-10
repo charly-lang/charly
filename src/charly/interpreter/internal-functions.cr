@@ -282,4 +282,11 @@ module InternalFunctions
 
     raise "trim expected at least 1 argument"
   end
+
+  # Return a string representation of the current stack
+  def __stackdump(arguments, stack)
+    io = MemoryIO.new
+    stack.stackdump(io, true)
+    return TString.new io.to_s
+  end
 end

@@ -33,6 +33,10 @@ export = {
   let stderr = stderr;
   let stdin = stdin;
 
+  func __stackdump() {
+    call_internal("__stackdump");
+  };
+
   func exit(code) {
     call_internal("exit", code);
   };
