@@ -44,4 +44,53 @@ export = {
     self;
   };
 
+  # Reverse a string
+  func reverse() {
+    let new = "";
+    self.each(func(c) {
+      new = c + new;
+    });
+    new;
+  };
+
+  # Filter out unwanted characters from a string
+  func filter(filter) {
+    let new = "";
+    self.each(func(c) {
+      if (filter(c)) {
+        new = new + c;
+      };
+    });
+    new;
+  };
+
+  # Return a substring from an index
+  func substring(start, end) {
+    let length = self.length();
+    let i = start;
+    let new = "";
+    while (i < end) {
+      let char = self[i];
+      if (char) {
+        new = new + self[i];
+      };
+      i = i + 1;
+    };
+    new;
+  };
+
+  # Map over a function
+  # Similar to each, but replaces each char with the result of the callback
+  func map(callback) {
+    let new = "";
+    self.each(func(c) {
+      new = new + callback(c);
+    });
+    new;
+  };
+
+  # Returns true if the string is empty
+  func empty() {
+    self.length() == 0;
+  };
 };

@@ -1,7 +1,7 @@
 export = {
 
   # Iterates over all elements inside an array
-  # *callback* receives the element and the index
+  # callback receives the element and the index
   func each(callback) {
     let i = 0;
     let count = self.length();
@@ -24,6 +24,50 @@ export = {
     });
   };
 
+  # Returns a new array whichs contains all
+  # elements for which the passed block returned a truthy value
+  func filter(callback) {
+    let new = [];
+    self.each(func(e, i) {
+      if (callback(e, i)) {
+        new.push(e);
+      };
+    });
+    new;
+  };
+
+  # Return a reversed version of this string
+  func reverse() {
+    let new = [];
+    self.each(func(e) {
+      new.unshift(e);
+    });
+    new;
+  };
+
+  func index_of(element) {
+    let index = -1;
+    let i = 0;
+
+    let length = self.length();
+    let found = false;
+
+    while (i < length) {
+      if (!found) {
+        if (self[i].type() == element.type()) {
+          if (self[i] == element) {
+            index = i;
+            found = true;
+            i = length;
+          };
+        };
+      };
+      i = i + 1;
+    };
+
+    index;
+  };
+
   # Converts all elements inside this array to strings
   # This modifies the array in place
   func all_to_s() {
@@ -37,6 +81,11 @@ export = {
   # Return the first element in this array
   func first() {
     self[0];
+  };
+
+  # Returns true if the array is empty
+  func empty() {
+    self.length() == 0;
   };
 
   # Return the last element in this array
