@@ -37,7 +37,7 @@ result; # => 50
 
 __Repeat & While loops__
 ```charly
-repeat(5, func() {
+5.times(func(i) {
   print("Hello");
 });
 
@@ -55,21 +55,21 @@ let input = gets();
 print(input);
 
 # Numbers
-let input_number = to_numeric(gets());
+let input_number = gets().to_n();
 print(input_number);
 ```
 
 __Type casting and checking__
 ```charly
-typeof(25); # => Numeric
-typeof(25.5); # => Numeric
-typeof("Charly"); # => String
-typeof([1, 2, 3]); # => Array
-typeof(null); # => Null
-typeof(false); # => Boolean
-typeof(class Box {}); # => Class
-typeof(func() {}); # => Function
-typeof({ let name = "charly"; }); # => Object
+25.type()                           # => Numeric
+25.5.type()                         # => Numeric
+"Charly".type()                     # => String
+[1, 2, 3].type()                    # => Array
+null.type()                         # => Null
+false.type()                        # => Boolean
+(class Box {}).type()               # => Class
+(func() {}).type()                  # => Function
+{ let name = "charly"; }.type()     # => Object
 
 let number = 25;
 print("Number is: " + number);
@@ -77,14 +77,17 @@ print("Number is: " + number);
 
 __Including other files__
 ```charly
-require("external.charly"); # Include a file in the current directory
-require("someotherlibrary"); # Include the someotherlibrary from the standard library
+# Include a file in the current directory
+require("external.charly");
+
+# Include the someotherlibrary from the standard library
+require("someotherlibrary");
 ```
 
 __Working with arrays__
 ```charly
 let array = [1, 2, 3];
-array = append(array, 4);
+array.push(4);
 print(array); # => [1, 2, 3, 4]
 ```
 
@@ -94,9 +97,9 @@ class Person {
   let name;
   let age;
 
-  func constructor(_name, _age) {
-    name = _name;
-    age = _age;
+  func constructor(name, age) {
+    self.name = name;
+    self.age = age;
   };
 };
 
@@ -120,6 +123,7 @@ $ charly -h
 Usage: charly [options] filename [arguments]
     -f FLAG, --flag FLAG             Set a flag
     -h, --help                       Show this help
+    -v, --version                    Show the version number
 
 Flags:
     ast                              Display AST's of parsed programs
