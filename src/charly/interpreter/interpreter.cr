@@ -867,20 +867,27 @@ class Interpreter
     # The stack for the object
     object_stack = Stack.new(classliteral.parent_stack)
 
+    # The object
+    object = TObject.new object_stack
+
     # Execute the class block inside the object_stack
     exec_block(classliteral.block, object_stack)
 
     # Search for the constructor of the class
     # and execute it in the object_stack if it was found
     if object_stack.contains("constructor")
-      exec_function(object_stack.get("constructor"), arguments)
+      function = object_stack.get "constructor"
 
-      # Remove the constructor again
-      object_stack.delete("constructor")
+      # Bind the self identifier
+      if function.is_a? TFunc
+        function.bound_stack.write("self", object, true, false)
+        exec_function(function, arguments)
+        object_stack.delete("constructor")
+      end
     end
 
     # Create a new TObject and store the object_stack in it
-    return TObject.new(object_stack)
+    return object
   end
 
   def exec_literal(node, stack)
