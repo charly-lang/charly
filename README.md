@@ -59,7 +59,7 @@ let input_number = gets().to_n();
 print(input_number);
 ```
 
-__Type casting and checking__
+__Primitive types__
 ```charly
 25.type()                           # => Numeric
 25.5.type()                         # => Numeric
@@ -70,9 +70,6 @@ false.type()                        # => Boolean
 (class Box {}).type()               # => Class
 (func() {}).type()                  # => Function
 { let name = "charly"; }.type()     # => Object
-
-let number = 25;
-print("Number is: " + number);
 ```
 
 __Including other files__
@@ -107,6 +104,13 @@ let leonard = Person("Leonard", 16);
 print(leonard.name); # "Leonard"
 print(leonard.age); # 16
 ```
+
+# Everything is an object... kind of
+When you write `5`, the interpreter actually treats it as a primitive. There are no funny castings or object instantiations. Once you do something like `5.times(func(){});`, the interpreter searches the current scope for an object called `Numeric` and checks if there is a function called `times` on it. If it finds the method, it injects a variable called `self` into the function's stack and executes it.
+
+This allows the interpreter to reuse the same object for all primitives.
+
+This principle applies to all language primitives. The `Array` object for example, specifies a method called `push` which inserts an element into the array.
 
 # Installation
 I have only tested this on macOS 10.12.
