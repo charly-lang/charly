@@ -1,0 +1,8 @@
+let name = "Leonard";
+
+func call_me(arg) {
+  arg + " Schuetz";
+  print(__stackdump());
+};
+
+call_me(name);

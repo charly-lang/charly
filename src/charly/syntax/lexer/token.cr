@@ -51,11 +51,13 @@ class Token
   property type : TokenType
   property value : String
   property raw : String
+  property touched : Bool
 
   def initialize(type = TokenType::Unknown, value = "", raw = "")
     @type = type
     @value = value
     @raw = raw
+    @touched = false
   end
 
   def to_s(io)

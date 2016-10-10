@@ -1,0 +1,105 @@
+export = {
+
+  # Iterates over all elements inside an array
+  # *callback* receives the element and the index
+  func each(callback) {
+    let i = 0;
+    let count = self.length();
+
+    while (i < count) {
+      callback(self[i], i);
+      i = i + 1;
+    };
+
+    self;
+  };
+
+  # Iterates over all elements inside an array
+  # *callback* receives the element and the index
+  # Each item in the array will be replaced with the result
+  # of the callback
+  func map(callback) {
+    self.each(func(v, i) {
+      self[i] = callback(v, i);
+    });
+  };
+
+  # Converts all elements inside this array to strings
+  # This modifies the array in place
+  func all_to_s() {
+    self.each(func(v, i) {
+      self[i] = v.to_s();
+    });
+  };
+
+  # Return the first element in this array
+  func first() {
+    self[0];
+  };
+
+  # Return the last element in this array
+  func last() {
+    self[self.length() - 1];
+  };
+
+  # Return an array of *size* filled with *default*
+  func of_size(size, default) {
+    call_internal("array_of_size", size, default);
+  };
+
+  # Append to the end of the array
+  func push(element) {
+    call_internal("array_insert", self, self.length(), element);
+  };
+
+  # Append to the beginning of the array
+  func unshift(element) {
+    call_internal("array_insert", self, 0, element);
+  };
+
+  # Insert an element at a given index
+  #
+  # If the index if smaller than 0
+  # it will be inserted at the beginning
+  # 
+  # If the index is bigger than the size of the array it will be inserted at the end
+  func insert(index, element) {
+    call_internal("array_insert", self, index, element);
+  };
+
+  # Delete the element at a given index
+  #
+  # If the index is smaller than 0, the first element will be deleted
+  # If the index is bigger than the size of the array, the last item will be deleted
+  func delete(index) {
+    call_internal("array_delete", self, index);
+  };
+
+  func __plus(element) {
+    if (element.type() ! "Array") {
+
+      # Create a new array containing self.length + 1 items
+      let new_array = Array.of_size(self.length() + 1, null);
+      self.each(func(v, i) {
+        new_array[i] = v;
+      });
+      new_array[new_array.length() - 1] = element;
+      new_array;
+    } else {
+
+      # Create an array with the size of the two arrays combined
+      let new_array = Array.of_size(self.length() + element.length(), null);
+
+      # Copy the values
+      self.each(func(v, i) {
+        new_array[i] = v;
+      });
+
+      element.each(func(v, i) {
+        new_array[i + self.length()] = v;
+      });
+
+      new_array;
+    };
+  };
+};

@@ -1,20 +1,20 @@
 let stdout = {
   func print() {
-    call_internal("stdout_print", __arguments);
+    call_internal("stdout_print", __arguments.all_to_s());
   };
 
   func write() {
-    call_internal("stdout_write", __arguments);
+    call_internal("stdout_write", __arguments.all_to_s());
   };
 };
 
 let stderr = {
   func print() {
-    call_internal("stderr_print", __arguments);
+    call_internal("stderr_print", __arguments.all_to_s());
   };
 
   func write() {
-    call_internal("stderr_write", __arguments);
+    call_internal("stderr_write", __arguments.all_to_s());
   };
 };
 
@@ -28,16 +28,14 @@ let stdin = {
   };
 };
 
-func colorize(string, colorcode) {
-  call_internal("colorize", string, colorcode);
-};
-
 export = {
   let stdout = stdout;
   let stderr = stderr;
   let stdin = stdin;
 
-  let colorize = colorize;
+  func __stackdump() {
+    call_internal("__stackdump");
+  };
 
   func exit(code) {
     call_internal("exit", code);

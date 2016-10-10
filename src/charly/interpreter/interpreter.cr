@@ -122,7 +122,7 @@ class Interpreter
       return TNull.new
     end
 
-    raise "Unknown node encountered #{node.class} #{stack}"
+    raise "Unknown node encountered #{node} #{stack}"
   end
 
   # Initializes a variable in the current stack
@@ -187,14 +187,7 @@ class Interpreter
         raise "Member node is not an identifier. That's a bug"
       end
 
-      # Check if the stack contains the value
-      # TODO: Figure out object write behaviour if the key doesn't exist
-      # Should we mimic javascript?
-      if identifier.stack.contains(member.value.as(String))
-        identifier.stack.write(member.value.as(String), value, false, false)
-      else
-        return TNull.new
-      end
+      identifier.stack.write(member.value.as(String), value, true, false)
       return value
     elsif identifier.is_a? IndexExpression
 
@@ -206,10 +199,15 @@ class Interpreter
       identifier = exec_expression(identifier, stack)
 
       # Only TArray and TString allowed
-      if identifier.is_a?(TArray)
+      if identifier.is_a? TArray
+
+        # Check that there is at least 1 expression
+        unless member.children.size > 0
+          raise "Missing index for array index expression"
+        end
 
         # Resolve the member
-        member = exec_expression(member, stack)
+        member = exec_expression(member.children[0], stack)
 
         # Typecheck the member
         if member.is_a?(TNumeric)
@@ -221,11 +219,25 @@ class Interpreter
 
           # Write to the index
           identifier.value[member.value.to_i64] = value
+          return value
         else
-          raise "Can't use #{member} in index expression."
+          raise "Can't use #{member} in array index expression."
         end
-      else
-        raise "Can't write to non-array #{identifier}"
+      end
+
+      # Search for the the __member function
+      prop = redirect_property(identifier, "__member_write", stack)
+      if prop.is_a? TFunc
+
+        # Resolve all children
+        arguments = [] of BaseType
+        member.children.each do |child|
+          arguments << exec_expression(child, stack)
+        end
+        arguments << value
+
+        # Execute the __member function
+        return exec_function(prop, arguments)
       end
     else
 
@@ -242,7 +254,7 @@ class Interpreter
       end
     end
 
-    value
+    return value
   end
 
   # Extracts the value of a variable from the current stack
@@ -253,9 +265,27 @@ class Interpreter
   def exec_unary_expression(node, stack)
 
     # Resolve the right side
+    operator = node.operator
     right = exec_expression(node.right, stack)
 
-    case node.operator
+    # Search for a operator overload on comparison expressions
+    operator_name = case node.operator
+    when MinusOperator
+      "__uminus"
+    when NotOperator
+      "__unot"
+    else
+      nil
+    end
+
+    if operator_name.is_a? String
+      prop = redirect_property(right, operator_name, stack)
+      if prop.is_a? TFunc
+        return exec_function(prop, [] of BaseType)
+      end
+    end
+
+    case operator
     when MinusOperator
       if right.is_a? TNumeric
         return TNumeric.new(-right.value)
@@ -273,6 +303,31 @@ class Interpreter
     operator = node.operator
     left = exec_expression(node.left, stack)
     right = exec_expression(node.right, stack)
+
+    # Search for a operator overload on binary expressions
+    operator_name = case operator
+    when PlusOperator
+      "__plus"
+    when MinusOperator
+      "__minus"
+    when MultOperator
+      "__mult"
+    when DivdOperator
+      "__divd"
+    when ModOperator
+      "__mod"
+    when PowOperator
+      "__pow"
+    else
+      nil
+    end
+
+    if operator_name.is_a? String
+      prop = redirect_property(left, operator_name, stack)
+      if prop.is_a? TFunc
+        return exec_function(prop, [right] of BaseType)
+      end
+    end
 
     if left.is_a?(TNumeric) && right.is_a?(TNumeric)
       case operator
@@ -343,6 +398,31 @@ class Interpreter
     left = exec_expression(node.left, stack)
     right = exec_expression(node.right, stack)
     operator = node.operator
+
+    # Search for a operator overload on comparison expressions
+    operator_name = case operator
+    when GreaterOperator
+      "__greater"
+    when LessOperator
+      "__less"
+    when GreaterEqualOperator
+      "__greaterequal"
+    when LessEqualOperator
+      "__lessequal"
+    when EqualOperator
+      "__equal"
+    when NotOperator
+      "__notequal"
+    else
+      nil
+    end
+
+    if operator_name.is_a? String
+      prop = redirect_property(left, operator_name, stack)
+      if prop.is_a? TFunc
+        return exec_function(prop, [right] of BaseType)
+      end
+    end
 
     # When comparing TNumeric's
     if left.is_a?(TNumeric) && right.is_a?(TNumeric)
@@ -552,6 +632,10 @@ class Interpreter
             return InternalFunctions.length(arguments[1..-1], stack)
           when "array_of_size"
             return InternalFunctions.array_of_size(arguments[1..-1], stack)
+          when "array_insert"
+            return InternalFunctions.array_insert(arguments[1..-1], stack)
+          when "array_delete"
+            return InternalFunctions.array_delete(arguments[1..-1], stack)
           when "require"
             return exec_require(arguments[1..-1], stack)
           when "include"
@@ -570,6 +654,8 @@ class Interpreter
             return InternalFunctions.to_numeric(arguments[1..-1], stack)
           when "trim"
             return InternalFunctions.trim(arguments[1..-1], stack)
+          when "__stackdump"
+            return InternalFunctions.__stackdump(arguments[1..-1], stack)
           else
             raise "Internal function call to '#{name.value}' not implemented!"
           end
@@ -598,46 +684,117 @@ class Interpreter
     identifier = exec_expression(node.identifier, stack)
     member = node.member
 
-    # Typecheck
-    if identifier.is_a?(TObject) && member.is_a?(IdentifierLiteral)
-
-      # Check if the objects stack contains the given value
-      if identifier.stack.contains(member.value)
-        return identifier.stack.get(member.value, false)
-      else
-        return TNull.new
-      end
+    if member.is_a?(IdentifierLiteral)
+      return redirect_property(identifier, member.value.as(String), stack);
     end
 
-    raise "Could not perform member expression on #{identifier}!"
+    return TNull.new
   end
 
   def exec_index_expression(node, stack)
     identifier = exec_expression(node.identifier, stack)
     member = node.member
 
+    unless member.is_a? ASTNode
+      raise "Index expression without member found. That's a bug in the parser."
+    end
+
     # Array index lookup
-    if identifier.is_a?(TArray)
+    if identifier.is_a? TArray
+
+      # Check if the list contains at least 1 item
+      # The others are simply ignored
+      unless member.children.size > 0
+        raise "Missing index for array index expression"
+      end
 
       # Resolve the identifier
-      member = exec_expression(member, stack)
+      member = exec_expression(member.children[0], stack)
 
       # Typecheck
       if member.is_a?(TNumeric)
 
         # Check for out-of-bounds error
-        if member.value > identifier.value.size - 1 || member.value < 0
+        if member.value.to_i64 > identifier.value.size - 1 || member.value.to_i64 < 0
           return TNull.new
         end
 
         # Return the value from the index
         return identifier.value[member.value.to_i64]
       else
-        raise "Invalid type #{member.class} for member expression"
+        raise "Invalid type #{member.class} for index expression"
+      end
+    else
+
+      # Search for the the __member function
+      prop = redirect_property(identifier, "__member", stack)
+      if prop.is_a? TFunc
+
+        # Resolve all children
+        arguments = [] of BaseType
+        member.children.each do |child|
+          arguments << exec_expression(child, stack)
+        end
+
+        # Execute the __member function
+        return exec_function(prop, arguments)
       end
     end
 
     raise "Could not perform index expression on #{identifier}"
+  end
+
+  # Redirects a property from a literal to one of the languages primitive classes
+  # The result will be returned
+  def redirect_property(identifier, propname : String, stack)
+
+    # If this is an object
+    if identifier.is_a? TObject
+
+      # Check if the object contains the propname
+      if identifier.stack.contains(propname)
+
+        # Get the prop
+        prop = identifier.stack.get(propname, false)
+
+        # Bind the self identifier if the prop is a function
+        if prop.is_a? TFunc
+          prop.bound_stack.write("self", identifier, true)
+        end
+
+        return prop
+      end
+    end
+
+    # Check the stack for an object specific to the current identifier
+    # For example, if the identifier is of type TNumeric
+    # we will search for an object called Numeric
+    # This is defined in the classname method on CharlyTypes
+    [identifier.class.to_s, "Object"].uniq.each do |identifier_name|
+      if stack.defined(identifier_name)
+        primitiveobject = stack.get(identifier_name)
+
+        # Typecheck
+        if primitiveobject.is_a? TObject
+
+          # Check if the object contains the prop
+          if primitiveobject.stack.contains propname
+
+            # Get the prop
+            prop = primitiveobject.stack.get(propname, false)
+
+            # Bind the self identifier if the prop is a function
+            if prop.is_a? TFunc
+              prop.bound_stack.write("self", identifier, true)
+            end
+
+            return prop
+          end
+        end
+      end
+    end
+
+    return TNull.new
   end
 
   # Executes *function*, passing it *arguments*
@@ -671,6 +828,14 @@ class Interpreter
     # Write the __arguments variable into the stack
     __arguments = TArray.new(arguments)
     function_stack.write("__arguments", __arguments, true)
+
+    # Merge the functions bound stack into the execution_stack
+    bound_stack = function.bound_stack
+    if bound_stack.is_a? Stack
+      bound_stack.values.each do |key, value|
+        function_stack.write(key, value, true)
+      end
+    end
 
     # Write the argument to the function stack
     arguments.each_with_index do |arg, index|
@@ -887,10 +1052,8 @@ class Interpreter
         filepath = ENV["CHARLYDIR"] + "/io.charly"
       when "unit-test"
         filepath = ENV["CHARLYDIR"] + "/unit-test.charly"
-      when "array"
-        filepath = ENV["CHARLYDIR"] + "/array.charly"
-      when "util"
-        filepath = ENV["CHARLYDIR"] + "/util.charly"
+      when "primitives"
+        filepath = ENV["CHARLYDIR"] + "/primitives/include.charly"
       else
         filepath = File.join(current_dir, filename)
       end

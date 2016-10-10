@@ -29,6 +29,10 @@ module Charly
       puts available_flags
       exit
     }
+    opts.on("-v", "--version", "Show the version number") {
+      puts "0.0.0"
+      exit
+    }
     opts.invalid_option {} # ignore
     opts.unknown_args do |before_dash|
       if before_dash.size == 0
@@ -54,6 +58,13 @@ module Charly
 
   # Write the arguments into the prelude stack
   prelude_stack.write("ARGV", CharlyTypes::TArray.new(arguments), true)
+
+  # Write the flags into the prelude stack
+  iflags = [] of CharlyTypes::BaseType
+  flags.each do |flag|
+    iflags << CharlyTypes::TString.new(flag)
+  end
+  prelude_stack.write("IFLAGS", CharlyTypes::TArray.new(iflags), true)
 
   # Get a InterpreterFascade
   interpreter = InterpreterFascade.new(session, flags)

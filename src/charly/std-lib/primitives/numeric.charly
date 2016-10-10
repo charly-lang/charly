@@ -1,0 +1,36 @@
+export = {
+
+  # Call the callback n times
+  # The callback receives the index
+  func times(callback) {
+    let i = 0;
+    while (i < self) {
+      callback(i);
+      i = i + 1;
+    };
+
+    self;
+  };
+
+  # Call the callback with values from n down to *num*
+  #
+  # 5.downto(2, func(i) {});
+  # will receive: 5, 4, 3, 2
+  func downto(num, callback) {
+    if (self >= num) {
+      if (self == num) {
+        callback(self);
+      };
+
+      if (self > num) {
+        let i = self;
+        while (i ! num - 1) {
+          callback(i);
+          i = i - 1;
+        };
+      };
+    };
+
+    self;
+  };
+};
