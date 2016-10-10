@@ -11,4 +11,24 @@ export = {
   func trim() {
     call_internal("trim", self);
   };
+
+  # Writes self to stdout and asks for user input
+  func prompt() {
+    write(self);
+    gets();
+  };
+
+  # Writes self to stdout and ask for a single char
+  func promptc() {
+    write(self);
+    getc();
+  };
+
+  # Writes self to stdout and ask for user input
+  # Input will be casted to a numeric
+  func promptn() {
+    write(self);
+    gets().to_n();
+  };
+
 };
