@@ -51,7 +51,8 @@ module InternalFunctions
     extend self
 
     def getc
-      return TString.new(::STDIN.read_char.to_s || "")
+      puts "STDIN.getc is not implemented right now!"
+      return TNull.new
     end
 
     def gets
