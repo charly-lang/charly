@@ -695,18 +695,18 @@ class Interpreter
     identifier = exec_expression(node.identifier, stack)
     member = node.member
 
+    # Sanity check
     unless member.is_a? ASTNode
       raise "Index expression without member found. That's a bug in the parser."
     end
 
+    # Check if there is at least 1 item in the index expression
+    unless member.children.size > 0
+      raise "Missing expression in index expression"
+    end
+
     # Array index lookup
     if identifier.is_a? TArray
-
-      # Check if the list contains at least 1 item
-      # The others are simply ignored
-      unless member.children.size > 0
-        raise "Missing index for array index expression"
-      end
 
       # Resolve the identifier
       member = exec_expression(member.children[0], stack)
@@ -722,7 +722,25 @@ class Interpreter
         # Return the value from the index
         return identifier.value[member.value.to_i64]
       else
-        raise "Invalid type #{member.class} for index expression"
+        raise "Invalid type #{member.class} for array index expression"
+      end
+    elsif identifier.is_a? TString
+
+      # Resolve the identifier
+      member = exec_expression(member.children[0], stack)
+
+      # Typecheck
+      if member.is_a?(TNumeric)
+
+        # Check for out-of-bounds error
+        if member.value.to_i64 > identifier.value.size - 1 || member.value.to_i64 < 0
+          return TNull.new
+        end
+
+        # Return the value from the index
+        return TString.new(identifier.value[member.value.to_i64].to_s)
+      else
+        raise "Invalid type #{member.class} for string index expression"
       end
     else
 
