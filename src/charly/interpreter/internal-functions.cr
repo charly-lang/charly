@@ -7,6 +7,29 @@ module InternalFunctions
   extend self
   include CharlyTypes
 
+  def sleep(arguments, stack)
+
+    # Check if there is at least 1 argument
+    unless arguments.size > 0
+      return TNull.new
+    end
+
+    # An array filled with TNull
+    if arguments.size >= 1
+
+      # Typecheck
+      amount = arguments[0]
+
+      if amount.is_a?(TNumeric)
+        sleep amount.value / 1000
+      else
+        raise "sleep expected argument 1 to be of type TNumeric, got #{amount.class}"
+      end
+    end
+
+    return TNull.new
+  end
+
   module STDOUT
     extend self
 
@@ -51,8 +74,8 @@ module InternalFunctions
     extend self
 
     def getc
-      puts "STDIN.getc is not implemented right now!"
-      return TNull.new
+      char = ::STDIN.raw &.read_char
+      return TString.new(char.to_s)
     end
 
     def gets
