@@ -539,6 +539,12 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert([null].empty(), false);
     });
 
+    it("joins an array", func(assert) {
+      assert([1, 2, 3, 4].join("-"), "1-2-3-4");
+      assert(["hello", "world", "whats", "up"].join("\n"), "hello\nworld\nwhats\nup");
+      assert(["hello", -25.9, "test", [1, 2]].join(""), "hello-25.9test[1, 2]");
+    });
+
   });
 
   describe("Numerics", func(it) {

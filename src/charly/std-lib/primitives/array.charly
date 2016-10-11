@@ -161,6 +161,8 @@ export = {
     call_internal("array_delete", self, index);
   };
 
+  # Return a new array by concatening self and element
+  # If element is an array, they will be merged
   func __plus(element) {
     if (element.type() ! "Array") {
 
@@ -195,8 +197,7 @@ export = {
 
     self.each(func(e) {
       if (e.type() == "Array") {
-        let flattened = e.flatten();
-        flattened.each(func(e) {
+        e.flatten().each(func(e) {
           new.push(e);
         });
       } else {
@@ -205,5 +206,22 @@ export = {
     });
 
     new;
+  };
+
+  # Join the elements of the array together
+  func join(separator) {
+    let string = "";
+    let count = self.length();
+
+    self.each(func(e, index) {
+      string = string + e.to_s();
+
+      # Unless were at the last element, append the separator
+      if (index < count - 1) {
+        string = string + separator.to_s();
+      };
+    });
+
+    string;
   };
 };
