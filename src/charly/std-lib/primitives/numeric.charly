@@ -33,4 +33,31 @@ export = {
 
     self;
   };
+
+  # Returns the absolute value of this number
+  func abs() {
+    if (self < 0) {
+      -self;
+    } else {
+      self;
+    };
+  };
+
+  # Returns the biggest of two numbers
+  func max(other) {
+    if (self < other) {
+      other;
+    } else {
+      self;
+    };
+  };
+
+  # Returns the smaller of two numbers
+  func min(other) {
+    if (self > other) {
+      other;
+    } else {
+      self;
+    };
+  };
 };

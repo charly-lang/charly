@@ -33,6 +33,12 @@ export = {
   let stderr = stderr;
   let stdin = stdin;
 
+  # Sleep for *amount*
+  # In miliseconds
+  func sleep(amount) {
+    call_internal("sleep", amount);
+  };
+
   func __stackdump() {
     call_internal("__stackdump");
   };
