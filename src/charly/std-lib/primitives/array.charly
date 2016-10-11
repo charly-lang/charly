@@ -45,6 +45,12 @@ export = {
     new;
   };
 
+  # Returns a copied version of this array
+  # Remember that objects and arrays are always passed by reference
+  func copy() {
+    self.map(func(e) { e; });
+  };
+
   func index_of(element) {
     let index = -1;
     let i = 0;
@@ -66,6 +72,35 @@ export = {
     };
 
     index;
+  };
+
+  func sort(sort_function) {
+    let done = false;
+    let sorted = self.copy();
+
+    # some temporary variables
+    # initialized here to save memory
+    let next;
+    let tmp;
+
+    while (!done) {
+      done = true;
+      sorted.each(func(left, i) {
+        if (i ! self.length() - 1) {
+          next = self[i + 1];
+
+          # Run the user specified sorting function
+          if (sort_function(left, next)) {
+            tmp = next;
+            sorted[i + 1] = left;
+            sorted[i] = tmp;
+            done = false;
+          };
+        };
+      });
+    };
+
+    sorted;
   };
 
   # Converts all elements inside this array to strings
