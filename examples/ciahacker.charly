@@ -1,0 +1,50 @@
+class Progress {
+  let pos = 0;
+  let max = 100;
+  let width = 50;
+
+  func constructor(width) {
+    self.width = width;
+  };
+
+  func tick() {
+    pos = pos + 1;
+    self.print();
+  };
+
+  func print() {
+    self.reset();
+    write("#" * (pos / max) * width, "\r");
+  };
+
+  func reset() {
+    write(" " * width, "\r");
+  };
+};
+
+let progressView = Progress(30);
+
+let messages = [
+  "Starting up hacking software",
+  "Warming up hacking nodes",
+  "Connecting to CIA server",
+  "Downloading information",
+  "Uploading information to private servers",
+  "Deleting traces"
+];
+
+let i = 0;
+let mi = 0;
+
+while (mi < messages.length()) {
+  progressView.reset();
+  print(messages[mi]);
+  i = 0;
+  progressView.pos = 0;
+  while (i < 100) {
+    progressView.tick();
+    sleep(200 / i + 1 + mi);
+    i = i + 1;
+  };
+  mi = mi + 1;
+};
