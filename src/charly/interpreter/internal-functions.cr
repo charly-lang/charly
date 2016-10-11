@@ -335,4 +335,39 @@ module InternalFunctions
 
     raise "ord expected at least 1 argument"
   end
+
+  # Several math functions, the implementation of this might change
+  def math(arguments, stack)
+
+    # Check if there are at least 2 arguments
+    if arguments.size >= 2
+      func_name = arguments[0]
+      unless func_name.is_a? TString
+        raise "math expected first argument to be of type TString, got #{func_name.class}"
+      end
+
+      # The second argument has to be a numeric
+      value = arguments[1]
+      unless value.is_a? TNumeric
+        raise "math expected second argument to be of type TNumeric, got #{func_name.class}"
+      end
+
+      # Generate all math bindings
+      {% for name in %w(cos cosh acos acosh sin sinh asin asinh tan tanh atan atanh cbrt sqrt log) %}
+      if func_name.value == "{{name.id}}"
+        return TNumeric.new(Math.{{name.id}}(value.value))
+      end
+      {% end %}
+      if func_name.value == "ceil"
+        return TNumeric.new(value.value.ceil)
+      end
+      if func_name.value == "floor"
+        return TNumeric.new(value.value.floor)
+      end
+
+      raise "Unknown math function #{func_name.value}"
+    end
+
+    raise "math expected at least 2 arguments"
+  end
 end

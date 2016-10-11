@@ -60,4 +60,9 @@ export = {
       self;
     };
   };
+
+  # Returns true if self is in delta range of expect
+  func close_to(expect, delta) {
+    (self - expect).abs() <= delta;
+  };
 };

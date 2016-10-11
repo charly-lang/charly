@@ -669,6 +669,8 @@ class Interpreter
             return InternalFunctions.sleep(arguments[1..-1], stack)
           when "ord"
             return InternalFunctions.ord(arguments[1..-1], stack)
+          when "math"
+            return InternalFunctions.math(arguments[1..-1], stack)
           else
             raise "Internal function call to '#{name.value}' not implemented!"
           end
@@ -1094,6 +1096,8 @@ class Interpreter
         filepath = ENV["CHARLYDIR"] + "/unit-test.charly"
       when "primitives"
         filepath = ENV["CHARLYDIR"] + "/primitives/include.charly"
+      when "math"
+        filepath = ENV["CHARLYDIR"] + "/math.charly"
       else
         filepath = File.join(current_dir, filename)
       end
