@@ -173,7 +173,9 @@ module InternalFunctions
         # If the index is smaller than 0, we delete the first element
         # If the index is bigger than the size of the array
         # we delete the last item
-        if index.value <= 0
+        if array.value.size == 0
+          return TNull.new
+        elsif index.value <= 0
           return array.value.shift
         elsif index.value >= array.value.size
           return array.value.pop
