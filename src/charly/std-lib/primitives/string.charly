@@ -93,4 +93,10 @@ export = {
   func empty() {
     self.length() == 0;
   };
+
+  # Returns an array of numbers representing this char
+  # If the char is a unicode char the array will contain 2 numbers and so on
+  func ord() {
+    call_internal("ord", self);
+  };
 };

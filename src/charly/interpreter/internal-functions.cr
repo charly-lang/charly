@@ -314,4 +314,25 @@ module InternalFunctions
     stack.stackdump(io, true)
     return TString.new io.to_s
   end
+
+  # Return the codepoint of a char as an array
+  def ord(arguments, stack)
+
+    # Check if there is at least 1 argument
+    if arguments.size > 0
+      arg = arguments[0]
+
+      if arg.is_a?(TString) && arg.value.size > 0
+        bytes = [] of BaseType
+        arg.value[0].bytes.map do |byte|
+          bytes << TNumeric.new(byte)
+        end
+        return TArray.new(bytes)
+      else
+        raise "trim expected a string with at least 1 char, got #{arg.class}"
+      end
+    end
+
+    raise "ord expected at least 1 argument"
+  end
 end
