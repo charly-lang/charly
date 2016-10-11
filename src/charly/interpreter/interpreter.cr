@@ -662,6 +662,8 @@ class Interpreter
             return InternalFunctions.trim(arguments[1..-1], stack)
           when "__stackdump"
             return InternalFunctions.__stackdump(arguments[1..-1], stack)
+          when "sleep"
+            return InternalFunctions.sleep(arguments[1..-1], stack)
           else
             raise "Internal function call to '#{name.value}' not implemented!"
           end
