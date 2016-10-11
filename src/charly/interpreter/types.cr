@@ -47,6 +47,12 @@ module CharlyTypes
     end
 
     def value_to_s(io)
+
+      if @value.nan?
+        io << "NAN"
+        return
+      end
+
       if value % 1 == 0
         io << value.to_i64
       else
