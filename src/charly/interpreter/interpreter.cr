@@ -663,8 +663,6 @@ class Interpreter
             return InternalFunctions.to_numeric(arguments[1..-1], stack)
           when "trim"
             return InternalFunctions.trim(arguments[1..-1], stack)
-          when "__stackdump"
-            return InternalFunctions.__stackdump(arguments[1..-1], stack)
           when "sleep"
             return InternalFunctions.sleep(arguments[1..-1], stack)
           when "ord"

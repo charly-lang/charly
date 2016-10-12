@@ -39,10 +39,6 @@ export = {
     call_internal("sleep", amount);
   };
 
-  func __stackdump() {
-    call_internal("__stackdump");
-  };
-
   func exit(code) {
     call_internal("exit", code);
   };
