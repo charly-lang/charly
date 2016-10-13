@@ -182,6 +182,7 @@ class ArrayLiteral < ASTNode; end
 class FunctionLiteral < ASTNode
   property argumentlist : ASTNode?
   property block : ASTNode?
+  property anonymous : Bool?
 end
 class ContainerLiteral < ASTNode
   property block : ASTNode?

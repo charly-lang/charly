@@ -465,7 +465,6 @@ let testResult = UnitTest("Charly").begin(func(describe) {
     it("concatenates two arrays", func(assert) {
       let num1 = [1, 2];
       let num2 = [3, 4];
-
       let num3 = num1 + num2;
 
       assert(num3[0], 1);
@@ -1022,12 +1021,12 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       myBox.name = "Leonard";
       myBox.age = 16;
       myBox.to_s = func() {
-        assert(self == myBox, true);
-        self.do_stuff = func() {
+        assert(self == myBox, false); # self is equal to the global object in this case
+        myBox.do_stuff = func() {
           "it works!";
         };
 
-        self.name + " - " + self.age;
+        myBox.name + " - " + myBox.age;
       };
 
       assert(myBox.name, "Leonard");
@@ -1090,6 +1089,33 @@ let testResult = UnitTest("Charly").begin(func(describe) {
 
       assert(myBox.name, "changed");
       assert(myBox.mybox.name, "changed as well");
+    });
+
+    it("anonymous functions's self is sourced from the stack ", func(assert) {
+      let val = 0;
+
+      let box1 = {
+        let val = 1;
+
+        func callback(callback) {
+          callback(self);
+        };
+      };
+
+      let box2 = {
+        let val = 2;
+
+        func call() {
+          box1.callback(func(context) {
+            self.val = 200;
+          });
+        };
+      };
+
+      box2.call();
+      assert(val, 0);
+      assert(box1.val, 1);
+      assert(box2.val, 200);
     });
 
     it("can specify the __member method", func(assert) {

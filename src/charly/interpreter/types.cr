@@ -116,15 +116,15 @@ module CharlyTypes
     property argumentlist : Array(ASTNode)
     property block : Block
     property parent_stack : Stack
-    property bound_stack : Stack
+    property anonymous : Bool
 
-    def initialize(argumentlist, block, parent_stack)
+    def initialize(argumentlist, block, parent_stack, anonymous = false)
       @value = false
       @argumentlist = argumentlist
       @block = block
       @block.parent_stack = parent_stack
       @parent_stack = parent_stack
-      @bound_stack = Stack.new(parent_stack)
+      @anonymous = anonymous
     end
 
     def value_to_s(io)

@@ -602,6 +602,9 @@ class Interpreter
       end
     end
 
+    # the default context for the function
+    context = stack.get("self")
+
     # Get the identifier of the call expression
     # If the identifier is an IdentifierLiteral we first check
     # if it's a call to "call_internal"
@@ -696,7 +699,21 @@ class Interpreter
         raise "Invalid type for member in member expression. That's a bug in the parser."
       end
     else
-      target = exec_expression(identifier, stack)
+
+      # We have to manually resolve the member expression since we need
+      # to extract the context for the function to run in
+      if identifier.is_a? MemberExpression
+
+        # Get the identifier and the target prop
+        context = exec_expression(identifier.identifier, stack)
+        member = identifier.member
+
+        if member.is_a?(IdentifierLiteral)
+          target = redirect_property(context, member.value.as(String), stack);
+        end
+      else
+        target = exec_expression(identifier, stack)
+      end
     end
 
     # Different handlers for different data types
@@ -708,7 +725,7 @@ class Interpreter
       context = target.parent_stack.get("self") unless context
       return exec_function(target, arguments, context)
     else
-      raise "#{identifier} is not a function!"
+      raise "#{identifier} is not a function! #{stack}"
     end
   end
 
@@ -853,13 +870,8 @@ class Interpreter
     function_stack.write("__arguments", TArray.new(arguments), true)
     function_stack.write("self", context, true)
 
-    # Merge the functions bound stack into the execution_stack
-    bound_stack = function.bound_stack
-    if bound_stack.is_a? Stack
-      bound_stack.values.each do |key, value|
-        function_stack.write(key, value, true)
-      end
-    end
+    # Write the self variable into the stack
+    function_stack.write("self", context, true)
 
     # Write the argument to the function stack
     arguments.each_with_index do |arg, index|
@@ -938,7 +950,7 @@ class Interpreter
       block = node.block
 
       if argumentlist.is_a? ASTNode && block.is_a? Block
-        return TFunc.new(argumentlist.children, block, stack)
+        return TFunc.new(argumentlist.children, block, stack, !!node.anonymous)
       end
     when .is_a? ArrayLiteral
 
@@ -965,13 +977,8 @@ class Interpreter
   def exec_container_literal(node, stack)
 
     # Check if there is a block
-    block = node.block
-    if block.is_a? Block
-
-      # Create the TClass instance
+    if (block = node.block).is_a? Block
       classliteral = TClass.new(block, stack)
-
-      # Create a new object from the class instance
       return exec_object_instantiation(classliteral, [] of BaseType, stack)
     end
 
