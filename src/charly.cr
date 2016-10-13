@@ -71,7 +71,7 @@ module Charly
 
   # Execute the prelude
   unless flags.includes? "noprelude"
-    interpreter.execute_file(RealFile.new("./src/charly/std-lib/prelude.charly"), prelude_stack)
+    interpreter.execute_file(RealFile.new(ENV["CHARLYDIR"] + "/prelude.charly"), prelude_stack)
   end
 
   # Execute the userfile
