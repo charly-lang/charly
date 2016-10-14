@@ -237,7 +237,7 @@ class Interpreter
         arguments << value
 
         # Execute the __member function
-        return exec_function(prop, arguments)
+        return exec_function(prop, arguments, identifier)
       end
     else
 
@@ -281,7 +281,7 @@ class Interpreter
     if operator_name.is_a? String
       prop = redirect_property(right, operator_name, stack)
       if prop.is_a? TFunc
-        return exec_function(prop, [] of BaseType)
+        return exec_function(prop, [] of BaseType, right)
       end
     end
 
@@ -325,7 +325,7 @@ class Interpreter
     if operator_name.is_a? String
       prop = redirect_property(left, operator_name, stack)
       if prop.is_a? TFunc
-        return exec_function(prop, [right] of BaseType)
+        return exec_function(prop, [right] of BaseType, left)
       end
     end
 
@@ -420,7 +420,7 @@ class Interpreter
     if operator_name.is_a? String
       prop = redirect_property(left, operator_name, stack)
       if prop.is_a? TFunc
-        return exec_function(prop, [right] of BaseType)
+        return exec_function(prop, [right] of BaseType, left)
       end
     end
 
@@ -587,6 +587,9 @@ class Interpreter
   # Executes a call expression
   def exec_call_expression(node, stack)
 
+    # Reserve the context variable
+    context = nil
+
     # Resolve all arguments
     arguments = [] of BaseType
     argumentlist = node.argumentlist
@@ -665,15 +668,38 @@ class Interpreter
       else
         target = stack.get(identifier.value)
       end
+    elsif identifier.is_a? MemberExpression
+
+      # We have to manually resolve a member expression in this case
+      # because we are interested in the identifier part
+      #
+      # identifier.member()
+      #    ^- what we want
+      me_identifier = identifier.identifier
+      me_member = identifier.member
+
+      # Resolve the identifier
+      me_identifier = exec_expression(me_identifier, stack)
+      context = me_identifier
+
+      if me_member.is_a?(IdentifierLiteral)
+        target = redirect_property(me_identifier, me_member.value.as(String), stack)
+        context = me_identifier
+      else
+        raise "Invalid type for member in member expression. That's a bug in the parser."
+      end
     else
-      target = exec_expression(node.identifier, stack)
+      target = exec_expression(identifier, stack)
     end
 
     # Different handlers for different data types
     if target.is_a? TClass
       return exec_object_instantiation(target, arguments, stack)
     elsif target.is_a? TFunc
-      return exec_function(target, arguments)
+
+      # Get the context if it was not set before
+      context = target.parent_stack.get("self") unless context
+      return exec_function(target, arguments, context)
     else
       raise "#{identifier} is not a function!"
     end
@@ -755,7 +781,7 @@ class Interpreter
         end
 
         # Execute the __member function
-        return exec_function(prop, arguments)
+        return exec_function(prop, arguments, identifier)
       end
     end
 
@@ -771,16 +797,7 @@ class Interpreter
 
       # Check if the object contains the propname
       if identifier.stack.contains(propname)
-
-        # Get the prop
-        prop = identifier.stack.get(propname, false)
-
-        # Bind the self identifier if the prop is a function
-        if prop.is_a? TFunc
-          prop.bound_stack.write("self", identifier, true)
-        end
-
-        return prop
+        return identifier.stack.get(propname, false)
       end
     end
 
@@ -797,16 +814,7 @@ class Interpreter
 
           # Check if the object contains the prop
           if primitiveobject.stack.contains propname
-
-            # Get the prop
-            prop = primitiveobject.stack.get(propname, false)
-
-            # Bind the self identifier if the prop is a function
-            if prop.is_a? TFunc
-              prop.bound_stack.write("self", identifier, true)
-            end
-
-            return prop
+            return primitiveobject.stack.get(propname, false)
           end
         end
       end
@@ -819,18 +827,10 @@ class Interpreter
   # inside *stack*
   # *function* is of type TFunc
   # *arguments* is an actual array of RunTimeType values
-  def exec_function(function, arguments : Array(BaseType))
-
-    # This needs to be here
-    # altough we are 100% sure it will always be a TFunc here
-    # crystal didn't stop complaining about it
-    unless function.is_a? TFunc
-      raise "Not a function!"
-    end
+  def exec_function(function : TFunc, arguments : Array(BaseType), context)
 
     # Check if there is a parent stack
-    parent_stack = function.block.parent_stack
-    if parent_stack.is_a? Stack
+    if (parent_stack = function.parent_stack).is_a? Stack
       function_stack = Stack.new(parent_stack)
     else
       raise "Could not find a valid stack for the function to run in"
@@ -843,9 +843,8 @@ class Interpreter
       end
     }.compact
 
-    # Write the __arguments variable into the stack
-    __arguments = TArray.new(arguments)
-    function_stack.write("__arguments", __arguments, true)
+    function_stack.write("__arguments", TArray.new(arguments), true)
+    function_stack.write("self", context, true)
 
     # Merge the functions bound stack into the execution_stack
     bound_stack = function.bound_stack
@@ -888,6 +887,9 @@ class Interpreter
     # The object
     object = TObject.new object_stack
 
+    # Inject the self keyword into the class block
+    object_stack.write("self", object, declaration: true)
+
     # Execute the class block inside the object_stack
     exec_block(classliteral.block, object_stack)
 
@@ -898,8 +900,7 @@ class Interpreter
 
       # Bind the self identifier
       if function.is_a? TFunc
-        function.bound_stack.write("self", object, true, false)
-        exec_function(function, arguments)
+        exec_function(function, arguments, object)
         object_stack.delete("constructor")
       end
     end
@@ -1037,7 +1038,7 @@ class Interpreter
       include_file = RealFile.new(filepath)
 
       # Create the stack for the interpreter
-      include_stack = Stack.new(stack.top)
+      include_stack = Stack.new(stack.top) # Top is the prelude's stack
       include_stack.write("export", TNull.new, true)
 
       # Create a new InterpreterFascade
