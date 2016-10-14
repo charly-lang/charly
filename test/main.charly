@@ -1043,7 +1043,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       myBox.name = "Leonard";
       myBox.age = 16;
       myBox.to_s = func() {
-        assert(self == myBox, false); # self is equal to the global object in this case
+        assert(self == myBox, true);
         myBox.do_stuff = func() {
           "it works!";
         };
@@ -1120,7 +1120,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
         let val = 1;
 
         func callback(callback) {
-          callback(self);
+          callback();
         };
       };
 
@@ -1128,7 +1128,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
         let val = 2;
 
         func call() {
-          box1.callback(func(context) {
+          box1.callback(func() {
             self.val = 200;
           });
         };
@@ -1247,32 +1247,6 @@ let testResult = UnitTest("Charly").begin(func(describe) {
 
       assert(-myBox, "uminus");
       assert(!myBox, "unot");
-    });
-
-    it("assigns the correct scope to redirected primitive methods", func(assert) {
-      let Box = {
-        let children = [1, 2];
-        let iterate = children.each;
-        let length = children.length;
-        let push = children.push;
-      };
-
-      Box.push(3);
-      Box.push(4);
-      Box.push(5);
-
-      let received = [];
-
-      Box.iterate(func(e) {
-        received.push(e);
-      });
-
-      assert(received.length(), 5);
-      assert(received[0], 1);
-      assert(received[1], 2);
-      assert(received[2], 3);
-      assert(received[3], 4);
-      assert(received[4], 5);
     });
 
     it("assigns the correct scope to functions that are added from the outside", func(assert) {

@@ -99,4 +99,14 @@ export = {
   func ord() {
     call_internal("ord", self);
   };
+
+  # Split this string into parts
+  func split(needle) {
+    [];
+  };
+
+  # Return the index of needle inside self
+  func index_of(needle) {
+    -1;
+  };
 };
