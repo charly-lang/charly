@@ -819,9 +819,9 @@ let testResult = UnitTest("Charly").begin(func(describe) {
         let name;
         let age;
 
-        func constructor(_name, _age) {
-          name = _name;
-          age = _age;
+        func constructor(name, age) {
+          self.name = name;
+          self.age = age;
         };
       };
 
@@ -837,8 +837,8 @@ let testResult = UnitTest("Charly").begin(func(describe) {
     it("calls functions inside classes", func(assert) {
       class Box {
         let value;
-        func set(_value) {
-          value = _value;
+        func set(value) {
+          self.value = value;
         };
       };
 
@@ -864,6 +864,15 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       myBox.changed = true;
 
       assert(changed, false);
+    });
+
+    it("can access self inside class blocks", func(assert) {
+      class Box {
+        self.name = "test";
+      };
+
+      let myBox = Box();
+      assert(myBox.name, "test");
     });
 
   });
