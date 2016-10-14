@@ -31,4 +31,17 @@ export = {
     gets().to_n();
   };
 
+  # Return each char in a string
+  func each(callback) {
+    let i = 0;
+    let count = self.length();
+
+    while (i < count) {
+      callback(self[i], i);
+      i = i + 1;
+    };
+
+    self;
+  };
+
 };

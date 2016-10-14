@@ -568,6 +568,23 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert("äääüö\n\n\nlol".trim(), "äääüö\n\n\nlol");
     });
 
+    it("iterates over all chars", func(assert) {
+      let name = "hello";
+      let chars = [];
+
+      name.each(func(char) {
+        chars.push(char);
+      });
+
+      assert(chars.length(), name.length());
+
+      assert(chars[0], "h");
+      assert(chars[1], "e");
+      assert(chars[2], "l");
+      assert(chars[3], "l");
+      assert(chars[4], "o");
+    });
+
   });
 
   describe("Functions", func(it) {
