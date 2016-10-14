@@ -603,7 +603,7 @@ class Interpreter
     end
 
     # the default context for the function
-    context = stack.get("self")
+    context = nil
 
     # Get the identifier of the call expression
     # If the identifier is an IdentifierLiteral we first check
@@ -699,21 +699,7 @@ class Interpreter
         raise "Invalid type for member in member expression. That's a bug in the parser."
       end
     else
-
-      # We have to manually resolve the member expression since we need
-      # to extract the context for the function to run in
-      if identifier.is_a? MemberExpression
-
-        # Get the identifier and the target prop
-        context = exec_expression(identifier.identifier, stack)
-        member = identifier.member
-
-        if member.is_a?(IdentifierLiteral)
-          target = redirect_property(context, member.value.as(String), stack);
-        end
-      else
-        target = exec_expression(identifier, stack)
-      end
+      target = exec_expression(identifier, stack)
     end
 
     # Different handlers for different data types
@@ -868,9 +854,6 @@ class Interpreter
     }.compact
 
     function_stack.write("__arguments", TArray.new(arguments), true)
-    function_stack.write("self", context, true)
-
-    # Write the self variable into the stack
     function_stack.write("self", context, true)
 
     # Write the argument to the function stack
