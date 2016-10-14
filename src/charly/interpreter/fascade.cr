@@ -17,12 +17,6 @@ class InterpreterFascade
     @flags = flags
   end
 
-  def execute_files(files, stack = @top)
-    files.map do |file|
-      execute_file file, stack
-    end
-  end
-
   def execute_file(file, stack = @top)
 
     # Parsing
@@ -30,11 +24,13 @@ class InterpreterFascade
     parser.parse
     program = parser.tree
 
+    # Setup the stack
+    stack.file = file
+    stack.session = @session
+
     # Execute the file in the interpreter
     unless @flags.includes? "noexec"
-      stack.file = file
-      stack.session = @session
-      return Interpreter.new [program], stack, @flags
+      Interpreter.new [program], stack, @flags
     else
       CharlyTypes::TNull.new
     end
