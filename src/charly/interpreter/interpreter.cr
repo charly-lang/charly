@@ -27,6 +27,9 @@ class Interpreter
 
   # Executes *program* inside *stack*
   def exec_program(program, stack)
+    global = TObject.new(stack)
+    stack.write("self", global, declaration: true)
+    stack.write("program", global, declaration: true)
     exec_block(program.children[0], stack)
   end
 
