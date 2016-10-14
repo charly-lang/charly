@@ -701,6 +701,115 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(f3, 3);
     });
 
+    it("gives functions the correct self pointer", func(assert) {
+      let box = {
+        let val = "in box";
+
+        func foo() {
+          got = self.val;
+        };
+      };
+
+      let got = null;
+      box.foo();
+
+      assert(got, "in box");
+    });
+
+    it("gives direct function calls the correct self pointer", func(assert) {
+      let box = {
+        let val = "in box";
+
+        func foo() {
+          func bar() {
+            got = self.val;
+          };
+
+          bar();
+        };
+      };
+
+      let got = null;
+      box.foo();
+
+      assert(got, "in box");
+    });
+
+    it("callbacks receive the correct self pointer", func(assert) {
+      func foo(callback) {
+        callback();
+      };
+
+      let box = {
+        let val = "in box";
+
+        func bar() {
+          foo(func() {
+            got = self.val;
+          });
+        };
+      };
+
+      let got = null;
+      box.bar();
+
+      assert(got, "in box");
+    });
+
+    it("assigned functions receive the correct self pointer", func(assert) {
+      let box = {
+        let val = "in box";
+      };
+
+      box.foo = func() {
+        got = self.val;
+      };
+
+      let got = null;
+      box.foo();
+
+      assert(got, "in box");
+    });
+
+    it("functions in nested objects get the correct self pointer", func(assert) {
+      let box = {
+        let val = "upper box";
+
+        let foo = {
+          let val = "inner box";
+
+          func bar() {
+            got = self.val;
+          };
+        };
+      };
+
+      let got = null;
+      box.foo.bar();
+
+      assert(got, "inner box");
+    });
+
+    it("assigned functions in nested objects get the correct self pointer", func(assert) {
+      let box = {
+        let val = "upper box";
+
+        let foo = {
+          let val = "inner box";
+        };
+      };
+
+      let got = null;
+
+      box.foo.bar = func bar() {
+        got = self.val;
+      };
+
+      box.foo.bar();
+
+      assert(got, "inner box");
+    });
+
   });
 
   describe("Classes", func(it) {
