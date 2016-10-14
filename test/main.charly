@@ -372,7 +372,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
     it("converts all items to strings", func(assert) {
       let nums = [1, 2, 3, 4];
 
-      nums.all_to_s();
+      nums = nums.all_to_s();
 
       assert(nums[0], "1");
       assert(nums[1], "2");
@@ -472,6 +472,23 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(num3[1], 2);
       assert(num3[2], 3);
       assert(num3[3], 4);
+    });
+
+    it("flattens an array", func(assert) {
+      let num = [1, [2, [3], 4], 5, [[6], 7], 8];
+
+      num = num.flatten();
+
+      assert(num.length(), 8);
+
+      assert(num[0], 1);
+      assert(num[1], 2);
+      assert(num[2], 3);
+      assert(num[3], 4);
+      assert(num[4], 5);
+      assert(num[5], 6);
+      assert(num[6], 7);
+      assert(num[7], 8);
     });
 
   });

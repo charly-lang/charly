@@ -27,9 +27,11 @@ export = {
   # Converts all elements inside this array to strings
   # This modifies the array in place
   func all_to_s() {
+    let new = Array.of_size(self.length(), null);
     self.each(func(v, i) {
-      self[i] = v.to_s();
+      new[i] = v.to_s();
     });
+    new;
   };
 
   # Return the first element in this array
@@ -101,5 +103,23 @@ export = {
 
       new_array;
     };
+  };
+
+  # Returns a recursively flattened version of this array
+  func flatten() {
+    let new = [];
+
+    self.each(func(e) {
+      if (e.type() == "Array") {
+        let flattened = e.flatten();
+        flattened.each(func(e) {
+          new.push(e);
+        });
+      } else {
+        new.push(e);
+      };
+    });
+
+    new;
   };
 };
