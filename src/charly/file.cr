@@ -30,11 +30,11 @@ end
 # A virtual file
 class EvalFile < VirtualFile
   def initialize(content)
-    @filename = "virtual-#{Time.new}.charly"
+    @filename = "virtual-#{Time.new.epoch_ms}.charly"
     @fullpath = "/virtual/#{@filename}"
     @fulldirectorypath = "/virtual"
     @directory = "virtual"
-    @size = content.length
+    @size = content.size.to_u64
     @content = content
   end
 end
