@@ -8,11 +8,9 @@ class Interpreter
   include CharlyTypes
   property initial_stack : Stack
   property program_result : BaseType
-  property flags : Array(String)
 
-  def initialize(programs, stack, flags)
+  def initialize(programs, stack)
     @initial_stack = stack
-    @flags = flags
     @program_result = exec_programs(programs, stack)
   end
 
@@ -28,8 +26,22 @@ class Interpreter
   # Executes *program* inside *stack*
   def exec_program(program, stack)
     global = TObject.new(stack)
-    stack.write("self", global, declaration: true)
-    stack.write("program", global, declaration: true)
+    stack.write("self", global, declaration: true, constant: true, force: true)
+    stack.write("program", global, declaration: true, constant: true, force: true)
+
+    # Insert ARGV and IFLAGS
+    argv = [] of BaseType
+    stack.session.not_nil!.flags.each do |flag|
+      argv << TString.new(flag)
+    end
+    stack.write("ARGV", TArray.new(argv), declaration: true, constant: true, force: true)
+
+    iflags = [] of BaseType
+    stack.session.not_nil!.flags.each do |flag|
+      iflags << TString.new(flag)
+    end
+    stack.write("IFLAGS", TArray.new(iflags), declaration: true, constant: true, force: true)
+
     exec_block(program.children[0], stack)
   end
 
@@ -860,8 +872,8 @@ class Interpreter
       end
     }.compact
 
-    function_stack.write("__arguments", TArray.new(arguments), true)
-    function_stack.write("self", context, true)
+    function_stack.write("__arguments", TArray.new(arguments), declaration: true, constant: true, force: true)
+    function_stack.write("self", context, declaration: true, constant: true, force: true)
 
     # Write the argument to the function stack
     arguments.each_with_index do |arg, index|
@@ -897,7 +909,7 @@ class Interpreter
     object = TObject.new object_stack
 
     # Inject the self keyword into the class block
-    object_stack.write("self", object, declaration: true)
+    object_stack.write("self", object, declaration: true, constant: true, force: true)
 
     # Execute the class block inside the object_stack
     exec_block(classliteral.block, object_stack)
@@ -1043,13 +1055,13 @@ class Interpreter
 
       # Create the stack for the interpreter
       include_stack = Stack.new(stack.top) # Top is the prelude's stack
-      include_stack.write("export", TNull.new, true)
+      include_stack.write("export", TNull.new, declaration: true)
 
       # Create a new InterpreterFascade
       # by passing it stack.top
       # it still has access to all the standard library functions
       # but doesn't have access to the current stack
-      interpreter = InterpreterFascade.new(stack.top.session, @flags)
+      interpreter = InterpreterFascade.new(stack.top.session.not_nil!)
       result = interpreter.execute_file(include_file, include_stack)
 
       return include_stack.get("export")

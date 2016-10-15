@@ -93,6 +93,14 @@ class Stack
     return self
   end
 
+  def session
+    parent = @parent
+    if parent.is_a? Stack
+      return parent.session
+    end
+    return @session
+  end
+
   def lock
     @locked = true
   end
@@ -101,18 +109,18 @@ class Stack
     @locked = false
   end
 
-  def write(key, value : BaseType, declaration = false, check_parent = true, constant = false)
+  def write(key, value : BaseType, declaration = false, check_parent = true, constant = false, force = false)
 
     # Check if this is a declaration
     if declaration
 
       # Check if the stack is locked
-      if @locked
+      if @locked && !force
         raise "Can't mutate '#{key}', stack is locked!"
       else
 
         # Check if the value already exists
-        if contains(key) && (entry = @values[key]).locked
+        if !force && contains(key) && (entry = @values[key]).locked
           raise "Can't reinitialize constant '#{key}'"
         end
 

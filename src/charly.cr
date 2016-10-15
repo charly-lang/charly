@@ -5,9 +5,9 @@ require "option_parser"
 
 module Charly
 
+  arguments = [] of String
   flags = [] of String
-  filename = "main.charly" # default name for the input file
-  arguments = [] of CharlyTypes::BaseType
+  filename = ""
 
   available_flags = <<-FLAGS
 
@@ -41,9 +41,7 @@ module Charly
       end
 
       filename = before_dash.shift
-      before_dash.each do |arg|
-        arguments << CharlyTypes::TString.new(arg)
-      end
+      arguments = before_dash
 
       # If the filename is repl, expand the path to the repl.charly file
       if filename == "repl"
@@ -53,27 +51,17 @@ module Charly
   end
 
   # The current session
-  session = Session.new
+  session = Session.new(arguments, flags)
 
   # Create a stack that contains the results of the standard library
   prelude_stack = Stack.new nil
   userfile_stack = Stack.new prelude_stack
 
   # Write the export variable into the user stack
-  userfile_stack.write("export", CharlyTypes::TNull.new, declaration: true)
-
-  # Write the arguments into the prelude stack
-  prelude_stack.write("ARGV", CharlyTypes::TArray.new(arguments), true)
-
-  # Write the flags into the prelude stack
-  iflags = [] of CharlyTypes::BaseType
-  flags.each do |flag|
-    iflags << CharlyTypes::TString.new(flag)
-  end
-  prelude_stack.write("IFLAGS", CharlyTypes::TArray.new(iflags), true)
+  userfile_stack.write("export", CharlyTypes::TNull.new, declaration: true, force: true)
 
   # Get a InterpreterFascade
-  interpreter = InterpreterFascade.new(session, flags)
+  interpreter = InterpreterFascade.new(session)
 
   # Execute the prelude
   unless flags.includes? "noprelude"

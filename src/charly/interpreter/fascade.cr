@@ -8,19 +8,16 @@ require "../syntax/parser/parser.cr"
 
 class InterpreterFascade
   property top : Stack
-  property session : Session?
-  property flags : Array(String)
+  property session : Session
 
-  def initialize(session = nil, flags = [] of String)
-    @session = session
+  def initialize(@session)
     @top = Stack.new nil
-    @flags = flags
   end
 
   def execute_file(file, stack = @top)
 
     # Parsing
-    parser = Parser.new file, @flags
+    parser = Parser.new file, @session
     parser.parse
     program = parser.tree
 
@@ -29,9 +26,8 @@ class InterpreterFascade
     stack.session = @session
 
     # Execute the file in the interpreter
-    unless @flags.includes? "noexec"
-      result = Interpreter.new [program], stack, @flags
-      return result.program_result
+    unless @session.flags.includes? "noexec"
+      Interpreter.new([program], stack).program_result
     else
       CharlyTypes::TNull.new
     end

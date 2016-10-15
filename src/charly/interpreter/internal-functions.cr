@@ -215,7 +215,7 @@ module InternalFunctions
       # the value variable we got from values is an entry in the stack
       # we need to unpack the value from the value
       object.stack.not_nil!.values.each do |key, value|
-        stack.parent.not_nil!.write(key, value.value, true)
+        stack.parent.not_nil!.write(key, value.value, true) unless key == "self"
       end
     end
     return TNull.new
@@ -385,7 +385,7 @@ module InternalFunctions
     context = TObject.new(context_stack)
 
     # Create the interpreter fascade
-    interpreter = InterpreterFascade.new(stack.session, [] of String)
+    interpreter = InterpreterFascade.new(stack.session.not_nil!)
 
     # Catch exceptions
     begin

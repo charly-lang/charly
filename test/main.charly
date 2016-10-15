@@ -802,16 +802,6 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(args_received[4], "work")
     })
 
-    it("__argument variable can be overwritten", func(assert) {
-      let args_received
-      func call_me(__arguments) {
-        args_received = __arguments
-      }
-      call_me("hello", "world", "this", "should", "work")
-
-      assert(args_received, "hello")
-    })
-
     it("can access the parent scope", func(assert) {
       let change_me = false
       func call_me() {
@@ -1102,27 +1092,6 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(myBox.do_stuff, null)
       assert(myBox.to_s(), "Leonard - 16")
       assert(myBox.do_stuff(), "it works!")
-    })
-
-    it("overrides the self identifier", func(assert) {
-      class Box {
-        let name = "test"
-
-        func stuff(self) {
-          self.name = "world"
-        }
-      }
-
-      let person = { let name = "hello" }
-      let myBox = Box()
-
-      assert(myBox.name, "test")
-      assert(person.name, "hello")
-
-      myBox.stuff(person)
-
-      assert(myBox.name, "test")
-      assert(person.name, "world")
     })
 
     it("has a reference to the correct object", func(assert) {
