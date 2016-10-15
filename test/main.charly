@@ -590,6 +590,15 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(sum, 55);
     });
 
+    it("calls upto", func(assert) {
+      let sum = 0;
+      5.upto(10, func(n) {
+        sum = sum + n;
+      });
+
+      assert(sum, 45);
+    });
+
   });
 
   describe("Strings", func(it) {
