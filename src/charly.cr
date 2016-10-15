@@ -35,14 +35,12 @@ module Charly
     }
     opts.invalid_option {} # ignore
     opts.unknown_args do |before_dash|
+      before_dash = before_dash.to_a
       if before_dash.size == 0
-        puts "Missing filename"
-        puts opts
-        puts available_flags
-        exit 1
+        before_dash.unshift "repl"
       end
 
-      filename = before_dash.to_a.shift
+      filename = before_dash.shift
       before_dash.each do |arg|
         arguments << CharlyTypes::TString.new(arg)
       end
