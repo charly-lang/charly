@@ -1,7 +1,7 @@
 export = {
-  let num = 25;
+  let num = 25
 
   func increment(arg) {
-    arg + 1;
-  };
-};
+    arg + 1
+  }
+}

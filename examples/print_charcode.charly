@@ -1,2 +1,2 @@
-let char = "enter char: ".promptc();
-write(char.ord());
+let char = "enter char: ".promptc()
+write(char.ord())

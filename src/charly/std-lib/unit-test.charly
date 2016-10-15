@@ -2,169 +2,169 @@ class UnitTest {
 
   # A single test defined in the it function
   class Test {
-    let title;
-    let assertions = [];
-    let failed_assertions = [];
+    let title
+    let assertions = []
+    let failed_assertions = []
 
     func constructor(_title) {
-      title = _title;
-    };
+      title = _title
+    }
 
     func add_assertion(real, expect) {
-      let match = real == expect;
+      let match = real == expect
       assertions.push([
         real, expect, match
-      ]);
+      ])
 
       if (!match) {
         failed_assertions.push([
           assertions.length() - 1,
           assertions.last()
-        ]);
-      };
-    };
+        ])
+      }
+    }
 
     func passed() {
-      failed_assertions.length() == 0;
-    };
-  };
+      failed_assertions.length() == 0
+    }
+  }
 
   # A single suite
   # contains a list of tests
   class Suite {
-    let title;
-    let tests = [];
-    let failed_tests = [];
+    let title
+    let tests = []
+    let failed_tests = []
 
     func constructor(_title) {
-      title = _title;
-    };
+      title = _title
+    }
 
     func add_test(test) {
-      tests.push(test);
+      tests.push(test)
 
       if (!test.passed()) {
-        failed_tests.push(test);
-      };
-    };
+        failed_tests.push(test)
+      }
+    }
 
     func passed() {
-      failed_tests.length() == 0;
-    };
-  };
+      failed_tests.length() == 0
+    }
+  }
 
-  let title;
-  let suites = [];
-  let failed_suites = [];
+  let title
+  let suites = []
+  let failed_suites = []
 
   func constructor(_title) {
-    title = _title;
-  };
+    title = _title
+  }
 
   func passed() {
-    failed_suites.length() == 0;
-  };
+    failed_suites.length() == 0
+  }
 
   # Begin a new series of connected test-suites
   func begin(callback) {
 
     # Get the current time for statistics later on
-    let start_time = time_ms();
+    let start_time = time_ms()
 
     # Run all tests
     callback(func describe(description, callback) {
-      let current_suite = Suite(description);
+      let current_suite = Suite(description)
 
-      print(("Suite: " + description).colorize(33));
+      print(("Suite: " + description).colorize(33))
       callback(func it(description, callback) {
-        let current_test = Test(description);
+        let current_test = Test(description)
 
-        write(("it " + description + " ").colorize(37));
+        write(("it " + description + " ").colorize(37))
         callback(func assert(real, expect) {
-          current_test.add_assertion(real, expect);
-          null;
-        });
+          current_test.add_assertion(real, expect)
+          null
+        })
 
         if (current_test.passed()) {
-          write("Passed".colorize(32));
+          write("Passed".colorize(32))
         } else {
-          write("Failed".colorize(31));
-        };
-        print("");
-        current_suite.add_test(current_test);
-        null;
-      });
-      print("");
+          write("Failed".colorize(31))
+        }
+        print("")
+        current_suite.add_test(current_test)
+        null
+      })
+      print("")
 
       # Add the current_suite to the suites array
-      suites.push(current_suite);
+      suites.push(current_suite)
 
       if (!current_suite.passed()) {
-        failed_suites.push(current_suite);
-      };
+        failed_suites.push(current_suite)
+      }
 
-      null;
-    });
+      null
+    })
 
     # Gather some statistics
-    let passed = true;
+    let passed = true
 
-    let suites_run = 0;
-    let tests_run = 0;
-    let assertions_run = 0;
-    let total_time = time_ms() - start_time;
+    let suites_run = 0
+    let tests_run = 0
+    let assertions_run = 0
+    let total_time = time_ms() - start_time
 
     # Extract the data
     suites.each(func(suite, s_index) {
 
-      suites_run = suites_run + 1;
+      suites_run = suites_run + 1
       suite.tests.each(func(test, t_index) {
 
-        tests_run = tests_run + 1;
+        tests_run = tests_run + 1
         test.assertions.each(func(assertion, a_index) {
 
-          assertions_run = assertions_run + 1;
+          assertions_run = assertions_run + 1
           if (assertion[2] == false) {
-            passed = false;
-          };
-        });
-      });
-    });
+            passed = false
+          }
+        })
+      })
+    })
 
     # Show the statistics
     if (passed) {
-      print("All test-suites have passed!".colorize(32));
+      print("All test-suites have passed!".colorize(32))
     } else {
-      print("Some test-suites have failed!".colorize(31));
+      print("Some test-suites have failed!".colorize(31))
 
       # Show all failed assertions in a nice graph
       failed_suites.each(func(suite) {
 
-        print("- " + suite.title.colorize(33));
+        print("- " + suite.title.colorize(33))
         suite.failed_tests.each(func(test) {
 
-          print("  - " + test.title.colorize(37));
+          print("  - " + test.title.colorize(37))
           test.failed_assertions.each(func(assertion) {
-            print("      " + (assertion[0] + 1) + ": " + ("Expected: " + assertion[1][1] + ", got: " + assertion[1][0]).colorize(31));
-          });
-        });
-      });
+            print("      " + (assertion[0] + 1) + ": " + ("Expected: " + assertion[1][1] + ", got: " + assertion[1][0]).colorize(31))
+          })
+        })
+      })
 
-      print("");
-    };
-    print("Ran " + suites_run.colorize(33) + " Suites");
-    print("Ran " + tests_run.colorize(33) + " Tests");
-    print("Ran " + assertions_run.colorize(33) + " Assertions");
-    print("Total time: " + total_time.colorize(33) + " miliseconds");
+      print("")
+    }
+    print("Ran " + suites_run.colorize(33) + " Suites")
+    print("Ran " + tests_run.colorize(33) + " Tests")
+    print("Ran " + assertions_run.colorize(33) + " Assertions")
+    print("Total time: " + total_time.colorize(33) + " miliseconds")
 
     # Return 0 if all tests passed
     # 1 if at least one failed
     if (passed) {
-      0;
+      0
     } else {
-      1;
-    };
-  };
-};
+      1
+    }
+  }
+}
 
-export = UnitTest;
+export = UnitTest

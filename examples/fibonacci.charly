@@ -1,16 +1,16 @@
 func fib(n) {
-  let last = 0;
-  let curr = 1;
+  let last = 0
+  let curr = 1
 
-  let tmp;
+  let tmp
   n.times(func() {
-    tmp = curr;
-    curr = last + curr;
-    last = tmp;
-  });
+    tmp = curr
+    curr = last + curr
+    last = tmp
+  })
 
-  last;
-};
+  last
+}
 
-let n = "Which fibonacci number do you want?: ".prompt().to_n();
-print(fib(n));
+let n = "Which fibonacci number do you want?: ".prompt().to_n()
+print(fib(n))

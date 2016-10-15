@@ -8,55 +8,57 @@ This is my try at writing an interpreter of a dynamic language from scratch with
 
 # Syntax
 
+Semicolons are completely optional!
+
 __Declaring a variable__
 ```charly
-let number = 900;
-let float = 5.5928;
-let string = "Hello World";
-let boolean = true;
-let array = [1, "charly", false];
-let nullvalue = null;
+let number = 900
+let float = 5.5928
+let string = "Hello World"
+let boolean = true
+let array = [1, "charly", false]
+let nullvalue = null
 let object = {
-  let name = "leonard";
-  let age = 16;
-};
+  let name = "leonard"
+  let age = 16
+}
 ```
 
 __Declaring a function__
 ```charly
 func callback(value, callback) {
-  callback(value);
-};
+  callback(value)
+}
 
 let result = callback(25, func(value) {
-  value * 2;
-});
+  value * 2
+})
 
-result; # => 50
+result # => 50
 ```
 
 __Repeat & While loops__
 ```charly
 5.times(func(i) {
-  print("Hello");
-});
+  print("Hello")
+})
 
-let i = 0;
+let i = 0
 while (i < 10) {
-  print("In a while loop");
-  i = i + 1;
-};
+  print("In a while loop")
+  i = i + 1
+}
 ```
 
 __User Input__
 ```charly
 # Strings
-let input = gets();
-print(input);
+let input = gets()
+print(input)
 
 # Numbers
-let input_number = gets().to_n();
-print(input_number);
+let input_number = gets().to_n()
+print(input_number)
 ```
 
 __Primitive types__
@@ -69,44 +71,44 @@ null.type()                         # => Null
 false.type()                        # => Boolean
 (class Box {}).type()               # => Class
 (func() {}).type()                  # => Function
-{ let name = "charly"; }.type()     # => Object
+{ let name = "charly" }.type()     # => Object
 ```
 
 __Including other files__
 ```charly
 # Include a file in the current directory
-require("external.charly");
+require("external.charly")
 
 # Include the someotherlibrary from the standard library
-require("someotherlibrary");
+require("someotherlibrary")
 ```
 
 __Working with arrays__
 ```charly
-let array = [1, 2, 3];
-array.push(4);
-print(array); # => [1, 2, 3, 4]
+let array = [1, 2, 3]
+array.push(4)
+print(array) # => [1, 2, 3, 4]
 ```
 
 __Classes & Objects__
 ```charly
 class Person {
-  let name;
-  let age;
+  let name
+  let age
 
   func constructor(name, age) {
-    self.name = name;
-    self.age = age;
-  };
-};
+    self.name = name
+    self.age = age
+  }
+}
 
-let leonard = Person("Leonard", 16);
-print(leonard.name); # "Leonard"
-print(leonard.age); # 16
+let leonard = Person("Leonard", 16)
+print(leonard.name) # "Leonard"
+print(leonard.age) # 16
 ```
 
 # Everything is an object... kind of
-When you write `5`, the interpreter actually treats it as a primitive. There are no funny castings or object instantiations. You can normally write code like `2 + 5` and it will work. Once you do something like `5.times(func(){});`, the interpreter searches the current scope for an object called `Numeric` and checks if there is a function called `times` on it. If it finds the method, it injects a variable called `self` into the function's stack and executes it.
+When you write `5`, the interpreter actually treats it as a primitive. There are no funny castings or object instantiations. You can normally write code like `2 + 5` and it will work. Once you do something like `5.times(func(){})`, the interpreter searches the current scope for an object called `Numeric` and checks if there is a function called `times` on it. If it finds the method, it injects a variable called `self` into the function's stack and executes it.
 
 This allows the interpreter to reuse the same object for all primitives.
 

@@ -1,58 +1,58 @@
 class TodoList {
   class Todo {
-    let title;
-    let complete = false;
+    let title
+    let complete = false
 
     func constructor(title) {
-      self.title = title;
-    };
+      self.title = title
+    }
 
     func toggle() {
-      self.complete = !self.complete;
-    };
-  };
+      self.complete = !self.complete
+    }
+  }
 
-  let todos = [];
+  let todos = []
 
   func add(title) {
-    let todo = Todo(title);
-    todos.push(todo);
-  };
+    let todo = Todo(title)
+    todos.push(todo)
+  }
 
   func remove(id) {
-    todos.delete(id);
-  };
+    todos.delete(id)
+  }
 
   func toggle(id) {
-    let todo = todos[id];
+    let todo = todos[id]
     if (todo) {
-      todo.toggle();
-    };
-  };
-};
+      todo.toggle()
+    }
+  }
+}
 
-let myList = TodoList();
+let myList = TodoList()
 
 # input loop
 
-let done = false;
-let input;
+let done = false
+let input
 while (!done) {
 
   # Render the todolist
-  print("Your Todos:");
+  print("Your Todos:")
   myList.todos.each(func(todo, index) {
 
     # Get the correct icon
-    let icon = "✓".colorize(32);
+    let icon = "✓".colorize(32)
     if (!todo.complete) {
-      icon = "✗".colorize(31);
-    };
+      icon = "✗".colorize(31)
+    }
 
     # Print the todo
-    print(index.colorize(34) + ": " + icon + " " + todo.title);
-  });
-  print("");
+    print(index.colorize(34) + ": " + icon + " " + todo.title)
+  })
+  print("")
 
   # Show the menu
   print("
@@ -60,23 +60,23 @@ while (!done) {
 2. Toggle todo
 3. Delete todo
 4. Quit application
-  ".trim());
+  ".trim())
 
   # Get user input
-  input = "> ".promptc().to_n();
-  write("   ", "\r");
+  input = "> ".promptc().to_n()
+  write("   ", "\r")
 
   if (input == 1) {
-    myList.add("title > ".prompt().trim());
+    myList.add("title > ".prompt().trim())
   } else if (input == 2) {
-    myList.toggle("id > ".prompt().to_n());
+    myList.toggle("id > ".prompt().to_n())
   } else if (input == 3) {
-    myList.remove("id > ".prompt().to_n());
+    myList.remove("id > ".prompt().to_n())
   } else if (input == 4) {
-    done = true;
+    done = true
   } else {
-    print("Sorry, I don't know that command!");
-  };
+    print("Sorry, I don't know that command!")
+  }
 
-  print("");
-};
+  print("")
+}

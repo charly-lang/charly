@@ -1,17 +1,17 @@
-let width = "How wide should the pyramid be?: ".prompt().to_n() + 1;
+let width = "How wide should the pyramid be?: ".prompt().to_n() + 1
 
 width.times(func(i) {
 
   # Draw the left padding
   (width - i).times(func() {
-    write(" ");
-  });
+    write(" ")
+  })
 
   # Draw the pyramid
   i.times(func() {
-    write(" *");
-  });
+    write(" *")
+  })
 
   # next line
-  write("\n");
-});
+  write("\n")
+})
