@@ -366,4 +366,34 @@ module InternalFunctions
 
     raise "math expected at least 2 arguments"
   end
+
+  def eval(arguments, stack)
+    unless arguments.size >= 2
+      raise "eval expected 2 arguments"
+    end
+
+    # Typecheck the arguments
+    source = arguments[0]
+    context = arguments[1]
+    unless source.is_a?(TString) && context.is_a?(TObject)
+      raise "eval expected string, object"
+    end
+
+    # Isolate the context
+    context_stack = context.stack.dup
+    context_stack.parent = stack.top
+    context = TObject.new(context_stack)
+
+    # Create the interpreter fascade
+    interpreter = InterpreterFascade.new(stack.session, [] of String)
+
+    # Catch exceptions
+    begin
+      result = interpreter.execute_file(EvalFile.new(source.value), context.stack)
+      return result
+    rescue e
+      puts e
+      return TNull.new
+    end
+  end
 end

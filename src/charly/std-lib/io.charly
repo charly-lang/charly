@@ -46,4 +46,8 @@ export = {
   func time_ms() {
     call_internal("time_ms")
   }
+
+  func eval(source, context) {
+    call_internal("eval", source, context)
+  }
 }

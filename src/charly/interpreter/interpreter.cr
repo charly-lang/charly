@@ -673,6 +673,8 @@ class Interpreter
             return InternalFunctions.ord(arguments[1..-1], stack)
           when "math"
             return InternalFunctions.math(arguments[1..-1], stack)
+          when "eval"
+            return InternalFunctions.eval(arguments[1..-1], stack)
           else
             raise "Internal function call to '#{name.value}' not implemented!"
           end
