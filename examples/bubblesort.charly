@@ -29,7 +29,7 @@ Array.sort = func(sort_function) {
 }
 
 let numbers = []
-let amount = "How many numbers do you want to sort?: ".prompt().to_n()
+let amount = "How many numbers do you want to sort?: ".promptn()
 print("Enter " + amount.colorize(32) + " numbers: ")
 
 amount.times(func() {

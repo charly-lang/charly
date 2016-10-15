@@ -12,5 +12,5 @@ func fib(n) {
   last
 }
 
-const n = "Which fibonacci number do you want?: ".prompt().to_n()
+const n = "Which fibonacci number do you want?: ".promptn()
 print(fib(n))

@@ -68,9 +68,9 @@ while (!done) {
   if (input == 1) {
     myList.add("title > ".prompt().trim())
   } else if (input == 2) {
-    myList.toggle("id > ".prompt().to_n())
+    myList.toggle("id > ".promptn())
   } else if (input == 3) {
-    myList.remove("id > ".prompt().to_n())
+    myList.remove("id > ".promptn())
   } else if (input == 4) {
     done = true
   } else {
