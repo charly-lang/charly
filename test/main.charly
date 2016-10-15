@@ -141,6 +141,12 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(50**0, 1)
     })
 
+    it("sleeps for a given time", func(assert) {
+      let start = time_ms()
+      sleep(1.seconds())
+      assert((time_ms() - start).close_to(1000, 10), true)
+    })
+
   })
 
   describe("Comparisons", func(it) {
