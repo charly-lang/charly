@@ -49,10 +49,10 @@ class Stack
     max_val = 0
     max_type = 0
     dump_values.each do |(depth, key, value)|
-      depth = "#{depth}"
-      key = "#{key}"
-      value = "#{value}"
-      type = "#{value.class}"
+      depth = "#{depth}"[0..30]
+      key = "#{key}"[0..30]
+      value = "#{value}"[0..30]
+      type = "#{value.class}"[0..30]
 
       max_depth = depth.size if depth.size > max_depth
       max_id = key.size if key.size > max_id

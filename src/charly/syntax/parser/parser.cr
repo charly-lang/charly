@@ -206,6 +206,14 @@ class Parser
     add_token(type, value, false)
   end
 
+  # Behaves the same as token(type, value)
+  # except that a matched node is not added to the tree
+  # and that it always returns true
+  def skip_optional_token(type, value = false)
+    add_token(type, value, false)
+    true
+  end
+
   # Runs each proc in *productions*
   # If a proc returns true
   # The result of the temporary production will be placed into the
@@ -297,23 +305,23 @@ class Parser
       match = false
       if token(TokenType::Keyword, "let") && token(TokenType::Identifier)
         match = check_each([->{
-          token(TokenType::Assignment) && expression && skip_token(TokenType::Semicolon)
+          token(TokenType::Assignment) && expression && skip_optional_token(TokenType::Semicolon)
         }, ->{
-          skip_token(TokenType::Semicolon)
+          skip_optional_token(TokenType::Semicolon)
         }])
       end
       match
     }, ->{
-      expression && skip_token(TokenType::Semicolon)
+      expression && skip_optional_token(TokenType::Semicolon)
     }, ->{
-      if_statement && skip_token(TokenType::Semicolon)
+      if_statement && skip_optional_token(TokenType::Semicolon)
     }, ->{
       token(TokenType::Keyword, "while") &&
       skip_token(TokenType::LeftParen) &&
       expression &&
       skip_token(TokenType::RightParen) &&
       block &&
-      skip_token(TokenType::Semicolon)
+      skip_optional_token(TokenType::Semicolon)
     })
   end
 

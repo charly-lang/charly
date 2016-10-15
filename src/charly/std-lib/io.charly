@@ -1,47 +1,49 @@
 let stdout = {
   func print() {
-    call_internal("stdout_print", __arguments.all_to_s());
-  };
+    call_internal("stdout_print", __arguments.all_to_s())
+  }
 
   func write() {
-    call_internal("stdout_write", __arguments.all_to_s());
-  };
-};
+    call_internal("stdout_write", __arguments.all_to_s())
+  }
+}
 
 let stderr = {
   func print() {
-    call_internal("stderr_print", __arguments.all_to_s());
-  };
+    call_internal("stderr_print", __arguments.all_to_s())
+  }
 
   func write() {
-    call_internal("stderr_write", __arguments.all_to_s());
-  };
-};
+    call_internal("stderr_write", __arguments.all_to_s())
+  }
+}
 
 let stdin = {
   func gets() {
-    call_internal("stdin_gets");
-  };
+    call_internal("stdin_gets")
+  }
 
   func getc() {
-    call_internal("stdin_getc");
-  };
-};
+    call_internal("stdin_getc")
+  }
+}
 
 export = {
-  let stdout = stdout;
-  let stderr = stderr;
-  let stdin = stdin;
+  let stdout = stdout
+  let stderr = stderr
+  let stdin = stdin
 
-  func __stackdump() {
-    call_internal("__stackdump");
-  };
+  # Sleep for *amount*
+  # In miliseconds
+  func sleep(amount) {
+    call_internal("sleep", amount)
+  }
 
   func exit(code) {
-    call_internal("exit", code);
-  };
+    call_internal("exit", code)
+  }
 
   func time_ms() {
-    call_internal("time_ms");
-  };
-};
+    call_internal("time_ms")
+  }
+}

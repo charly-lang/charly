@@ -7,6 +7,29 @@ module InternalFunctions
   extend self
   include CharlyTypes
 
+  def sleep(arguments, stack)
+
+    # Check if there is at least 1 argument
+    unless arguments.size > 0
+      return TNull.new
+    end
+
+    # An array filled with TNull
+    if arguments.size >= 1
+
+      # Typecheck
+      amount = arguments[0]
+
+      if amount.is_a?(TNumeric)
+        sleep amount.value / 1000
+      else
+        raise "sleep expected argument 1 to be of type TNumeric, got #{amount.class}"
+      end
+    end
+
+    return TNull.new
+  end
+
   module STDOUT
     extend self
 
@@ -51,8 +74,8 @@ module InternalFunctions
     extend self
 
     def getc
-      puts "STDIN.getc is not implemented right now!"
-      return TNull.new
+      char = ::STDIN.raw &.read_char
+      return TString.new(char.to_s)
     end
 
     def gets
@@ -150,7 +173,9 @@ module InternalFunctions
         # If the index is smaller than 0, we delete the first element
         # If the index is bigger than the size of the array
         # we delete the last item
-        if index.value <= 0
+        if array.value.size == 0
+          return TNull.new
+        elsif index.value <= 0
           return array.value.shift
         elsif index.value >= array.value.size
           return array.value.pop
@@ -283,10 +308,59 @@ module InternalFunctions
     raise "trim expected at least 1 argument"
   end
 
-  # Return a string representation of the current stack
-  def __stackdump(arguments, stack)
-    io = MemoryIO.new
-    stack.stackdump(io, true)
-    return TString.new io.to_s
+  # Return the codepoint of a char as an array
+  def ord(arguments, stack)
+
+    # Check if there is at least 1 argument
+    if arguments.size > 0
+      arg = arguments[0]
+
+      if arg.is_a?(TString) && arg.value.size > 0
+        bytes = [] of BaseType
+        arg.value[0].bytes.map do |byte|
+          bytes << TNumeric.new(byte)
+        end
+        return TArray.new(bytes)
+      else
+        raise "trim expected a string with at least 1 char, got #{arg.class}"
+      end
+    end
+
+    raise "ord expected at least 1 argument"
+  end
+
+  # Several math functions, the implementation of this might change
+  def math(arguments, stack)
+
+    # Check if there are at least 2 arguments
+    if arguments.size >= 2
+      func_name = arguments[0]
+      unless func_name.is_a? TString
+        raise "math expected first argument to be of type TString, got #{func_name.class}"
+      end
+
+      # The second argument has to be a numeric
+      value = arguments[1]
+      unless value.is_a? TNumeric
+        raise "math expected second argument to be of type TNumeric, got #{func_name.class}"
+      end
+
+      # Generate all math bindings
+      {% for name in %w(cos cosh acos acosh sin sinh asin asinh tan tanh atan atanh cbrt sqrt log) %}
+      if func_name.value == "{{name.id}}"
+        return TNumeric.new(Math.{{name.id}}(value.value))
+      end
+      {% end %}
+      if func_name.value == "ceil"
+        return TNumeric.new(value.value.ceil)
+      end
+      if func_name.value == "floor"
+        return TNumeric.new(value.value.floor)
+      end
+
+      raise "Unknown math function #{func_name.value}"
+    end
+
+    raise "math expected at least 2 arguments"
   end
 end

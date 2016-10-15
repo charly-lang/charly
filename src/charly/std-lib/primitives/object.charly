@@ -2,22 +2,22 @@ export = {
 
   # Return the length of this object
   func length() {
-    call_internal("length", self);
-  };
+    call_internal("length", self)
+  }
 
   # Returns a colorized version of the string representation
   # of this object
   func colorize(code) {
-    call_internal("colorize", self.to_s(), code);
-  };
+    call_internal("colorize", self.to_s(), code)
+  }
 
   # Cast the current object to a string
   func to_s() {
-    "" + self;
-  };
+    "" + self
+  }
 
   # Returns the type of this object as a string
   func type() {
-    call_internal("typeof", self);
-  };
-};
+    call_internal("typeof", self)
+  }
+}

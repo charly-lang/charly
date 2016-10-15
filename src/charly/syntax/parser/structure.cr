@@ -133,14 +133,13 @@ class Structure
       end
     end
 
-    # Function literals
+    # Strip the func keyword from the FunctionLiterals
     if node.is_a?(FunctionLiteral) && (node.children.size == 4 || node.children.size == 3)
 
       # Check for the func keyword
       if node.children[0].is_a?(KeywordLiteral) && node.children[0].value == "func"
-        identifier_is_present = node.children.size == 4
-
         @finished = false
+        node.anonymous = node.children.size == 3
         node.children.shift # Remove the func keyword
         return node
       end

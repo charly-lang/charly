@@ -602,6 +602,9 @@ class Interpreter
       end
     end
 
+    # the default context for the function
+    context = nil
+
     # Get the identifier of the call expression
     # If the identifier is an IdentifierLiteral we first check
     # if it's a call to "call_internal"
@@ -660,8 +663,12 @@ class Interpreter
             return InternalFunctions.to_numeric(arguments[1..-1], stack)
           when "trim"
             return InternalFunctions.trim(arguments[1..-1], stack)
-          when "__stackdump"
-            return InternalFunctions.__stackdump(arguments[1..-1], stack)
+          when "sleep"
+            return InternalFunctions.sleep(arguments[1..-1], stack)
+          when "ord"
+            return InternalFunctions.ord(arguments[1..-1], stack)
+          when "math"
+            return InternalFunctions.math(arguments[1..-1], stack)
           else
             raise "Internal function call to '#{name.value}' not implemented!"
           end
@@ -704,7 +711,7 @@ class Interpreter
       context = target.parent_stack.get("self") unless context
       return exec_function(target, arguments, context)
     else
-      raise "#{identifier} is not a function!"
+      raise "#{identifier} is not a function! #{stack}"
     end
   end
 
@@ -849,14 +856,6 @@ class Interpreter
     function_stack.write("__arguments", TArray.new(arguments), true)
     function_stack.write("self", context, true)
 
-    # Merge the functions bound stack into the execution_stack
-    bound_stack = function.bound_stack
-    if bound_stack.is_a? Stack
-      bound_stack.values.each do |key, value|
-        function_stack.write(key, value, true)
-      end
-    end
-
     # Write the argument to the function stack
     arguments.each_with_index do |arg, index|
 
@@ -934,7 +933,7 @@ class Interpreter
       block = node.block
 
       if argumentlist.is_a? ASTNode && block.is_a? Block
-        return TFunc.new(argumentlist.children, block, stack)
+        return TFunc.new(argumentlist.children, block, stack, !!node.anonymous)
       end
     when .is_a? ArrayLiteral
 
@@ -961,13 +960,8 @@ class Interpreter
   def exec_container_literal(node, stack)
 
     # Check if there is a block
-    block = node.block
-    if block.is_a? Block
-
-      # Create the TClass instance
+    if (block = node.block).is_a? Block
       classliteral = TClass.new(block, stack)
-
-      # Create a new object from the class instance
       return exec_object_instantiation(classliteral, [] of BaseType, stack)
     end
 
@@ -1083,6 +1077,8 @@ class Interpreter
         filepath = ENV["CHARLYDIR"] + "/unit-test.charly"
       when "primitives"
         filepath = ENV["CHARLYDIR"] + "/primitives/include.charly"
+      when "math"
+        filepath = ENV["CHARLYDIR"] + "/math.charly"
       else
         filepath = File.join(current_dir, filename)
       end

@@ -1,19 +1,16 @@
-# Calculates the n fibonacci number
 func fib(n) {
-  let last = 0;
-  let curr = 1;
+  let last = 0
+  let curr = 1
 
-  let tmp;
-  repeat(n, func(i) {
-    tmp = curr;
-    curr = last + curr;
-    last = tmp;
-  });
+  let tmp
+  n.times(func() {
+    tmp = curr
+    curr = last + curr
+    last = tmp
+  })
 
-  curr;
-};
+  last
+}
 
-write("The nth fibonacci number do you want?: ");
-let n = to_numeric(gets());
-let result = fib(n);
-print(result);
+let n = "Which fibonacci number do you want?: ".prompt().to_n()
+print(fib(n))

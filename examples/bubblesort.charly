@@ -1,37 +1,43 @@
-# This modifies the array in place
-func sort(array) {
-  let sorted = false;
-  while (!sorted) {
-    sorted = true;
-    each(array, func(current, i) {
-      if (i ! length(array) - 1) {
-        let next = array[i + 1];
+# This is the exact same method that in the standard-library
+Array.sort = func(sort_function) {
+  let done = false
+  let sorted = self.copy()
 
-        if (current > next) {
-          let tmp = next;
-          array[i + 1] = current;
-          array[i] = tmp;
+  # some temporary variables
+  # initialized here to save memory
+  let next
+  let tmp
 
-          sorted = false;
-        };
-      };
-    });
-  };
-};
+  while (!done) {
+    done = true
+    sorted.each(func(left, i) {
+      if (i ! self.length() - 1) {
+        next = self[i + 1]
 
-let amount = 0;
-let numbers = [];
+        # Run the user specified sorting function
+        if (sort_function(left, next)) {
+          tmp = next
+          sorted[i + 1] = left
+          sorted[i] = tmp
+          done = false
+        }
+      }
+    })
+  }
 
-write("How many numbers do you want to sort: ");
-amount = to_numeric(gets());
+  sorted
+}
 
-print("Enter " + colorize(amount, 32) + " numbers: ");
+let numbers = []
+let amount = "How many numbers do you want to sort?: ".prompt().to_n()
+print("Enter " + amount.colorize(32) + " numbers: ")
 
-numbers = array_of_size(amount, null);
-numbers = each(numbers, func(e, i) {
-  numbers[i] = to_numeric(gets());
-});
+amount.times(func() {
+  numbers.push(gets().to_n())
+})
 
-sort(numbers);
+numbers = numbers.sort(func(left, right) {
+  left > right
+})
 
-print(numbers);
+print(numbers)

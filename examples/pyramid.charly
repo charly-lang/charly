@@ -1,18 +1,17 @@
-let index = 0;
-let width = 20;
+let width = "How wide should the pyramid be?: ".prompt().to_n() + 1
 
-write("How wide should the pyramid be: ");
-width = to_numeric(gets()) + 1;
+width.times(func(i) {
 
-while (index < width) {
-  repeat(width - index, func() {
-    write(" ");
-  });
+  # Draw the left padding
+  (width - i).times(func() {
+    write(" ")
+  })
 
-  repeat(index, func() {
-    write(" *");
-  });
+  # Draw the pyramid
+  i.times(func() {
+    write(" *")
+  })
 
-  print("");
-  index = index + 1;
-};
+  # next line
+  write("\n")
+})

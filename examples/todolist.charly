@@ -1,89 +1,82 @@
-class Todo {
-  let title;
-  let completed = false;
+class TodoList {
+  class Todo {
+    let title
+    let complete = false
 
-  func constructor(_title) {
-    title = _title;
-  };
-};
+    func constructor(title) {
+      self.title = title
+    }
 
-let Todos = {
-  let todos = [];
+    func toggle() {
+      self.complete = !self.complete
+    }
+  }
 
-  func add_todo(title) {
-    todos = append(todos, Todo(trim(title)));
-  };
+  let todos = []
 
-  func toggle_todo(index) {
+  func add(title) {
+    let todo = Todo(title)
+    todos.push(todo)
+  }
 
-    # Check for overflow
-    let count = length(todos);
-    if (index >= 0) {
-      if (index < (count)) {
-        todos[index].completed = !todos[index].completed;
-      };
-    };
-  };
+  func remove(id) {
+    todos.delete(id)
+  }
 
-  func delete_todo(index) {
-    let new = [];
+  func toggle(id) {
+    let todo = todos[id]
+    if (todo) {
+      todo.toggle()
+    }
+  }
+}
 
-    each(todos, func(todo, todoindex) {
-      if (todoindex ! index) {
-        new = append(new, todo);
-      };
-    });
+let myList = TodoList()
 
-    todos = new;
-  };
-};
+# input loop
 
-# Helper function to get user input
-func question(title) {
-    print("");
-    write(title);
-    gets();
-};
+let done = false
+let input
+while (!done) {
 
-# Input loop
-let should_exit = false;
-while (!should_exit) {
+  # Render the todolist
+  print("Your Todos:")
+  myList.todos.each(func(todo, index) {
 
-  # Display all todos
-  each(Todos.todos, func(todo, index) {
-    if (todo.completed) {
-      write("[" + colorize("✓", 32) + "] ");
-    } else {
-      write("[" + colorize("✗", 31) + "] ");
-    };
-    print(index + ": " + todo.title);
-  });
+    # Get the correct icon
+    let icon = "✓".colorize(32)
+    if (!todo.complete) {
+      icon = "✗".colorize(31)
+    }
 
-  # Print the menu
-  print("");
-  print("-- Todo List written in Charly --");
-  print("-- 1: Add todo");
-  print("-- 2: Toggle todo");
-  print("-- 3: Delete todo");
-  print("-- 4: Quit application");
+    # Print the todo
+    print(index.colorize(34) + ": " + icon + " " + todo.title)
+  })
+  print("")
 
-  # Input
-  let menu = to_numeric(question("> "));
+  # Show the menu
+  print("
+1. Add todo
+2. Toggle todo
+3. Delete todo
+4. Quit application
+  ".trim())
 
-  # Add a todo
-  if (menu == 1) {
-    Todos.add_todo(question("Title: "));
-  };
+  # Get user input
+  input = "> ".promptc().to_n()
+  write("   ", "\r")
 
-  if (menu == 2) {
-    Todos.toggle_todo(to_numeric(question("Index: ")));
-  };
+  if (input == 1) {
+    myList.add("title > ".prompt().trim())
+  } else if (input == 2) {
+    myList.toggle("id > ".prompt().to_n())
+  } else if (input == 3) {
+    myList.remove("id > ".prompt().to_n())
+  } else if (input == 4) {
+    done = true
+  } else {
+    print("Sorry, I don't know that command!")
+  }
 
-  if (menu == 3) {
-    Todos.delete_todo(to_numeric(question("Index: ")));
-  };
-
-  if (menu == 4) {
-    should_exit = true;
-  };
-};
+  print("")
+}
