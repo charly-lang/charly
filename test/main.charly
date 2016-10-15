@@ -676,6 +676,9 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert("".substring(0, 5), "");
       assert("hello world".substring(0, 5), "hello");
       assert("hello".substring(0, 10), "hello");
+      assert("hello world".substring(6, 5), "world");
+      assert("what is going on here".substring(8, 5), "going");
+      assert("".substring(10, 0), "");
     });
 
     it("maps over a string", func(assert) {
@@ -710,11 +713,11 @@ let testResult = UnitTest("Charly").begin(func(describe) {
     });
 
     it("returns the index of a substring", func(assert) {
-      assert("hello beautiful world".index_of("hello"), 0);
-      assert("hello beautiful world".index_of("beautiful"), 6);
-      assert("hello beautiful world".index_of("world"), 16);
-      assert("I'm not here".index_of("test"), -1);
-      assert("hello beautiful world".index_of(" "), 5);
+      assert("hello beautiful world".index_of("hello", 0), 0);
+      assert("hello beautiful world".index_of("beautiful", 0), 6);
+      assert("hello beautiful world".index_of("world", 0), 16);
+      assert("I'm not here".index_of("test", 0), -1);
+      assert("hello beautiful world".index_of(" ", 0), 5);
     });
 
   });

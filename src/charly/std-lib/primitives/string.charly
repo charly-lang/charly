@@ -65,18 +65,19 @@ export = {
   };
 
   # Return a substring from an index
-  func substring(start, end) {
-    let length = self.length();
-    let i = start;
-    let new = "";
-    while (i < end) {
-      let char = self[i];
-      if (char) {
-        new = new + self[i];
+  func substring(start, offset) {
+    let index = start;
+    let end = start + offset;
+    let result = "";
+
+    while (index < end) {
+      if (self[index]) {
+        result = result + self[index];
       };
-      i = i + 1;
+      index = index + 1;
     };
-    new;
+
+    result;
   };
 
   # Map over a function
@@ -106,7 +107,20 @@ export = {
   };
 
   # Return the index of needle inside self
-  func index_of(needle) {
-    -1;
+  func index_of(needle, offset) {
+    let found_index = -1;
+    let end_pos = self.length() - needle.length();
+    self.each(func(char, i) {
+      if (found_index == -1) {
+        if (i <= end_pos) {
+          if (i >= offset) {
+            if (self.substring(i, needle.length()) == needle) {
+              found_index = i;
+            };
+          };
+        };
+      };
+    });
+    found_index;
   };
 };
