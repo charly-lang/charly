@@ -116,6 +116,28 @@ print(leonard.name) # "Leonard"
 print(leonard.age) # 16
 ```
 
+# Using the built-in REPL
+
+Currently it's not possible to use the left-arrow or right-arrow keys to position your cursor. I know this sucks and I will change it in the future.
+
+```
+$ charly repl
+> 2 + 2
+4
+> "test"
+test
+> $ * 4
+testtesttesttest
+> func increment(a) { a + 1 }
+Function
+> increment(25)
+26
+> print("hello world")
+hello world
+null
+> .exit
+```
+
 # Everything is an object... kind of
 When you write `5`, the interpreter actually treats it as a primitive. There are no funny castings or object instantiations. You can normally write code like `2 + 5` and it will work. Once you do something like `5.times(func(){})`, the interpreter searches the current scope for an object called `Numeric` and checks if there is a function called `times` on it. If it finds the method, it injects a variable called `self` into the function's stack and executes it.
 
