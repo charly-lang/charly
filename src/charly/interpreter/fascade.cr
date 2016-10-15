@@ -30,7 +30,8 @@ class InterpreterFascade
 
     # Execute the file in the interpreter
     unless @flags.includes? "noexec"
-      Interpreter.new [program], stack, @flags
+      result = Interpreter.new [program], stack, @flags
+      return result.program_result
     else
       CharlyTypes::TNull.new
     end
