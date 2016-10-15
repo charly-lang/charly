@@ -720,6 +720,24 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert("hello beautiful world".index_of(" ", 0), 5);
     });
 
+    it("lstrip", func(assert) {
+      assert("hello world".lstrip(5), " world");
+      assert("- myname".lstrip(2), "myname");
+      assert("".lstrip(5), "");
+      assert("what is going on".lstrip(999), "");
+      assert("hello world".lstrip(0), "hello world");
+      assert("hello world".lstrip(-5), "hello world");
+    });
+
+    it("rstrip", func(assert) {
+      assert("hello world".rstrip(5), "hello ");
+      assert("- myname".rstrip(2), "- myna");
+      assert("".rstrip(5), "");
+      assert("what is going on".rstrip(999), "");
+      assert("hello world".rstrip(0), "hello world");
+      assert("hello world".rstrip(-5), "hello world");
+    });
+
   });
 
   describe("Functions", func(it) {

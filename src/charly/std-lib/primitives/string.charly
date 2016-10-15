@@ -12,6 +12,16 @@ export = {
     call_internal("trim", self);
   };
 
+  # Remove n characters from the left
+  func lstrip(n) {
+    self.substring(n, self.length() - n);
+  };
+
+  # Remove n characters from the right
+  func rstrip(n) {
+    self.substring(0, self.length() - n);
+  };
+
   # Writes self to stdout and asks for user input
   func prompt() {
     write(self);
