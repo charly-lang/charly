@@ -20,7 +20,15 @@ while (!finished) {
     history.push(input)
     result = eval(input, context)
     context.$ = result
-    print(result)
+
+    # Different coloring based on their types
+    if (result.type() == "String") {
+      print(result.colorize(32))
+    } else if (result.type() == "Numeric") {
+      print(result.colorize(33))
+    } else {
+      print(result)
+    }
   }
 }
 
