@@ -463,12 +463,12 @@ class Lexer
 
   # Returns true if *char* could be the start of an identifier
   def ident_start(char)
-    char.alpha? || char == '_' || char.ord > 0x9F
+    char.alpha? || char == '_' || char == '$' || char.ord > 0x9F
   end
 
   # Returns true if *char* could be inside an identifier
   def ident_part(char)
-    ident_start(char) || char.digit?
+    ident_start(char) || char.digit? || char == '$'
   end
 
   # Checks if the current buffer is a keyword or an identifier
