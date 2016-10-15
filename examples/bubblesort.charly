@@ -1,24 +1,3 @@
-# This modifies the array in place
-func sort(array) {
-  let sorted = false;
-  while (!sorted) {
-    sorted = true;
-    each(array, func(current, i) {
-      if (i ! length(array) - 1) {
-        let next = array[i + 1];
-
-        if (current > next) {
-          let tmp = next;
-          array[i + 1] = current;
-          array[i] = tmp;
-
-          sorted = false;
-        };
-      };
-    });
-  };
-};
-
 # This is the exact same method that in the standard-library
 Array.sort = func(sort_function) {
   let done = false;
