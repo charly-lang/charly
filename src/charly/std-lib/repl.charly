@@ -1,0 +1,27 @@
+# The context in which all eval statements are run
+const context = {
+  let $
+};
+context.context = context;
+
+# Input history
+const history = [];
+
+# Repeat until .exit is called
+let finished = false
+let input
+let result
+while (!finished) {
+  input = "> ".prompt().trim()
+
+  if (input == ".exit") {
+    finished = true
+  } else {
+    history.push(input)
+    result = eval(input, context)
+    context.$ = result
+    print(result)
+  }
+}
+
+export = context

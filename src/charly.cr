@@ -46,6 +46,11 @@ module Charly
       before_dash.each do |arg|
         arguments << CharlyTypes::TString.new(arg)
       end
+
+      # If the filename is repl, expand the path to the repl.charly file
+      if filename == "repl"
+        filename = ENV["CHARLYDIR"] + "/repl.charly"
+      end
     end
   end
 
@@ -55,6 +60,9 @@ module Charly
   # Create a stack that contains the results of the standard library
   prelude_stack = Stack.new nil
   userfile_stack = Stack.new prelude_stack
+
+  # Write the export variable into the user stack
+  userfile_stack.write("export", CharlyTypes::TNull.new, declaration: true)
 
   # Write the arguments into the prelude stack
   prelude_stack.write("ARGV", CharlyTypes::TArray.new(arguments), true)

@@ -1086,6 +1086,8 @@ class Interpreter
         filepath = ENV["CHARLYDIR"] + "/primitives/include.charly"
       when "math"
         filepath = ENV["CHARLYDIR"] + "/math.charly"
+      when "repl"
+        filepath = ENV["CHARLYDIR"] + "/repl.charly"
       else
         filepath = File.join(current_dir, filename)
       end
