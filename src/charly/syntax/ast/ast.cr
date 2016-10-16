@@ -187,6 +187,7 @@ end
 # Literals
 class LiteralValue < Terminal; end
 class NullLiteral < LiteralValue; end
+class NANLiteral < LiteralValue; end
 class IdentifierLiteral < LiteralValue; end
 class StringLiteral < LiteralValue; end
 class NumericLiteral < LiteralValue; end

@@ -266,6 +266,18 @@ class Lexer
       else
         consume_ident(start)
       end
+    when 'N'
+      case next_char
+      when 'A'
+        case next_char
+        when 'N'
+          check_ident_or_keyword(TokenType::NAN, start)
+        else
+          consume_ident(start)
+        end
+      else
+        consume_ident(start)
+      end
     when 't'
       case next_char
       when 'r'

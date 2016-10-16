@@ -7,6 +7,7 @@ enum TokenType
   String
   Boolean
   Null
+  NAN
   Keyword
 
   # Arithmetic Operators

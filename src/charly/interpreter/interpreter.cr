@@ -145,6 +145,10 @@ class Interpreter
       return TNull.new
     end
 
+    if node.is_a? NANLiteral
+      return TNumeric.new(Float64::NAN)
+    end
+
     raise "Unknown node encountered #{node} #{stack}"
   end
 

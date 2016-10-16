@@ -124,6 +124,8 @@ class Parser
       case type
       when TokenType::Null
         @node << produce NullLiteral
+      when TokenType::NAN
+        @node << produce NANLiteral
       when TokenType::Numeric
         @node << produce NumericLiteral
       when TokenType::Identifier
@@ -451,6 +453,8 @@ class Parser
       token(TokenType::Boolean) && consume_postfix
     }, ->{
       token(TokenType::Null) && consume_postfix
+    }, ->{
+      token(TokenType::NAN) && consume_postfix
     }, ->{
       token(TokenType::Identifier) && consume_postfix
     }, ->{
