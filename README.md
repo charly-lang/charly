@@ -162,10 +162,52 @@ This allows the interpreter to reuse the same object for all primitives.
 
 This principle applies to all language primitives. The `Array` object for example, specifies a method called `push` which inserts an element into the array.
 
-# Installation
-I have only tested this on macOS 10.12.
-It should theoretically work on linux systems too.
+# Behaviour of *self* in methods
+The self keyword always points to the object a method was called on. Where the method currently lives is not taken into consideration. Example:
+```charly
+let value = 10
 
+let Box = {
+  let value = 10
+
+  func foo(new) {
+    self.value = new
+  }
+}
+
+# Both the outer value and the value inside Box are set to 10
+
+Box.foo(20)
+# Outer *value* is still 10, Box.value is now 20
+
+let foo = Box.foo
+foo(50)
+# Outer *value* is still 10, Box.value is now 50
+```
+
+If you directly call method, the interpreter will set *self* to whatever value it was in the scope where the function was defined in. It behaves kind of like [Arrow functions in JavaScript](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Functions/Arrow_functions). This means you can _"extract"_ functions and they keep working the way you expect them to.
+
+Example:
+```charly
+let Box = {
+  let name = "leonard"
+
+  func greet() {
+    "Hello " + self.name
+  }
+}
+
+let greet = Box.greet
+print(greet()) # will print Hello leonard
+```
+
+This currently only works on objects. If you try to extract a method like *each* from an Array this won't work. This will be fixed in a future release.
+
+# OS Support
+I'm developing on macOS 10.12 so it should work without any problems on that.
+The [CI Build](https://travis-ci.com/KCreate/charly-lang) runs on Ubuntu 12.04.5 LTS.
+
+# Installation
 You will need a working [crystal](http://crystal-lang.org/) installation.
 
 To install the `charly` command and automatically copy it to the `/usr/bin` folder, run `install.sh`.
