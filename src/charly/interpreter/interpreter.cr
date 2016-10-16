@@ -89,6 +89,10 @@ class Interpreter
       return exec_comparison_expression(node, stack)
     end
 
+    if node.is_a? LogicalExpression
+      return exec_logical_expression(node, stack)
+    end
+
     if node.is_a? IdentifierLiteral
       return exec_identifier_literal(node, stack)
     end
@@ -559,6 +563,25 @@ class Interpreter
     end
 
     return TBoolean.new(false)
+  end
+
+  def exec_logical_expression(node, stack)
+    case (op = node.operator)
+    when ANDOperator
+      left = eval_bool(exec_expression(node.left, stack), stack)
+      if left
+        return TBoolean.new(eval_bool(exec_expression(node.right, stack), stack))
+      else
+        return TBoolean.new(false)
+      end
+    when OROperator
+      left = eval_bool(exec_expression(node.left, stack), stack)
+      right = eval_bool(exec_expression(node.right, stack), stack)
+
+      return TBoolean.new(left || right)
+    else
+      raise "Unknown logical operator #{op}"
+    end
   end
 
   # Execute an if statement
