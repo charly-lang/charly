@@ -561,21 +561,6 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(["hello", -25.9, "test", [1, 2]].join(""), "hello-25.9test[1, 2]")
     })
 
-    it("flattens an array", func(assert) {
-      let num = [1, 2, [3, [4], 5], 6]
-      num = num.flatten()
-
-      print(num)
-
-      assert(num.length(), 6)
-      assert(num[0], 1)
-      assert(num[1], 2)
-      assert(num[2], 3)
-      assert(num[3], 4)
-      assert(num[4], 5)
-      assert(num[5], 6)
-    })
-
   })
 
   describe("Numerics", func(it) {
