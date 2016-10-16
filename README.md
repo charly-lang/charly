@@ -134,6 +134,7 @@ print(leonard.age) # 16
 ```
 
 __CLI arguments and flags__
+
 You can access flags passed to the interpreter via the global `IFLAGS` array. Flags are stored as a String.
 Command line arguments (arguments passed after the filename which are not flags) are available via `ARGV`.
 
@@ -147,10 +148,10 @@ $ charly test.charly 1 2 3 -f ast
 Will result in:
 
 ```charly
-ARGV # [1, 2, 3]
-IFLAGS # [ast]
-ENV["SHELL"] # /bin/bash
-ENV.SHELL # /bin/bash
+ARGV          # [1, 2, 3]
+IFLAGS        # [ast]
+ENV["SHELL"]  # /bin/bash
+ENV.SHELL     # /bin/bash
 ```
 
 # Using the built-in REPL
