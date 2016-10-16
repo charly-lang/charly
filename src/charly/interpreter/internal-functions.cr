@@ -325,6 +325,10 @@ module InternalFunctions
     describe_args([TObject, TString])
     object, prop = arg1, arg2
 
+    if object.stack.contains prop.value
+      return object.stack.get(prop.value)
+    end
+
     TNull.new
   end
 
@@ -333,7 +337,7 @@ module InternalFunctions
     arg1, arg2, arg3 = nil, nil, nil
     describe_args([TObject, TString, BaseType])
     object, prop, value = arg1, arg2, arg3
-
-    TNull.new
+    object.stack.write(prop.value, value, declaration: true, check_parent: false)
+    return value
   end
 end

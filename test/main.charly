@@ -1293,6 +1293,32 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(Box.val, 90)
     })
 
+    it("reads and writes via index expressions", func(assert) {
+      let Box = {
+        let name = "leonard"
+      }
+
+      assert(Box["name"], "leonard")
+
+      Box["age"] = 16
+
+      assert(Box["age"], 16)
+    })
+
+    it("adds functions via index expressions", func(assert) {
+      let Box = {
+        let name = "test"
+      }
+
+      Box["change_name"] = func(name) {
+        self.name = name
+      }
+
+      Box.change_name("leonard")
+
+      assert(Box["name"], "leonard")
+    })
+
   })
 
   describe("While loops", func(it) {

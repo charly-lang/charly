@@ -20,4 +20,14 @@ export = {
   func type() {
     call_internal("typeof", self)
   }
+
+  # Return the property at value
+  func __member(name) {
+    call_internal("getvalue", self, name)
+  }
+
+  # Set the property at value
+  func __member_write(name, value) {
+    call_internal("setvalue", self, name, value)
+  }
 }
