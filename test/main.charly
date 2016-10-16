@@ -1424,6 +1424,11 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(IFLAGS.length(), 0)
     })
 
+    it("receives an argument called ENV", func(assert) {
+      assert(ENV.type(), "Object")
+      assert(ENV["CHARLYDIR"].type(), "String")
+    })
+
   })
 
   describe("Math", func(it) {
