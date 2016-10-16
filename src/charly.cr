@@ -1,9 +1,11 @@
 require "./charly/file.cr"
 require "./charly/interpreter/fascade.cr"
 require "./charly/interpreter/session.cr"
+require "./charly/interpreter/types.cr"
 require "option_parser"
 
 module Charly
+  include CharlyTypes
 
   arguments = [] of String
   flags = [] of String
@@ -58,20 +60,28 @@ module Charly
   userfile_stack = Stack.new prelude_stack
 
   # Write the export variable into the user stack
-  userfile_stack.write("export", CharlyTypes::TNull.new, declaration: true, force: true)
+  userfile_stack.write("export", TNull.new, declaration: true, force: true)
 
   # Insert ARGV and IFLAGS
-  argv = [] of CharlyTypes::BaseType
+  argv = [] of BaseType
   arguments.each do |flag|
-    argv << CharlyTypes::TString.new(flag)
+    argv << TString.new(flag)
   end
-  prelude_stack.write("ARGV", CharlyTypes::TArray.new(argv), declaration: true, constant: true, force: true)
+  prelude_stack.write("ARGV", TArray.new(argv), declaration: true, constant: true, force: true)
 
-  iflags = [] of CharlyTypes::BaseType
+  iflags = [] of BaseType
   flags.each do |flag|
-    iflags << CharlyTypes::TString.new(flag)
+    iflags << TString.new(flag)
   end
-  prelude_stack.write("IFLAGS", CharlyTypes::TArray.new(iflags), declaration: true, constant: true, force: true)
+  prelude_stack.write("IFLAGS", TArray.new(iflags), declaration: true, constant: true, force: true)
+
+  # Insert ENV
+  env_stack = Stack.new(prelude_stack)
+  env_object = TObject.new(env_stack)
+  ENV.each do |key, value|
+    env_stack.write(key, TString.new(value), declaration: true, constant: true, force: true)
+  end
+  prelude_stack.write("ENV", env_object, declaration: true, constant: true, force: true)
 
   # Get a InterpreterFascade
   interpreter = InterpreterFascade.new(session)
