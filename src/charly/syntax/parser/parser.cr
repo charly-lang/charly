@@ -180,6 +180,10 @@ class Parser
         @node << produce EqualOperator
       when TokenType::Not
         @node << produce NotOperator
+      when TokenType::AND
+        @node << produce ANDOperator
+      when TokenType::OR
+        @node << produce OROperator
       else
         puts "Unknown token found (#{type})"
       end
@@ -425,6 +429,10 @@ class Parser
           token(TokenType::Not)
         }, ->{
           token(TokenType::Assignment)
+        }, ->{
+          token(TokenType::OR)
+        }, ->{
+          token(TokenType::AND)
         }]) && expression
         return true
       end

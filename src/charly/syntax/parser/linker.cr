@@ -73,6 +73,14 @@ class Linker
       return
     end
 
+    if node.is_a? LogicalExpression
+      node.linked = true
+      node.operator = node.children[1]
+      node.left = node.children[0]
+      node.right = node.children[2]
+      return
+    end
+
     if node.is_a? FunctionLiteral
       node.linked = true
 

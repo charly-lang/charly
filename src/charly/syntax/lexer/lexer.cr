@@ -108,6 +108,18 @@ class Lexer
       else
         next_char TokenType::Assignment
       end
+    when '&'
+      case peek_char
+      when '&'
+        next_char
+        next_char TokenType::AND
+      end
+    when '|'
+      case peek_char
+      when '|'
+        next_char
+        next_char TokenType::OR
+      end
     when '!'
       next_char TokenType::Not
     when '<'
@@ -496,6 +508,6 @@ class Lexer
 
   # Called when a unknown token is received
   def unknown_token
-    raise "Unknown token: #{current_char.inspect}"
+    raise "Unexpected character: #{current_char.inspect}"
   end
 end

@@ -121,6 +121,13 @@ class ComparisonExpression < ASTNode
   property right : ASTNode?
 end
 
+# A single logical expression
+class LogicalExpression < ASTNode
+  property operator : ASTNode?
+  property left : ASTNode?
+  property right : ASTNode?
+end
+
 # A variable declaration
 class VariableDeclaration < ASTNode
   property identifier : ASTNode?
@@ -236,3 +243,8 @@ class ComparisonOperatorLiteral < Terminal; end
   class GreaterEqualOperator < ComparisonOperatorLiteral; end
   class EqualOperator < ComparisonOperatorLiteral; end
   class NotOperator < ComparisonOperatorLiteral; end
+
+# Logical Operators
+class LogicalOperatorLiteral < Terminal; end
+  class ANDOperator < LogicalOperatorLiteral; end
+  class OROperator < LogicalOperatorLiteral; end

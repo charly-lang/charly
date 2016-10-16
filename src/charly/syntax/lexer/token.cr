@@ -29,6 +29,10 @@ enum TokenType
   LessEqual
   GreaterEqual
 
+  # Logic Operators
+  AND
+  OR
+
   # Structural
   LeftParen, RightParen
   LeftCurly, RightCurly

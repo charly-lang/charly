@@ -75,7 +75,7 @@ class Structure
       end
     end
 
-    # Binary Expressions
+    # Expressions
     if node.is_a?(Expression) && node.children.size == 3
 
       # Check for the arithmetic operator
@@ -87,15 +87,21 @@ class Structure
         new_node << node.children[2]
         return new_node
       end
-    end
-
-    # Comparison Expressions
-    if node.is_a?(Expression) && node.children.size == 3
 
       # Check for the comparison operator
       if node.children[1].is_a? ComparisonOperatorLiteral
         @finished = false
         new_node = ComparisonExpression.new(node)
+        new_node << node.children[0]
+        new_node << node.children[1]
+        new_node << node.children[2]
+        return new_node
+      end
+
+      # Check for the comparison operator
+      if node.children[1].is_a? LogicalOperatorLiteral
+        @finished = false
+        new_node = LogicalExpression.new(node)
         new_node << node.children[0]
         new_node << node.children[1]
         new_node << node.children[2]
