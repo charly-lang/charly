@@ -147,6 +147,28 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert((time_ms() - start).close_to(1000, 10), true)
     })
 
+    it("does AND assignments", func(assert) {
+      let a = 20
+
+      a += 1
+      assert(a, 21)
+
+      a -= 1
+      assert(a, 20)
+
+      a *= 20
+      assert(a, 400)
+
+      a /= 20
+      assert(a, 20)
+
+      a %= 6
+      assert(a, 2)
+
+      a **= 3
+      assert(a, 8)
+    })
+
   })
 
   describe("Comparisons", func(it) {
