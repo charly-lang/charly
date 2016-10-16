@@ -29,19 +29,6 @@ class Interpreter
     stack.write("self", global, declaration: true, constant: true, force: true)
     stack.write("program", global, declaration: true, constant: true, force: true)
 
-    # Insert ARGV and IFLAGS
-    argv = [] of BaseType
-    stack.session.not_nil!.flags.each do |flag|
-      argv << TString.new(flag)
-    end
-    stack.write("ARGV", TArray.new(argv), declaration: true, constant: true, force: true)
-
-    iflags = [] of BaseType
-    stack.session.not_nil!.flags.each do |flag|
-      iflags << TString.new(flag)
-    end
-    stack.write("IFLAGS", TArray.new(iflags), declaration: true, constant: true, force: true)
-
     exec_block(program.children[0], stack)
   end
 

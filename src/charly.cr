@@ -60,6 +60,19 @@ module Charly
   # Write the export variable into the user stack
   userfile_stack.write("export", CharlyTypes::TNull.new, declaration: true, force: true)
 
+  # Insert ARGV and IFLAGS
+  argv = [] of CharlyTypes::BaseType
+  arguments.each do |flag|
+    argv << CharlyTypes::TString.new(flag)
+  end
+  prelude_stack.write("ARGV", CharlyTypes::TArray.new(argv), declaration: true, constant: true, force: true)
+
+  iflags = [] of CharlyTypes::BaseType
+  flags.each do |flag|
+    iflags << CharlyTypes::TString.new(flag)
+  end
+  prelude_stack.write("IFLAGS", CharlyTypes::TArray.new(iflags), declaration: true, constant: true, force: true)
+
   # Get a InterpreterFascade
   interpreter = InterpreterFascade.new(session)
 
