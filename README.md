@@ -33,6 +33,23 @@ const E = 2.7182818284590451
 PI = 4 # Cannot redeclare constant PI
 ```
 
+__Objects__
+```charly
+let Box = {
+  let name = "mybox"
+}
+
+Box.name # mybox
+Box["name"] # mybox
+Box.name = "yourbox"
+Box.name # yourbox
+Box["name"] # yourbox
+
+Box.age # null
+Box["age"] = 16
+Box.age # 16
+```
+
 __Declaring a function__
 ```charly
 func callback(value, callback) {
