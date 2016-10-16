@@ -52,6 +52,29 @@ class Structure
       end
     end
 
+    # +=, -=, *= operators etc.
+    if node.is_a?(Expression) && node.children.size == 4
+
+      # Check for the assignment operator
+      if (op = node.children[2]).is_a?(AssignmentOperator)
+
+        unless (t = node.children[0]).is_a?(IdentifierLiteral)
+          raise "Invalid left side in AND assignment"
+        end
+
+        @finished = false
+        assignment = VariableAssignment.new(node.parent)
+        expression = BinaryExpression.new(assignment)
+        assignment << node.children[0]
+        assignment << expression
+        expression << node.children[0]
+        expression << node.children[1]
+        expression << node.children[3]
+
+        return assignment
+      end
+    end
+
     # Binary Expressions
     if node.is_a?(Expression) && node.children.size == 3
 

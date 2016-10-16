@@ -400,17 +400,17 @@ class Parser
     node_production(Expression, ->{
       if unary_expression
         check_each([->{
-          token(TokenType::Plus)
+          token(TokenType::Plus) && optional_token(TokenType::Assignment)
         }, ->{
-          token(TokenType::Minus)
+          token(TokenType::Minus) && optional_token(TokenType::Assignment)
         }, ->{
-          token(TokenType::Mult)
+          token(TokenType::Mult) && optional_token(TokenType::Assignment)
         }, ->{
-          token(TokenType::Divd)
+          token(TokenType::Divd) && optional_token(TokenType::Assignment)
         }, ->{
-          token(TokenType::Mod)
+          token(TokenType::Mod) && optional_token(TokenType::Assignment)
         }, ->{
-          token(TokenType::Pow)
+          token(TokenType::Pow) && optional_token(TokenType::Assignment)
         }, ->{
           token(TokenType::Greater)
         }, ->{
