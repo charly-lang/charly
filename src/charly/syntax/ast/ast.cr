@@ -7,11 +7,13 @@ abstract class ASTNode
   property! parent : ASTNode
   property! value : Bool | Float64 | String
   property linked : Bool
+  property group : Bool
 
   def initialize(parent)
     @parent = parent
     @children = [] of ASTNode
     @linked = false
+    @group = false
   end
 
   # Appends *node* to the children of this node
@@ -86,6 +88,13 @@ end
 class WhileStatement < ASTNode
   property test : ASTNode?
   property consequent : ASTNode?
+end
+
+# A single Group
+# (1 + 2)
+# ^     ^
+# |_____|__ That's the group
+class Group < ASTNode
 end
 
 # A single expression

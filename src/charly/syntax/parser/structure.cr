@@ -219,6 +219,42 @@ class Structure
       @finished = false
     end
 
+    # Operator precedence
+    if node.is_a?(BinaryExpression) && is_multiplicative(node)
+
+      # Check for additive expressions
+      left = node.children[0]
+      right = node.children[2]
+
+      if right.is_a?(BinaryExpression) && is_additive(right)
+
+        # Create the correct node
+        cnode = BinaryExpression.new node.parent
+        cnodeleft = BinaryExpression.new cnode
+        cnodeleft << node.children[0]
+        cnodeleft << node.children[1]
+        cnodeleft << right.children[0]
+        cnode << cnodeleft
+        cnode << right.children[1]
+        cnode << right.children[2]
+
+        @finished = false
+        return cnode
+      end
+    end
+
     node
   end
+end
+
+def is_multiplicative(node : BinaryExpression)
+  node.children[1].is_a?(MultOperator) ||
+  node.children[1].is_a?(DivdOperator) ||
+  node.children[1].is_a?(PowOperator) ||
+  node.children[1].is_a?(ModOperator)
+end
+
+def is_additive(node : BinaryExpression)
+  node.children[1].is_a?(PlusOperator) ||
+  node.children[1].is_a?(MinusOperator)
 end

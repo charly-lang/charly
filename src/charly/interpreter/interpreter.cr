@@ -57,6 +57,10 @@ class Interpreter
   # Executes *node* inside *stack*
   def exec_expression(node, stack)
 
+    if node.is_a? Group
+      return exec_expression(node.children[0], stack)
+    end
+
     if node.is_a? VariableDeclaration
       return exec_variable_declaration(node, stack)
     end

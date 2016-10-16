@@ -92,21 +92,21 @@ class Parser
   # Returns true if the next token is equal to *type*
   # and optionally to *value*
   # Doesn't increment the @next pointer
-  def peek_token(type, value = false)
+  def peek_token(type, value = false, offset = 0)
 
     # Check if there are any tokens left
-    if @next >= @tokens.size
+    if @next + offset >= @tokens.size
       return false
     end
 
     # Mark the token as touched
-    @tokens[@next].touched = true
+    @tokens[@next + offset].touched = true
 
     # Check for a match
-    if value
-      @tokens[@next].type == type && @tokens[@next].value == value
+    if !value.is_a?(Bool)
+      @tokens[@next + offset].type == type && @tokens[@next + offset].value == value
     else
-      @tokens[@next].type == type
+      @tokens[@next + offset].type == type
     end
   end
 
@@ -454,9 +454,7 @@ class Parser
     }, ->{
       token(TokenType::Identifier) && consume_postfix
     }, ->{
-      skip_token(TokenType::LeftParen) &&
-      expression &&
-      skip_token(TokenType::RightParen) && consume_postfix
+      group
     }, ->{
       array_literal && consume_postfix
     }, ->{
@@ -465,6 +463,14 @@ class Parser
       class_literal && consume_postfix
     }, ->{
       container_literal && consume_postfix
+    })
+  end
+
+  def group
+    node_production(Group, ->{
+      skip_token(TokenType::LeftParen) &&
+      expression &&
+      skip_token(TokenType::RightParen) && consume_postfix
     })
   end
 
