@@ -222,7 +222,7 @@ let greet = Box.greet
 print(greet()) # will print Hello leonard
 ```
 
-This currently only works on objects. If you try to extract a method like *each* from an Array this won't work. This will be fixed in a future release.
+This currently only works on objects. If you try to extract a method like *each* from an Array this won't work. It will just result in undefined behaviour. This maybe a bug?
 
 # OS Support
 I'm developing on macOS 10.12 so it should work without any problems on that.
