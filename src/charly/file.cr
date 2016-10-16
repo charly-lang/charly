@@ -2,16 +2,12 @@ abstract class VirtualFile
   property filename : String
   property fullpath : String
   property fulldirectorypath : String
-  property directory : String
-  property size : UInt64
   property content : String
 
   def initialize
     @filename = nil
     @fullpath = nil
     @fulldirectorypath = nil
-    @directory = nil
-    @size = nil
     @content = nil
   end
 
@@ -31,10 +27,8 @@ end
 class EvalFile < VirtualFile
   def initialize(content)
     @filename = "virtual-#{Time.new.epoch_ms}.charly"
-    @fullpath = "/virtual/#{@filename}"
-    @fulldirectorypath = "/virtual"
-    @directory = "virtual"
-    @size = content.size.to_u64
+    @fullpath = ENV["PWD"] + "/#{@filename}"
+    @fulldirectorypath = ENV["PWD"]
     @content = content
   end
 end
@@ -45,8 +39,6 @@ class RealFile < VirtualFile
     @filename = File.basename path
     @fullpath = File.expand_path path
     @fulldirectorypath = File.dirname @fullpath
-    @directory = File.dirname path
-    @size = File.size path
     @content = File.read path
   end
 end
