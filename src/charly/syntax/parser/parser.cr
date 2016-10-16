@@ -2,6 +2,7 @@ require "../ast/ast.cr"
 require "../lexer/lexer.cr"
 require "./structure.cr"
 require "./linker.cr"
+require "../../interpreter/session.cr"
 
 # Parses a list of tokens into a program
 class Parser
@@ -14,10 +15,10 @@ class Parser
   property file : VirtualFile
   property node : ASTNode
   property next : UInt64
-  property flags : Array(String)
+  property session : Session
 
   # Create a new parser from a virtualfile
-  def initialize(@file, @flags)
+  def initialize(@file, @session)
 
     # Get all the tokens from the file
     lexer = Lexer.new file
@@ -31,7 +32,7 @@ class Parser
       token.type != TokenType::Comment
     end
 
-    if flags.includes? "tokens"
+    if @session.flags.includes? "tokens"
       @tokens.each do |token|
         puts token
       end
@@ -71,7 +72,7 @@ class Parser
     linker.start
 
     # If the *--ast* cli option was passed, display the tree
-    if flags.includes? "ast"
+    if @session.flags.includes? "ast"
       puts "--- AST: #{@file.filename} ---"
       puts @tree
     end
@@ -397,32 +398,32 @@ class Parser
     node_production(Expression, ->{
       if unary_expression
         check_each([->{
-          token(TokenType::Mult) && expression
+          token(TokenType::Plus)
         }, ->{
-          token(TokenType::Divd) && expression
+          token(TokenType::Minus)
         }, ->{
-          token(TokenType::Plus) && expression
+          token(TokenType::Mult)
         }, ->{
-          token(TokenType::Minus) && expression
+          token(TokenType::Divd)
         }, ->{
-          token(TokenType::Mod) && expression
+          token(TokenType::Mod)
         }, ->{
-          token(TokenType::Pow) && expression
+          token(TokenType::Pow)
         }, ->{
-          token(TokenType::Greater) && expression
+          token(TokenType::Greater)
         }, ->{
-          token(TokenType::Less) && expression
+          token(TokenType::Less)
         }, ->{
-          token(TokenType::LessEqual) && expression
+          token(TokenType::LessEqual)
         }, ->{
-          token(TokenType::GreaterEqual) && expression
+          token(TokenType::GreaterEqual)
         }, ->{
-          token(TokenType::Equal) && expression
+          token(TokenType::Equal)
         }, ->{
-          token(TokenType::Not) && expression
+          token(TokenType::Not)
         }, ->{
-          token(TokenType::Assignment) && expression
-        }])
+          token(TokenType::Assignment)
+        }]) && expression
         return true
       end
       return false
