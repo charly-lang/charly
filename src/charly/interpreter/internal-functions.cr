@@ -7,19 +7,19 @@ module InternalFunctions
   extend self
 
   # Helper macros to describe argument types and amount
-  macro describe_args(amount, types)
+  macro describe_args(types)
 
     # The name of the function
     %name = arguments[0]
 
     # Remove the functionname from the arguments
-    {% if amount > 0 %}
+    {% if types.size > 0 %}
       arguments = arguments[1..-1]
     {% end %}
 
     # Check for the argument count
-    unless arguments.size == {{amount}}
-      raise "#{%name} expected #{{{amount}}} arguments, got: #{arguments.size}"
+    unless arguments.size == {{types.size}}
+      raise "#{%name} expected #{{{types.size}}} arguments, got: #{arguments.size}"
     end
 
     # Check argument types
@@ -38,7 +38,7 @@ module InternalFunctions
 
   def sleep(arguments, stack)
     arg1 = nil
-    describe_args(1, [TNumeric])
+    describe_args([TNumeric])
 
     sleep arg1.value / 1000
     return TNull.new
@@ -49,7 +49,7 @@ module InternalFunctions
 
     def print(arguments, stack)
       arg1 = nil
-      InternalFunctions.describe_args(1, [TArray])
+      InternalFunctions.describe_args([TArray])
       arguments = arg1.value
 
       arguments.each do |arg|
@@ -61,7 +61,7 @@ module InternalFunctions
 
     def write(arguments, stack)
       arg1 = nil
-      InternalFunctions.describe_args(1, [TArray])
+      InternalFunctions.describe_args([TArray])
       arguments = arg1.value
 
       arguments.each do |arg|
@@ -77,7 +77,7 @@ module InternalFunctions
 
     def print(arguments, stack)
       arg1 = nil
-      InternalFunctions.describe_args(1, [TArray])
+      InternalFunctions.describe_args([TArray])
       arguments = arg1.value
 
       arguments.each do |arg|
@@ -89,7 +89,7 @@ module InternalFunctions
 
     def write(arguments, stack)
       arg1 = nil
-      InternalFunctions.describe_args(1, [TArray])
+      InternalFunctions.describe_args([TArray])
       arguments = arg1.value
 
       arguments.each do |arg|
@@ -116,7 +116,7 @@ module InternalFunctions
   # Get the length of various types
   def length(arguments, stack)
     arg1 = nil
-    describe_args(1, [BaseType])
+    describe_args([BaseType])
 
     case arg1
     when TNumeric
@@ -136,7 +136,7 @@ module InternalFunctions
   # All other arguments are ignored
   def array_of_size(arguments, stack)
     arg1, arg2 = nil, nil
-    describe_args(2, [TNumeric, BaseType])
+    describe_args([TNumeric, BaseType])
     count, default = arg1, arg2
 
     return TArray.new(Array.new(arg1.value.to_i64, arg2))
@@ -145,7 +145,7 @@ module InternalFunctions
   # Insert a value at a given index in an array
   def array_insert(arguments, stack)
     arg1, arg2, arg3 = nil, nil, nil
-    describe_args(3, [TArray, TNumeric, BaseType])
+    describe_args([TArray, TNumeric, BaseType])
     array, index, value = arg1, arg2, arg3
 
     # If the index is smaller than 0, we shift to the beginning
@@ -165,7 +165,7 @@ module InternalFunctions
   # Delete a value at a given index in an array
   def array_delete(arguments, stack)
     arg1, arg2 = nil, nil
-    describe_args(2, [TArray, TNumeric])
+    describe_args([TArray, TNumeric])
     array, index = arg1, arg2
 
     # If the index is smaller than 0, we delete the first element
@@ -187,7 +187,7 @@ module InternalFunctions
   # Dump all values from an object into it's parent stack
   def unpack(arguments, stack)
     arg1 = nil
-    describe_args(1, [TObject])
+    describe_args([TObject])
     object = arg1
 
     # Get the correct stack
@@ -209,7 +209,7 @@ module InternalFunctions
   # Colorize a string with a given color code
   def colorize(arguments, stack)
     arg1, arg2 = nil, nil
-    describe_args(2, [BaseType, TNumeric])
+    describe_args([BaseType, TNumeric])
     target, code = arg1, arg2
 
     return TString.new("\e[#{code.value.to_i64}m#{target}\e[0m")
@@ -220,7 +220,7 @@ module InternalFunctions
   # It will be casted to an integer and used as the exit code
   def exit(arguments, stack)
     arg1 = nil
-    describe_args(1, [BaseType])
+    describe_args([BaseType])
     code = arg1
 
     if code.is_a? TNumeric
@@ -233,14 +233,14 @@ module InternalFunctions
   # Returns the type of a literal as a string
   def typeof(arguments, stack)
     arg1 = nil
-    describe_args(1, [BaseType])
+    describe_args([BaseType])
     return TString.new("#{arg1.class}")
   end
 
   # Converts a value to a numeric
   def to_numeric(arguments, stack)
     arg1 = nil
-    describe_args(1, [TString])
+    describe_args([TString])
     num = arg1.value.to_f64?(strict: false)
 
     if num.is_a? Float64
@@ -253,14 +253,14 @@ module InternalFunctions
   # Trim a string
   def trim(arguments, stack)
     arg1 = nil
-    describe_args(1, [TString])
+    describe_args([TString])
     return TString.new(arg1.value.strip)
   end
 
   # Return the codepoint of a char as an array
   def ord(arguments, stack)
     arg1 = nil
-    describe_args(1, [TString])
+    describe_args([TString])
     if arg1.value.size > 0
       bytes = [] of BaseType
       arg1.value[0].bytes.map do |byte|
@@ -275,7 +275,7 @@ module InternalFunctions
   # Several math functions, the implementation of this might change
   def math(arguments, stack)
     arg1, arg2 = nil, nil
-    describe_args(2, [TString, TNumeric])
+    describe_args([TString, TNumeric])
     func_name, value = arg1, arg2
 
     # Generate all math bindings
@@ -298,7 +298,7 @@ module InternalFunctions
 
   def eval(arguments, stack)
     arg1, arg2 = nil, nil
-    describe_args(2, [TString, TObject])
+    describe_args([TString, TObject])
     source, context = arg1, arg2
 
     # Isolate the context
@@ -322,7 +322,7 @@ module InternalFunctions
   # Return a given value from an object
   def getvalue(arguments, stack)
     arg1, arg2 = nil, nil
-    describe_args(2, [TObject, TString])
+    describe_args([TObject, TString])
     object, prop = arg1, arg2
 
     TNull.new
@@ -331,7 +331,7 @@ module InternalFunctions
   # Set a given value on an object
   def setvalue(arguments, stack)
     arg1, arg2, arg3 = nil, nil, nil
-    describe_args(2, [TObject, TString, BaseType])
+    describe_args([TObject, TString, BaseType])
     object, prop, value = arg1, arg2, arg3
 
     TNull.new
