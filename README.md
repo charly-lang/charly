@@ -133,6 +133,26 @@ print(leonard.name) # "Leonard"
 print(leonard.age) # 16
 ```
 
+__CLI arguments and flags__
+You can access flags passed to the interpreter via the global `IFLAGS` array. Flags are stored as a String.
+Command line arguments (arguments passed after the filename which are not flags) are available via `ARGV`.
+
+Current environment variables are available via the object `ENV`.
+
+Example:
+```
+$ charly test.charly 1 2 3 -f ast
+```
+
+Will result in:
+
+```charly
+ARGV # [1, 2, 3]
+IFLAGS # [ast]
+ENV["SHELL"] # /bin/bash
+ENV.SHELL # /bin/bash
+```
+
 # Using the built-in REPL
 
 Currently it's not possible to use the left-arrow or right-arrow keys to position your cursor. I know this sucks and I will change it in the future.
