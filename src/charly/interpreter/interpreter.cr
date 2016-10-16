@@ -575,10 +575,17 @@ class Interpreter
         return TBoolean.new(false)
       end
     when OROperator
-      left = eval_bool(exec_expression(node.left, stack), stack)
-      right = eval_bool(exec_expression(node.right, stack), stack)
+      left = exec_expression(node.left, stack)
+      right = exec_expression(node.right, stack)
 
-      return TBoolean.new(left || right)
+      left_bool = eval_bool(left, stack)
+      right_bool = eval_bool(right, stack)
+
+      if left_bool
+        return left
+      else
+        return right
+      end
     else
       raise "Unknown logical operator #{op}"
     end

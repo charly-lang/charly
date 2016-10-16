@@ -324,6 +324,40 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(!"test", false)
     })
 
+    it("does AND comparison", func(assert) {
+      assert(true && true, true)
+      assert(true && false, false)
+      assert(false && true, false)
+      assert(false && false, false)
+    })
+
+    it("does OR comparison", func(assert) {
+      assert(true || true, true)
+      assert(true || false, true)
+      assert(false || true, true)
+      assert(false || false, false)
+    })
+
+    it("does conditional assignment", func(assert) {
+      let a = 25
+      let b = null
+      let c = false
+
+      let d
+
+      d = a || b
+      assert(d.type(), "Numeric")
+
+      d = b || c
+      assert(d.type(), "Boolean")
+
+      d = b || a
+      assert(d.type(), "Numeric")
+
+      d = c || b
+      assert(d.type(), "Null")
+    })
+
   })
 
   describe("Arrays", func(it) {
