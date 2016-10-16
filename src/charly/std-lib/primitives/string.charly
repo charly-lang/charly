@@ -48,7 +48,7 @@ export = {
 
     while (i < count) {
       callback(self[i], i)
-      i = i + 1
+      i += 1
     }
 
     self
@@ -68,7 +68,7 @@ export = {
     let new = ""
     self.each(func(c) {
       if (filter(c)) {
-        new = new + c
+        new += c
       }
     })
     new
@@ -82,9 +82,9 @@ export = {
 
     while (index < end) {
       if (self[index]) {
-        result = result + self[index]
+        result += self[index]
       }
-      index = index + 1
+      index += 1
     }
 
     result
@@ -94,7 +94,7 @@ export = {
   func map(callback) {
     let new = ""
     self.each(func(c) {
-      new = new + callback(c)
+      new += callback(c)
     })
     new
   }
@@ -125,7 +125,7 @@ export = {
         haystack_length = haystack.length()
         i = 0
       }
-      i = i + 1
+      i += 1
     }
 
     # If the haystack still contains values append them too

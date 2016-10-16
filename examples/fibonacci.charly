@@ -5,7 +5,7 @@ func fib(n) {
   let tmp
   n.times(func() {
     tmp = curr
-    curr = last + curr
+    curr += last
     last = tmp
   })
 

@@ -6,8 +6,8 @@ class UnitTest {
     let assertions = []
     let failed_assertions = []
 
-    func constructor(_title) {
-      title = _title
+    func constructor(title) {
+      self.title = title
     }
 
     func add_assertion(real, expect) {
@@ -36,8 +36,8 @@ class UnitTest {
     let tests = []
     let failed_tests = []
 
-    func constructor(_title) {
-      title = _title
+    func constructor(title) {
+      self.title = title
     }
 
     func add_test(test) {
@@ -57,8 +57,8 @@ class UnitTest {
   let suites = []
   let failed_suites = []
 
-  func constructor(_title) {
-    title = _title
+  func constructor(title) {
+    self.title = title
   }
 
   func passed() {
@@ -117,13 +117,13 @@ class UnitTest {
     # Extract the data
     suites.each(func(suite, s_index) {
 
-      suites_run = suites_run + 1
+      suites_run += 1
       suite.tests.each(func(test, t_index) {
 
-        tests_run = tests_run + 1
+        tests_run += 1
         test.assertions.each(func(assertion, a_index) {
 
-          assertions_run = assertions_run + 1
+          assertions_run += 1
           if (assertion[2] == false) {
             passed = false
           }

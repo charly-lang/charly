@@ -576,7 +576,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
     it("calls times", func(assert) {
       let sum = 0
       500.times(func(i) {
-        sum = sum + i
+        sum += i
       })
 
       assert(sum, 124750)
@@ -585,7 +585,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
     it("calls downto", func(assert) {
       let sum = 0
       10.downto(0, func(n) {
-        sum = sum + n
+        sum += n
       })
 
       assert(sum, 55)
@@ -594,7 +594,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
     it("calls upto", func(assert) {
       let sum = 0
       5.upto(10, func(n) {
-        sum = sum + n
+        sum += n
       })
 
       assert(sum, 45)
@@ -1312,8 +1312,8 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       let sum = 0
       let index = 0
       while (index < 500) {
-        sum = sum + index
-        index = index + 1
+        sum += index
+        index += 1
       }
 
       assert(sum, 124750)

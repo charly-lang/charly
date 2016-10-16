@@ -26,6 +26,8 @@ while (!finished) {
       print(result.colorize(32))
     } else if (result.type() == "Numeric") {
       print(result.colorize(33))
+    } else if (result.type() == "Null") {
+      print(result.colorize(30))
     } else {
       print(result)
     }

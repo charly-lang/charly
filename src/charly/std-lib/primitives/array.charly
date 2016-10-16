@@ -8,7 +8,7 @@ export = {
 
     while (i < count) {
       callback(self[i], i)
-      i = i + 1
+      i += 1
     }
 
     self
@@ -68,7 +68,7 @@ export = {
           }
         }
       }
-      i = i + 1
+      i += 1
     }
 
     index
@@ -214,11 +214,11 @@ export = {
     let count = self.length()
 
     self.each(func(e, index) {
-      string = string + e.to_s()
+      string += e.to_s()
 
       # Unless were at the last element, append the separator
       if (index < count - 1) {
-        string = string + separator.to_s()
+        string += separator.to_s()
       }
     })
 

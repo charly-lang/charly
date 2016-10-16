@@ -8,7 +8,7 @@ class Progress {
   }
 
   func tick() {
-    pos = pos + 1
+    pos += 1
     self.print()
   }
 
@@ -44,7 +44,7 @@ while (mi < messages.length()) {
   while (i < 100) {
     progressView.tick()
     sleep(200 / i + 1 + mi)
-    i = i + 1
+    i += 1
   }
-  mi = mi + 1
+  mi += 1
 }
