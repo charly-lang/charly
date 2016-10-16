@@ -5,28 +5,42 @@ require "./types.cr"
 # This includes print, dump, rand, various math functions, etc.
 module InternalFunctions
   extend self
+
+  # Helper macros to describe argument types and amount
+  macro describe_args(amount, types)
+
+    # The name of the function
+    %name = arguments[0]
+
+    # Remove the functionname from the arguments
+    {% if amount > 0 %}
+      arguments = arguments[1..-1]
+    {% end %}
+
+    # Check for the argument count
+    unless arguments.size == {{amount}}
+      raise "#{%name} expected #{{{amount}}} arguments, got: #{arguments.size}"
+    end
+
+    # Check argument types
+    {% for type, index in types %}
+
+      arg{{index + 1}} = arguments[{{index}}]
+
+      unless arg{{index + 1}}.is_a?({{type}})
+        raise "#{%name} expected argument #{{{index}} + 1} to be of type #{{{type}}}, got #{arguments[{{index}}].class}"
+      end
+    {% end %}
+  end
+
+  extend self
   include CharlyTypes
 
   def sleep(arguments, stack)
+    arg1 = nil
+    describe_args(1, [TNumeric])
 
-    # Check if there is at least 1 argument
-    unless arguments.size > 0
-      return TNull.new
-    end
-
-    # An array filled with TNull
-    if arguments.size >= 1
-
-      # Typecheck
-      amount = arguments[0]
-
-      if amount.is_a?(TNumeric)
-        sleep amount.value / 1000
-      else
-        raise "sleep expected argument 1 to be of type TNumeric, got #{amount.class}"
-      end
-    end
-
+    sleep arg1.value / 1000
     return TNull.new
   end
 
@@ -34,6 +48,10 @@ module InternalFunctions
     extend self
 
     def print(arguments, stack)
+      arg1 = nil
+      InternalFunctions.describe_args(1, [TArray])
+      arguments = arg1.value
+
       arguments.each do |arg|
         ::STDOUT.puts arg
         ::STDOUT.flush
@@ -42,6 +60,10 @@ module InternalFunctions
     end
 
     def write(arguments, stack)
+      arg1 = nil
+      InternalFunctions.describe_args(1, [TArray])
+      arguments = arg1.value
+
       arguments.each do |arg|
         ::STDOUT.print arg
         ::STDOUT.flush
@@ -54,6 +76,10 @@ module InternalFunctions
     extend self
 
     def print(arguments, stack)
+      arg1 = nil
+      InternalFunctions.describe_args(1, [TArray])
+      arguments = arg1.value
+
       arguments.each do |arg|
         ::STDERR.print arg
         ::STDERR.flush
@@ -62,6 +88,10 @@ module InternalFunctions
     end
 
     def write(arguments, stack)
+      arg1 = nil
+      InternalFunctions.describe_args(1, [TArray])
+      arguments = arg1.value
+
       arguments.each do |arg|
         ::STDERR.print arg
         ::STDERR.flush
@@ -73,27 +103,30 @@ module InternalFunctions
   module STDIN
     extend self
 
-    def getc
+    def getc(arguments, stack)
       char = ::STDIN.raw &.read_char
       return TString.new(char.to_s)
     end
 
-    def gets
+    def gets(arguments, stack)
       return TString.new(::STDIN.gets || "")
     end
   end
 
   # Get the length of various types
   def length(arguments, stack)
-    case arg = arguments[0]
-    when .is_a? TNumeric
-      return arg
-    when .is_a? TString
-      return TNumeric.new(arg.value.size.to_f64)
-    when .is_a? TArray
-      return TNumeric.new(arg.value.size.to_f64)
+    arg1 = nil
+    describe_args(1, [BaseType])
+
+    case arg1
+    when TNumeric
+      return arg1
+    when TString
+      return TNumeric.new(arg1.value.size.to_f64)
+    when TArray
+      return TNumeric.new(arg1.value.size.to_f64)
     else
-      return TNull.new
+      return TNumeric.new(0)
     end
   end
 
@@ -102,282 +135,171 @@ module InternalFunctions
   # An optional second argument can be used for the default value
   # All other arguments are ignored
   def array_of_size(arguments, stack)
+    arg1, arg2 = nil, nil
+    describe_args(2, [TNumeric, BaseType])
+    count, default = arg1, arg2
 
-    # Check if there are 2 arguments
-    unless arguments.size > 0
-      return TNull.new
-    end
-
-    # An array filled with TNull
-    if arguments.size >= 2
-
-      # Typecheck
-      count = arguments[0]
-      default = arguments[1]
-
-      if count.is_a?(TNumeric)
-        return TArray.new(Array.new(count.value.to_i64, default))
-      else
-        raise "array_of_size expected argument 1 to be of type TNumeric, got #{count.class}"
-      end
-    end
-
-    return TNull.new
+    return TArray.new(Array.new(arg1.value.to_i64, arg2))
   end
 
   # Insert a value at a given index in an array
   def array_insert(arguments, stack)
+    arg1, arg2, arg3 = nil, nil, nil
+    describe_args(3, [TArray, TNumeric, BaseType])
+    array, index, value = arg1, arg2, arg3
 
-    # We need at least 3 arguments
-    if arguments.size >= 3
-      array = arguments[0]
-      index = arguments[1]
-      value = arguments[2]
-
-      # Typecheck
-      if array.is_a?(TArray) && index.is_a?(TNumeric) && value.is_a?(BaseType)
-
-        # If the index is smaller than 0, we shift to the beginning
-        # If the index is bigger than the size of the array
-        # we append to the end
-        if index.value <= 0
-          array.value.unshift(value)
-        elsif index.value >= array.value.size
-          array.value << value
-        else
-          array.value.insert(index.value.to_i64, value)
-        end
-
-        return array
-
-      else
-        raise "array_delete expected array, index, any"
-      end
-
+    # If the index is smaller than 0, we shift to the beginning
+    # If the index is bigger than the size of the array
+    # we append to the end
+    if index.value <= 0
+      array.value.unshift(value)
+    elsif index.value >= array.value.size
+      array.value << value
+    else
+      array.value.insert(index.value.to_i64, value)
     end
 
-    raise "array_insert expected at least 3 arguments"
+    return array
   end
 
   # Delete a value at a given index in an array
   def array_delete(arguments, stack)
+    arg1, arg2 = nil, nil
+    describe_args(2, [TArray, TNumeric])
+    array, index = arg1, arg2
 
-    # We need at least 2 arguments
-    if arguments.size >= 2
-      array = arguments[0]
-      index = arguments[1]
-
-      # Typecheck
-      if array.is_a?(TArray) && index.is_a?(TNumeric)
-
-        # If the index is smaller than 0, we delete the first element
-        # If the index is bigger than the size of the array
-        # we delete the last item
-        if array.value.size == 0
-          return TNull.new
-        elsif index.value <= 0
-          return array.value.shift
-        elsif index.value >= array.value.size
-          return array.value.pop
-        else
-          return array.value.delete_at(index.value.to_i64)
-        end
-
-        return array
-
-      else
-        raise "array_delete expected array, index"
-      end
-
+    # If the index is smaller than 0, we delete the first element
+    # If the index is bigger than the size of the array
+    # we delete the last item
+    if array.value.size == 0
+      return TNull.new
+    elsif index.value <= 0
+      return array.value.shift
+    elsif index.value >= array.value.size
+      return array.value.pop
+    else
+      return array.value.delete_at(index.value.to_i64)
     end
 
-    raise "array_delete expected at least 2 arguments"
+    return array
   end
 
   # Dump all values from an object into it's parent stack
   def unpack(arguments, stack)
+    arg1 = nil
+    describe_args(1, [TObject])
+    object = arg1
 
-    # Check if there is at least 1 argument
-    unless arguments.size > 0
-      return TNull.new
+    # Get the correct stack
+    # We assume this is called via the unpack method and not
+    # call_internal("unpack", ...)
+    #
+    # This means we have to go up two stacks in order to
+    # be able to write to the correct one
+    #
+    # the value variable we got from values is an entry in the stack
+    # we need to unpack the value from the value
+    object.stack.not_nil!.values.each do |key, value|
+      stack.parent.not_nil!.write(key, value.value, true) unless key == "self"
     end
 
-    object = arguments[0]
-    if object.is_a?(TObject)
-
-      # Get the correct stack
-      # We assume this is called via the unpack method and not
-      # call_internal("unpack", ...)
-      #
-      # This means we have to go up two stacks in order to
-      # be able to write to the correct one
-      #
-      # the value variable we got from values is an entry in the stack
-      # we need to unpack the value from the value
-      object.stack.not_nil!.values.each do |key, value|
-        stack.parent.not_nil!.write(key, value.value, true) unless key == "self"
-      end
-    end
     return TNull.new
   end
 
   # Colorize a string with a given color code
   def colorize(arguments, stack)
+    arg1, arg2 = nil, nil
+    describe_args(2, [BaseType, TNumeric])
+    target, code = arg1, arg2
 
-    # Check if there are two arguments
-    unless arguments.size > 0
-      return TNull.new
-    end
-
-    if arguments.size >= 2
-      text = arguments[0]
-      color_code = arguments[1]
-
-      # Typecheck
-      unless color_code.is_a?(TNumeric)
-        raise "colorize expected second argument to be of type TNumeric"
-      end
-
-      return TString.new("\e[#{color_code.value.to_i64}m#{text}\e[0m")
-    end
-    return TNull.new
+    return TString.new("\e[#{code.value.to_i64}m#{target}\e[0m")
   end
 
   # Exit the program
   # If the first argument is a TNumeric
   # It will be casted to an integer and used as the exit code
   def exit(arguments, stack)
+    arg1 = nil
+    describe_args(1, [BaseType])
+    code = arg1
 
-    if arguments.size > 0
-      code = arguments[0]
-
-      if code.is_a? TNumeric
-        exit code.value.to_i
-      end
+    if code.is_a? TNumeric
+      exit code.value.to_i
+    else
+      exit 0
     end
-
-    exit 0
   end
 
   # Returns the type of a literal as a string
   def typeof(arguments, stack)
-
-    # Check if there is at least 1 argument
-    if arguments.size > 0
-      arg = arguments[0]
-      return TString.new("#{arg.class}")
-    end
-
-    raise "typeof expected at least 1 argument"
+    arg1 = nil
+    describe_args(1, [BaseType])
+    return TString.new("#{arg1.class}")
   end
 
   # Converts a value to a numeric
   def to_numeric(arguments, stack)
+    arg1 = nil
+    describe_args(1, [TString])
+    num = arg1.value.to_f64?(strict: false)
 
-    # Check if there is at least 1 argument
-    if arguments.size > 0
-      arg = arguments[0]
-
-      if arg.is_a?(TString)
-        num = arg.value.to_f64?(strict: false)
-
-        if num.is_a? Float64
-          return TNumeric.new(num)
-        else
-          return TNull.new
-        end
-      else
-        raise "to_numeric expected a string, got #{arg.class}"
-      end
+    if num.is_a? Float64
+      return TNumeric.new(num)
+    else
+      return TNull.new
     end
-
-    raise "to_numeric expected at least 1 argument"
   end
 
   # Trim a string
   def trim(arguments, stack)
-
-    # Check if there is at least 1 argument
-    if arguments.size > 0
-      arg = arguments[0]
-
-      if arg.is_a?(TString)
-        return TString.new(arg.value.strip)
-      else
-        raise "trim expected a string, got #{arg.class}"
-      end
-    end
-
-    raise "trim expected at least 1 argument"
+    arg1 = nil
+    describe_args(1, [TString])
+    return TString.new(arg1.value.strip)
   end
 
   # Return the codepoint of a char as an array
   def ord(arguments, stack)
-
-    # Check if there is at least 1 argument
-    if arguments.size > 0
-      arg = arguments[0]
-
-      if arg.is_a?(TString) && arg.value.size > 0
-        bytes = [] of BaseType
-        arg.value[0].bytes.map do |byte|
-          bytes << TNumeric.new(byte)
-        end
-        return TArray.new(bytes)
-      else
-        raise "trim expected a string with at least 1 char, got #{arg.class}"
+    arg1 = nil
+    describe_args(1, [TString])
+    if arg1.value.size > 0
+      bytes = [] of BaseType
+      arg1.value[0].bytes.map do |byte|
+        bytes << TNumeric.new(byte)
       end
+      return TArray.new(bytes)
+    else
+      raise "ord expected the string to have at least 1 char in it."
     end
-
-    raise "ord expected at least 1 argument"
   end
 
   # Several math functions, the implementation of this might change
   def math(arguments, stack)
+    arg1, arg2 = nil, nil
+    describe_args(2, [TString, TNumeric])
+    func_name, value = arg1, arg2
 
-    # Check if there are at least 2 arguments
-    if arguments.size >= 2
-      func_name = arguments[0]
-      unless func_name.is_a? TString
-        raise "math expected first argument to be of type TString, got #{func_name.class}"
-      end
-
-      # The second argument has to be a numeric
-      value = arguments[1]
-      unless value.is_a? TNumeric
-        raise "math expected second argument to be of type TNumeric, got #{func_name.class}"
-      end
-
-      # Generate all math bindings
-      {% for name in %w(cos cosh acos acosh sin sinh asin asinh tan tanh atan atanh cbrt sqrt log) %}
+    # Generate all math bindings
+    {% for name in %w(cos cosh acos acosh sin sinh asin asinh tan tanh atan atanh cbrt sqrt log) %}
       if func_name.value == "{{name.id}}"
         return TNumeric.new(Math.{{name.id}}(value.value))
       end
-      {% end %}
-      if func_name.value == "ceil"
-        return TNumeric.new(value.value.ceil)
-      end
-      if func_name.value == "floor"
-        return TNumeric.new(value.value.floor)
-      end
+    {% end %}
 
-      raise "Unknown math function #{func_name.value}"
+    if func_name.value == "ceil"
+      return TNumeric.new(value.value.ceil)
     end
 
-    raise "math expected at least 2 arguments"
+    if func_name.value == "floor"
+      return TNumeric.new(value.value.floor)
+    end
+
+    raise "Unknown math function #{func_name.value}"
   end
 
   def eval(arguments, stack)
-    unless arguments.size >= 2
-      raise "eval expected 2 arguments"
-    end
-
-    # Typecheck the arguments
-    source = arguments[0]
-    context = arguments[1]
-    unless source.is_a?(TString) && context.is_a?(TObject)
-      raise "eval expected string, object"
-    end
+    arg1, arg2 = nil, nil
+    describe_args(2, [TString, TObject])
+    source, context = arg1, arg2
 
     # Isolate the context
     context_stack = context.stack.dup
@@ -395,5 +317,23 @@ module InternalFunctions
       puts e
       return TNull.new
     end
+  end
+
+  # Return a given value from an object
+  def getvalue(arguments, stack)
+    arg1, arg2 = nil, nil
+    describe_args(2, [TObject, TString])
+    object, prop = arg1, arg2
+
+    TNull.new
+  end
+
+  # Set a given value on an object
+  def setvalue(arguments, stack)
+    arg1, arg2, arg3 = nil, nil, nil
+    describe_args(2, [TObject, TString, BaseType])
+    object, prop, value = arg1, arg2, arg3
+
+    TNull.new
   end
 end

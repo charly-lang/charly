@@ -607,6 +607,24 @@ class Interpreter
     end
   end
 
+  # Redirect an internal method to InternalFunctions
+  macro internal_method(fname, path = nil)
+    if name.value == "{{fname.id}}"
+      {% if path == nil %}
+        return InternalFunctions.{{fname.id}}(arguments, stack)
+      {% else %}
+        return InternalFunctions{{path}}(arguments, stack)
+      {% end %}
+    end
+  end
+
+  # Directly bind an internal method
+  macro bind_internal_method(fname, method)
+    if name.value == "{{fname.id}}"
+      return {{method}}
+    end
+  end
+
   # Executes a call expression
   def exec_call_expression(node, stack)
 
@@ -638,62 +656,38 @@ class Interpreter
         name = arguments[0]
         if name.is_a? TString
 
-          first_argument = arguments[1]?
+          # IO Methods
+          internal_method :stdout_print, ::STDOUT.print
+          internal_method :stdout_write, ::STDOUT.write
+          internal_method :stderr_print, ::STDERR.print
+          internal_method :stderr_write, ::STDERR.write
+          internal_method :stdin_gets, ::STDIN.gets
+          internal_method :stdin_getc, ::STDIN.getc
 
-          case name.value
-          when "stdout_print"
-            raise "Expected array" unless first_argument.is_a?(TArray)
-            return InternalFunctions::STDOUT.print(first_argument.value, stack)
-          when "stdout_write"
-            raise "Expected array" unless first_argument.is_a?(TArray)
-            return InternalFunctions::STDOUT.write(first_argument.value, stack)
-          when "stderr_print"
-            raise "Expected array" unless first_argument.is_a?(TArray)
-            return InternalFunctions::STDERR.print(first_argument.value, stack)
-          when "stderr_write"
-            raise "Expected array" unless first_argument.is_a?(TArray)
-            return InternalFunctions::STDERR.write(first_argument.value, stack)
-          when "stdin_gets"
-            return InternalFunctions::STDIN.gets
-          when "stdin_getc"
-            return InternalFunctions::STDIN.getc
-          when "length"
-            return InternalFunctions.length(arguments[1..-1], stack)
-          when "array_of_size"
-            return InternalFunctions.array_of_size(arguments[1..-1], stack)
-          when "array_insert"
-            return InternalFunctions.array_insert(arguments[1..-1], stack)
-          when "array_delete"
-            return InternalFunctions.array_delete(arguments[1..-1], stack)
-          when "require"
-            return exec_require(arguments[1..-1], stack)
-          when "include"
-            return exec_include(arguments[1..-1], stack)
-          when "unpack"
-            return InternalFunctions.unpack(arguments[1..-1], stack)
-          when "time_ms"
-            return TNumeric.new(Time.now.epoch_ms.to_f64)
-          when "colorize"
-            return InternalFunctions.colorize(arguments[1..-1], stack)
-          when "exit"
-            return InternalFunctions.exit(arguments[1..-1], stack)
-          when "typeof"
-            return InternalFunctions.typeof(arguments[1..-1], stack)
-          when "to_numeric"
-            return InternalFunctions.to_numeric(arguments[1..-1], stack)
-          when "trim"
-            return InternalFunctions.trim(arguments[1..-1], stack)
-          when "sleep"
-            return InternalFunctions.sleep(arguments[1..-1], stack)
-          when "ord"
-            return InternalFunctions.ord(arguments[1..-1], stack)
-          when "math"
-            return InternalFunctions.math(arguments[1..-1], stack)
-          when "eval"
-            return InternalFunctions.eval(arguments[1..-1], stack)
-          else
-            raise "Internal function call to '#{name.value}' not implemented!"
-          end
+          # Various language features
+          bind_internal_method :require, exec_require(arguments[1..-1], stack)
+          bind_internal_method :include, exec_include(arguments[1..-1], stack)
+          bind_internal_method :time_ms, TNumeric.new(Time.now.epoch_ms.to_f64)
+
+          # Misc. methods
+          internal_method :length
+          internal_method :array_of_size
+          internal_method :array_insert
+          internal_method :array_delete
+          internal_method :unpack
+          internal_method :colorize
+          internal_method :exit
+          internal_method :typeof
+          internal_method :to_numeric
+          internal_method :trim
+          internal_method :sleep
+          internal_method :ord
+          internal_method :math
+          internal_method :eval
+          internal_method :getvalue
+          internal_method :setvalue
+
+          raise "Internal function call to '#{name.value}' not implemented!"
         else
           raise "The first argument to call_internal has to be a string."
         end
