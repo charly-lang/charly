@@ -21,6 +21,7 @@ let string = "Hello World"
 let boolean = true
 let array = [1, "charly", false]
 let nullvalue = null
+let nanvalue = NAN
 let object = {
   let name = "leonard"
   let age = 16
@@ -65,7 +66,7 @@ let result = callback(25, func(value) {
 result # => 50
 ```
 
-__Repeat & While loops__
+__Times & While loops__
 ```charly
 5.times(func(i) {
   print("Hello")
@@ -74,7 +75,7 @@ __Repeat & While loops__
 let i = 0
 while (i < 10) {
   print("In a while loop")
-  i = i + 1
+  i += 1
 }
 ```
 
@@ -96,6 +97,7 @@ __Primitive types__
 "Charly".type()                     # => String
 [1, 2, 3].type()                    # => Array
 null.type()                         # => Null
+NAN.type()                          # => Numeric
 false.type()                        # => Boolean
 (class Box {}).type()               # => Class
 (func() {}).type()                  # => Function
@@ -105,10 +107,12 @@ false.type()                        # => Boolean
 __Including other files__
 ```charly
 # Include a file in the current directory
-require("external.charly")
+require("foo.charly")
+require("./foo.charly")
+require("./dir/foo.charly")
 
-# Include the someotherlibrary from the standard library
-require("someotherlibrary")
+# Include the math module from the standard library
+require("math")
 ```
 
 __Working with arrays__
@@ -116,6 +120,7 @@ __Working with arrays__
 let array = [1, 2, 3]
 array.push(4)
 print(array) # => [1, 2, 3, 4]
+print(array[1]) # => 2
 ```
 
 __Classes & Objects__
@@ -178,8 +183,18 @@ null
 > .exit
 ```
 
+If you need to pass arguments or flags to a REPL session you can do so via the repl command
+```
+charly repl these are all arguments
+```
+
+```charly
+> ARGV
+[these, are, all, arguments]
+```
+
 # Everything is an object... kind of
-When you write `5`, the interpreter actually treats it as a primitive. There are no funny castings or object instantiations. You can normally write code like `2 + 5` and it will work. Once you do something like `5.times(func(){})`, the interpreter searches the current scope for an object called `Numeric` and checks if there is a function called `times` on it. If it finds the method, it injects a variable called `self` into the function's stack and executes it.
+When you write `5`, the interpreter actually treats it as a primitive. There are no funny castings or object instantiations. You can normally write code like `2 + 5` and it will work. Once you do something like `5.times(func() {})`, the interpreter searches the current scope for an object called `Numeric` and checks if there is a function called `times` on it. If it finds the method, it injects a variable called `self` into the function's stack and executes it.
 
 This allows the interpreter to reuse the same object for all primitives.
 
@@ -208,7 +223,7 @@ foo(50)
 # Outer *value* is still 10, Box.value is now 50
 ```
 
-If you directly call method, the interpreter will set *self* to whatever value it was in the scope where the function was defined in. It behaves kind of like [Arrow functions in JavaScript](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Functions/Arrow_functions). This means you can _"extract"_ functions and they keep working the way you expect them to.
+If you directly call method, the interpreter will set *self* to whatever value it was in the scope where the function was defined in. That's the reason why Box.value was set to 50. It behaves kind of like [Arrow functions in JavaScript](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Functions/Arrow_functions). This means you can _"extract"_ functions and they keep working the way you expect them to.
 
 Example:
 ```charly
@@ -224,7 +239,7 @@ let greet = Box.greet
 print(greet()) # will print Hello leonard
 ```
 
-This currently only works on objects. If you try to extract a method like *each* from an Array this won't work. It will just result in undefined behaviour. This maybe a bug?
+This currently only works on objects. If you try to extract a method like *each* from an Array this won't work. It will just result in undefined behaviour.
 
 # OS Support
 I'm developing on macOS 10.12 so it should work without any problems on that.
