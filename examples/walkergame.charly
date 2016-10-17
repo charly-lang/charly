@@ -1,0 +1,74 @@
+class Game {
+  let raster
+  let width
+  let height
+
+  let playerX = 0
+  let playerY = 0
+
+  func constructor(width, height) {
+    self.width = width
+    self.height = height
+
+    # Construct the raster
+    raster = Array.of_size(height, null).map(func() {
+      Array.of_size(width, " ")
+    })
+
+    # Insert the player
+    raster[playerY][playerX] = "#"
+  }
+
+  func set_pos(x, y) {
+
+    # Normalize the coordinates
+    x = x.min(self.width - 1).max(0)
+    y = y.min(self.height - 1).max(0)
+
+    # Reset the current location
+    raster[playerY][playerX] = " "
+
+    # Update the position
+    self.playerX = x
+    self.playerY = y
+
+    # Draw the next location
+    raster[y][x] = "#"
+  }
+
+  func render() {
+    print("__" * (self.width + 1))
+    raster.each(func(yRow, y) {
+      write("|")
+      yRow.each(func(xTile, y) {
+        write(xTile + " ")
+      })
+      write("|\n")
+    })
+    print("__" * (self.width + 1))
+  }
+
+  func start() {
+    let input
+    while (true) {
+      input = getc()
+
+      if (input == "q") {
+        exit(0)
+      } else if (input == "w") {
+        self.set_pos(self.playerX, self.playerY - 1)
+      } else if (input == "a") {
+        self.set_pos(self.playerX - 1, self.playerY)
+      } else if (input == "s") {
+        self.set_pos(self.playerX, self.playerY + 1)
+      } else if (input == "d") {
+        self.set_pos(self.playerX + 1, self.playerY)
+      }
+      self.render()
+    }
+  }
+}
+
+let walkerGame = Game(10, 10)
+walkerGame.render()
+walkerGame.start()
