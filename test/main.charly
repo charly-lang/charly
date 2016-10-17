@@ -394,10 +394,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       nums[1] = 3
       nums[2] = 4
 
-      assert(nums[0], 2)
-      assert(nums[1], 3)
-      assert(nums[2], 4)
-      assert(nums[3], 4)
+      assert(nums == [2, 3, 4, 4], true)
     })
 
     it("writes to a nested index", func(assert) {
@@ -408,10 +405,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       nums[2][0] = 4
       nums[2][1] = 5
 
-      assert(nums[0], 2)
-      assert(nums[1], 3)
-      assert(nums[2][0], 4)
-      assert(nums[2][1], 5)
+      assert(nums == [2, 3, [4, 5]], true)
     })
 
     it("gives back the length", func(assert) {
@@ -430,10 +424,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
         got.push(v)
       })
 
-      assert(got[0], nums[0])
-      assert(got[1], nums[1])
-      assert(got[2], nums[2])
-      assert(got[3], nums[3])
+      assert(got == nums, true)
     })
 
     it("maps over an array", func(assert) {
@@ -443,10 +434,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
         n**2
       })
 
-      assert(nums[0], 1)
-      assert(nums[1], 4)
-      assert(nums[2], 9)
-      assert(nums[3], 16)
+      assert(nums == [1, 4, 9, 16], true)
     })
 
     it("converts all items to strings", func(assert) {
@@ -454,10 +442,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
 
       nums = nums.all_to_s()
 
-      assert(nums[0], "1")
-      assert(nums[1], "2")
-      assert(nums[2], "3")
-      assert(nums[3], "4")
+      assert(nums == ["1", "2", "3", "4"], true)
     })
 
     it("creates a new array using Array.of_size", func(assert) {
@@ -474,12 +459,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       nums.push(6)
 
       assert(nums.length(), 6)
-      assert(nums[0], 1)
-      assert(nums[1], 2)
-      assert(nums[2], 3)
-      assert(nums[3], 4)
-      assert(nums[4], 5)
-      assert(nums[5], 6)
+      assert(nums == [1, 2, 3, 4, 5, 6], true)
     })
 
     it("append to the beginning", func(assert) {
@@ -491,12 +471,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       nums.unshift(6)
 
       assert(nums.length(), 6)
-      assert(nums[0], 6)
-      assert(nums[1], 5)
-      assert(nums[2], 4)
-      assert(nums[3], 3)
-      assert(nums[4], 1)
-      assert(nums[5], 2)
+      assert(nums == [6, 5, 4, 3, 1, 2], true)
     })
 
     it("inserts at a given index", func(assert) {
@@ -509,12 +484,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       nums.insert(4, 7)
 
       assert(nums.length(), 7)
-      assert(nums[0], 5)
-      assert(nums[1], 3)
-      assert(nums[2], 4)
-      assert(nums[3], 1)
-      assert(nums[4], 7)
-      assert(nums[5], 2)
+      assert(nums == [5, 3, 4, 1, 7, 2], true)
     })
 
     it("deletes a given index", func(assert) {
@@ -525,8 +495,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       nums.delete(1)
 
       assert(nums.length(), 2)
-      assert(nums[0], 2)
-      assert(nums[1], 4)
+      assert(nums == [2, 4], true)
     })
 
     it("returns the first element", func(assert) {
@@ -547,10 +516,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       let num2 = [3, 4]
       let num3 = num1 + num2
 
-      assert(num3[0], 1)
-      assert(num3[1], 2)
-      assert(num3[2], 3)
-      assert(num3[3], 4)
+      assert(num3 == [1, 2, 3, 4], true)
     })
 
     it("flattens an array", func(assert) {
@@ -559,15 +525,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       num = num.flatten()
 
       assert(num.length(), 8)
-
-      assert(num[0], 1)
-      assert(num[1], 2)
-      assert(num[2], 3)
-      assert(num[3], 4)
-      assert(num[4], 5)
-      assert(num[5], 6)
-      assert(num[6], 7)
-      assert(num[7], 8)
+      assert(num == [1, 2, 3, 4, 5, 6, 7, 8], true)
     })
 
     it("filters an array", func(assert) {
@@ -582,9 +540,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       })
 
       assert(nums.length(), 3)
-      assert(nums[0], 1)
-      assert(nums[1], 3)
-      assert(nums[2], 5)
+      assert(nums == [1, 3, 5], true)
     })
 
     it("reverses an array", func(assert) {
@@ -592,10 +548,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
 
       nums = nums.reverse()
 
-      assert(nums[0], 4)
-      assert(nums[1], 3)
-      assert(nums[2], 2)
-      assert(nums[3], 1)
+      assert(nums == [4, 3, 2, 1], true)
     })
 
     it("returns the index of an element", func(assert) {
@@ -731,12 +684,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
         chars.push(c)
       })
 
-      assert(chars[0], "c")
-      assert(chars[1], "h")
-      assert(chars[2], "a")
-      assert(chars[3], "r")
-      assert(chars[4], "l")
-      assert(chars[5], "y")
+      assert(chars == ["c", "h", "a", "r", "l", "y"], true)
     })
 
     it("returns a char at a given index", func(assert) {
@@ -845,9 +793,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       }
       call_me("hello", "world", "this", "should", "work")
 
-      assert(args_received[0], "hello")
-      assert(args_received[2], "this")
-      assert(args_received[4], "work")
+      assert(args_received == ["hello", "world", "this", "should", "work"], true)
     })
 
     it("can access the parent scope", func(assert) {
