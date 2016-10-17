@@ -1,0 +1,36 @@
+class Event {
+  let name
+  let handlers = []
+
+  func constructor(name) {
+    self.name = name
+  }
+
+  func register(function) {
+    handlers.push(function)
+  }
+
+  func fire(data) {
+    handlers.each(func(handler) {
+      handler(data)
+    })
+  }
+}
+
+class EventEmitter {
+  let events = {}
+
+  func add_event(name) {
+    events[name] = Event(name)
+  }
+
+  func add_handler(name, function) {
+    events[name].register(function)
+  }
+
+  func fire_event(name, data) {
+    events[name].fire(data)
+  }
+}
+
+export = EventEmitter
