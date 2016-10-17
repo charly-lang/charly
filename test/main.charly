@@ -194,8 +194,8 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(-1 == true, true)
       assert("" == true, true)
       assert("test" == true, true)
-      assert([] == true, true)
-      assert([1, 2] == true, true)
+      assert([] == true, false)
+      assert([1, 2] == true, false)
       assert(null == false, true)
       assert({ let name = "leonard" } == true, true)
       assert(func() {} == true, true)
@@ -229,6 +229,13 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(func(arg) {} == func(arg) {}, false)
       assert(func(arg) { arg + 1 } == func(arg) { arg + 1 }, false)
       assert(func() { 2 } == func(){ 2 }, false)
+    })
+
+    it("compares arrays", func(assert) {
+      assert([1, 2, 3] == [1, 2, 3], true)
+      assert([] == [], true)
+      assert([false] == [false], true)
+      assert([[1, 2], "test"] == [[1, 2], "test"], true)
     })
 
     it("does misc. comparisons", func(assert) {

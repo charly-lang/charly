@@ -224,4 +224,31 @@ export = {
 
     string
   }
+
+  # Compare an array to something else
+  func __equal(other) {
+
+    # Check the type first off
+    if (other.type() ! self.type()) {
+      false
+    } else if (other.type() == "Boolean" && other) {
+      true
+    } else {
+
+      # Check the length
+      if (other.length() ! self.length()) {
+        false
+      } else {
+
+        # Iterate over the contents
+        let equal = true
+        other.each(func(e, i) {
+          if (equal) {
+            equal = e == self[i]
+          }
+        })
+        equal
+      }
+    }
+  }
 }
