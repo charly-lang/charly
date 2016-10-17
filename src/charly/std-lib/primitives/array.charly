@@ -51,6 +51,15 @@ export = {
     self.map(func(e) { e })
   }
 
+  # Clears the current array
+  # This modified the array in place
+  func clear() {
+    while (self.length() > 0) {
+      self.delete(0)
+    }
+    self
+  }
+
   func index_of(element) {
     let index = -1
     let i = 0
