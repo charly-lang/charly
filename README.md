@@ -92,16 +92,16 @@ print(input_number)
 
 __Primitive types__
 ```charly
-25.type                           # => Numeric
-25.5.type                         # => Numeric
-"Charly".type                     # => String
-[1, 2, 3].type                    # => Array
-null.type                         # => Null
-NAN.type                          # => Numeric
-false.type                        # => Boolean
-(class Box {}).type               # => Class
-(func() {}).type                  # => Function
-{ let name = "charly" }.type      # => Object
+25.type()                           # => Numeric
+25.5.type()                         # => Numeric
+"Charly".type()                     # => String
+[1, 2, 3].type()                    # => Array
+null.type()                         # => Null
+NAN.type()                          # => Numeric
+false.type()                        # => Boolean
+(class Box {}).type()               # => Class
+(func() {}).type()                  # => Function
+{ let name = "charly" }.type()      # => Object
 ```
 
 __Including other files__

@@ -298,7 +298,7 @@ module InternalFunctions
     raise "Unknown math function #{func_name.value}"
   end
 
-  def eval(arguments, stack)
+  def eval(arguments, stack, primitives, prelude, session)
     arg1, arg2 = nil, nil
     describe_args([TString, TObject])
     source, context = arg1, arg2
@@ -309,7 +309,7 @@ module InternalFunctions
     context = TObject.new(context_stack)
 
     # Create the interpreter fascade
-    interpreter = InterpreterFascade.new(stack.session.not_nil!)
+    interpreter = InterpreterFascade.new(session, primitives, prelude)
 
     # Catch exceptions
     begin

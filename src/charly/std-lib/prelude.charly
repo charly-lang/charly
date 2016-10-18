@@ -21,10 +21,10 @@ func unpack(object) {
   call_internal("unpack", object)
 }
 
-# Primitives
-unpack(require("./primitives/include.charly"))
+# Bindings to the primitives
+unpack(require("./bindings/include.charly"))
 
-# Default print and write functions
+# Include IO and bind some common-used methods
 unpack(require("io"))
 const print = stdout.print
 const write = stdout.write

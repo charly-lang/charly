@@ -1,6 +1,5 @@
 require "../types.cr"
 require "../../file.cr"
-require "../session.cr"
 require "./entry.cr"
 
 # A single stack containing variables
@@ -10,7 +9,6 @@ class Stack
   property file : VirtualFile?
   property values : Hash(HashKey, StackEntry)
   property locked : Bool
-  property session : Session?
 
   def initialize(parent)
     @parent = parent
@@ -91,14 +89,6 @@ class Stack
       return parent.top
     end
     return self
-  end
-
-  def session
-    parent = @parent
-    if parent.is_a? Stack
-      return parent.session
-    end
-    return @session
   end
 
   def lock

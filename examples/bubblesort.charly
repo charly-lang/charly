@@ -1,33 +1,3 @@
-# This is the exact same method that in the standard-library
-Array.sort = func(sort_function) {
-  let done = false
-  let sorted = self.copy()
-
-  # some temporary variables
-  # initialized here to save memory
-  let next
-  let tmp
-
-  while (!done) {
-    done = true
-    sorted.each(func(left, i) {
-      if (i ! self.length() - 1) {
-        next = self[i + 1]
-
-        # Run the user specified sorting function
-        if (sort_function(left, next)) {
-          tmp = next
-          sorted[i + 1] = left
-          sorted[i] = tmp
-          done = false
-        }
-      }
-    })
-  }
-
-  sorted
-}
-
 let numbers = []
 let amount = "How many numbers do you want to sort?: ".promptn()
 print("Enter " + amount.colorize(32) + " numbers: ")

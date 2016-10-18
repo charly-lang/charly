@@ -1,5 +1,4 @@
 export = {
-  const type = self
 
   # Return the length of this object
   func length() {
@@ -18,8 +17,8 @@ export = {
   }
 
   # Returns the type of this object as a string
-  func typeof(value) {
-    call_internal("typeof", value)
+  func type() {
+    call_internal("typeof", self)
   }
 
   # Return the property at value
@@ -35,7 +34,7 @@ export = {
   # Pipes self into *other*
   # Other has to be a function
   func call(other) {
-    if (other.type == Function) {
+    if (other.type() == "Function") {
       other(self)
     }
   }

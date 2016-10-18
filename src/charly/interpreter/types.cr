@@ -1,4 +1,5 @@
 require "../syntax/ast/ast.cr"
+require "./stack/stack.cr"
 
 module CharlyTypes
 
@@ -100,6 +101,14 @@ module CharlyTypes
   class TArray < BaseType
     property value : Array(BaseType)
 
+    def self.new_from_strings(strings : Array(String))
+      values = [] of BaseType
+      strings.each do |arg|
+        values << TString.new(arg)
+      end
+      TArray.new(values)
+    end
+
     def value_to_s(io)
       io << "["
       @value.map_with_index do |child, index|
@@ -170,6 +179,14 @@ module CharlyTypes
     def initialize(stack)
       @value = false
       @stack = stack
+    end
+
+    def self.new_from_hash(hash, parent_stack : Stack)
+      new_stack = Stack.new(parent_stack)
+      hash.each do |key, value|
+        new_stack.write(key, TString.new(value), declaration: true)
+      end
+      TObject.new(new_stack)
     end
 
     def value_to_s(io)

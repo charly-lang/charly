@@ -1,10 +1,8 @@
-export = {
-  const String = require("./string.charly")
-  const Numeric = require("./numeric.charly")
-  const Boolean = require("./boolean.charly")
-  const Array = require("./array.charly")
-  const Null = require("./null.charly")
-  const Object = require("./object.charly")
-  const Class = require("./class.charly")
-  const Function = require("./function.charly")
-}
+const String = require("./string.charly")
+const Numeric = require("./numeric.charly")
+const Boolean = require("./boolean.charly")
+const Array = require("./array.charly")
+const Null = require("./null.charly")
+const Object = require("./object.charly")
+const Class = require("./class.charly")
+const Function = require("./function.charly")

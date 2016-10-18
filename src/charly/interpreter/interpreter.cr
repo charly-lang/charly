@@ -1,6 +1,7 @@
 require "../syntax/ast/ast.cr"
 require "./stack/stack.cr"
 require "./types.cr"
+require "./session.cr"
 require "./internal-functions.cr"
 
 # Execute the AST by recursively traversing it's nodes
@@ -8,9 +9,15 @@ class Interpreter
   include CharlyTypes
   property initial_stack : Stack
   property program_result : BaseType
+  property primitives : Stack
+  property prelude : Stack
+  property session : Session
 
-  def initialize(programs, stack)
+  def initialize(programs, stack, session, primitives, prelude)
     @initial_stack = stack
+    @primitives = primitives
+    @prelude = prelude
+    @session = session
     @program_result = exec_programs(programs, stack)
   end
 
@@ -705,9 +712,13 @@ class Interpreter
           internal_method :sleep
           internal_method :ord
           internal_method :math
-          internal_method :eval
           internal_method :getvalue
           internal_method :setvalue
+
+          # The eval method needs access to the primitives
+          if name.value == "eval"
+            return InternalFunctions.eval(arguments, stack, @primitives, @prelude, @session)
+          end
 
           raise "Internal function call to '#{name.value}' not implemented!"
         else
@@ -749,7 +760,6 @@ class Interpreter
       context = target.parent_stack.get("self") unless context
       return exec_function(target, arguments, context)
     else
-      puts stack
       raise "#{identifier} is not a function!"
     end
   end
@@ -855,8 +865,8 @@ class Interpreter
     # we will search for an object called Numeric
     # This is defined in the classname method on CharlyTypes
     [identifier.class.to_s, "Object"].uniq.each do |identifier_name|
-      if stack.defined(identifier_name)
-        primitiveobject = stack.get(identifier_name)
+      if @primitives.defined(identifier_name)
+        primitiveobject = @primitives.get(identifier_name)
 
         # Typecheck
         if primitiveobject.is_a? TObject
@@ -1024,10 +1034,10 @@ class Interpreter
     filepath = include_file_lookup(filename.value)
 
     # Check if this path is already cached
-    if stack.top.session.try &.cached_require_calls.has_key?(filepath)
+    if @session.cached_require_calls.has_key?(filepath)
 
       # Type & sanity check
-      cache = stack.top.session.try &.cached_require_calls[filepath]
+      cache = @session.cached_require_calls[filepath]
 
       if cache.is_a?(BaseType)
         return cache
@@ -1038,7 +1048,7 @@ class Interpreter
       result = exec_include(arguments, stack, false)
 
       # Save the combination in the current session
-      stack.top.session.try &.cached_require_calls[filepath] = result
+      @session.cached_require_calls[filepath] = result
       return result
     end
   end
@@ -1074,13 +1084,13 @@ class Interpreter
       include_file = RealFile.new(filepath)
 
       # Create the stack for the interpreter
-      include_stack = Stack.new(stack.top) # Top is the prelude's stack
+      include_stack = Stack.new(@prelude) # Top is the prelude's stack
 
       # Create a new InterpreterFascade
       # by passing it stack.top
       # it still has access to all the standard library functions
       # but doesn't have access to the current stack
-      interpreter = InterpreterFascade.new(stack.top.session.not_nil!)
+      interpreter = InterpreterFascade.new(@session, @primitives, @prelude)
       result = interpreter.execute_file(include_file, include_stack)
 
       return include_stack.get("export")

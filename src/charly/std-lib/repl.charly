@@ -22,11 +22,11 @@ while (!finished) {
     context.$ = result
 
     # Different coloring based on their types
-    if (result.type == String) {
+    if (result.type() == "String") {
       print(result.colorize(32))
-    } else if (result.type == Numeric) {
+    } else if (result.type() == "Numeric") {
       print(result.colorize(33))
-    } else if (result.type == Null) {
+    } else if (result.type() == "Null") {
       print(result.colorize(30))
     } else {
       print(result)

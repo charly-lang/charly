@@ -1,5 +1,4 @@
 export = {
-  const type = self
 
   # Call the callback n times
   # The callback receives the index

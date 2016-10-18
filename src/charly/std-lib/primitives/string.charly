@@ -1,5 +1,4 @@
 export = {
-  const type = self
 
   # Returns the numeric representation of this string
   # Returns null if the string could not be casted to a
