@@ -940,6 +940,8 @@ class Interpreter
       return exec_block(function.block, function_stack)
     rescue e : Events::Return
       return e.payload
+    rescue e : Events::Break
+      raise "Invalid break statement"
     end
   end
 
