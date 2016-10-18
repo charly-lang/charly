@@ -52,8 +52,11 @@ module Charly
     end
   end
 
+  # Create the usefile
+  userfile = RealFile.new(filename)
+
   # The current session
-  session = Session.new(arguments, flags)
+  session = Session.new(arguments, flags, userfile)
 
   # Initialise the different layers
   top_stack = Stack.new(nil)
@@ -70,7 +73,7 @@ module Charly
   interpreter = InterpreterFascade.new(session, primitives_stack, prelude_stack)
   interpreter.execute_file(RealFile.new(ENV["CHARLYDIR"] + "/prelude.charly"), prelude_stack)
   interpreter.execute_file(RealFile.new(ENV["CHARLYDIR"] + "/primitives/include.charly"), primitives_stack)
-  interpreter.execute_file(RealFile.new(filename), userfile_stack)
+  interpreter.execute_file(userfile, userfile_stack)
 
   # If the stackdump flag was set
   # display the userstack at the end of execution
