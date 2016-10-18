@@ -346,6 +346,16 @@ class Parser
       }]) &&
       block &&
       skip_optional_token(TokenType::Semicolon)
+    }, ->{
+      return_statement
+    })
+  end
+
+  def return_statement
+    node_production(ReturnStatement, ->{
+      token(TokenType::Keyword, "return") &&
+      expression &&
+      skip_optional_token(TokenType::Semicolon)
     })
   end
 

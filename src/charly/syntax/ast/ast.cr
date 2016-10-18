@@ -186,6 +186,11 @@ end
 class IdentifierList < ASTNode
 end
 
+# Return statement
+class ReturnStatement < ASTNode
+  property expression : ASTNode?
+end
+
 # A terminal node
 class Terminal < ASTNode
   property raw : String?
