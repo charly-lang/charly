@@ -1,4 +1,5 @@
 export = {
+  const type = self;
 
   # Iterates over all elements inside an array
   # callback receives the element and the index
@@ -69,7 +70,7 @@ export = {
 
     while (i < length) {
       if (!found) {
-        if (self[i].type() == element.type()) {
+        if (self[i].type == element.type) {
           if (self[i] == element) {
             index = i
             found = true
@@ -173,7 +174,7 @@ export = {
   # Return a new array by concatening self and element
   # If element is an array, they will be merged
   func __plus(element) {
-    if (element.type() ! "Array") {
+    if (element.type ! Array) {
 
       # Create a new array containing self.length + 1 items
       let new_array = Array.of_size(self.length() + 1, null)
@@ -205,7 +206,7 @@ export = {
     let new = []
 
     self.each(func(e) {
-      if (e.type() == "Array") {
+      if (e.type == Array) {
         e.flatten().each(func(e) {
           new.push(e)
         })
@@ -238,9 +239,9 @@ export = {
   func __equal(other) {
 
     # Check the type first off
-    if (other.type() ! self.type()) {
+    if (other.type ! self.type) {
       false
-    } else if (other.type() == "Boolean") {
+    } else if (other.type == "Boolean") {
       other
     } else {
 
