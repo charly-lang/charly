@@ -958,7 +958,14 @@ class Interpreter
     object_stack.write("self", object, declaration: true, constant: true, force: true)
 
     # Execute the class block inside the object_stack
-    exec_block(classliteral.block, object_stack)
+    begin
+      exec_block(classliteral.block, object_stack)
+    rescue e : Events::Return
+      raise "Invalid return statement"
+    rescue e : Events::Break
+      raise "Invalid break statement"
+    end
+
 
     # Search for the constructor of the class
     # and execute it in the object_stack if it was found
