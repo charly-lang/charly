@@ -120,7 +120,7 @@ class Stack
       else
 
         # Check if the value already exists
-        if !force && contains(key) && (entry = @values[key]).locked
+        if !force && contains(key) && @values[key].locked
           raise "Can't reinitialize constant '#{key}'"
         end
 

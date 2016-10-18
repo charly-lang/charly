@@ -200,7 +200,9 @@ module InternalFunctions
     # the value variable we got from values is an entry in the stack
     # we need to unpack the value from the value
     object.stack.not_nil!.values.each do |key, value|
-      stack.parent.not_nil!.write(key, value.value, declaration: true, constant: value.locked) unless key == "self"
+      unless key == "self"
+        stack.parent.not_nil!.write(key, value.value, declaration: true, constant: value.locked)
+      end
     end
 
     return TNull.new

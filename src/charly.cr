@@ -59,29 +59,26 @@ module Charly
   prelude_stack = Stack.new nil
   userfile_stack = Stack.new prelude_stack
 
-  # Write the export variable into the user stack
-  userfile_stack.write("export", TNull.new, declaration: true, force: true)
-
   # Insert ARGV and IFLAGS
   argv = [] of BaseType
   arguments.each do |flag|
     argv << TString.new(flag)
   end
-  prelude_stack.write("ARGV", TArray.new(argv), declaration: true, constant: true, force: true)
+  prelude_stack.write("ARGV", TArray.new(argv), declaration: true, constant: true)
 
   iflags = [] of BaseType
   flags.each do |flag|
     iflags << TString.new(flag)
   end
-  prelude_stack.write("IFLAGS", TArray.new(iflags), declaration: true, constant: true, force: true)
+  prelude_stack.write("IFLAGS", TArray.new(iflags), declaration: true, constant: true)
 
   # Insert ENV
   env_stack = Stack.new(prelude_stack)
   env_object = TObject.new(env_stack)
   ENV.each do |key, value|
-    env_stack.write(key, TString.new(value), declaration: true, constant: true, force: true)
+    env_stack.write(key, TString.new(value), declaration: true, constant: true)
   end
-  prelude_stack.write("ENV", env_object, declaration: true, constant: true, force: true)
+  prelude_stack.write("ENV", env_object, declaration: true, constant: true)
 
   # Get a InterpreterFascade
   interpreter = InterpreterFascade.new(session)

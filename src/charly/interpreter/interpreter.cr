@@ -28,6 +28,7 @@ class Interpreter
     global = TObject.new(stack)
     stack.write("self", global, declaration: true, constant: true, force: true)
     stack.write("program", global, declaration: true, constant: true, force: true)
+    stack.write("export", TNull.new, declaration: true)
 
     exec_block(program.children[0], stack)
   end
@@ -1074,7 +1075,6 @@ class Interpreter
 
       # Create the stack for the interpreter
       include_stack = Stack.new(stack.top) # Top is the prelude's stack
-      include_stack.write("export", TNull.new, declaration: true)
 
       # Create a new InterpreterFascade
       # by passing it stack.top
