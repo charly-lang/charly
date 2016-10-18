@@ -1002,6 +1002,13 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(peter.age, 20)
     })
 
+    it("creates a new class via foo.new", func(assert) {
+      class Box {}
+
+      let myBox = Box.new()
+      assert(myBox.type(), "Object")
+    })
+
     it("calls functions inside classes", func(assert) {
       class Box {
         let value
