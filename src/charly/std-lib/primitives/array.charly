@@ -240,8 +240,8 @@ export = {
     # Check the type first off
     if (other.type() ! self.type()) {
       false
-    } else if (other.type() == "Boolean" && other) {
-      true
+    } else if (other.type() == "Boolean") {
+      other
     } else {
 
       # Check the length

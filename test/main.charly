@@ -236,6 +236,11 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert([] == [], true)
       assert([false] == [false], true)
       assert([[1, 2], "test"] == [[1, 2], "test"], true)
+
+      assert([1] == [1, 2], false)
+      assert(["", "a"] == ["a"], false)
+      assert([1, 2, 3] == [1, [2], 3], false)
+      assert([""] == [""], true)
     })
 
     it("does misc. comparisons", func(assert) {
@@ -484,7 +489,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       nums.insert(4, 7)
 
       assert(nums.length(), 7)
-      assert(nums == [5, 3, 4, 1, 7, 2], true)
+      assert(nums == [5, 3, 4, 1, 7, 2, 6], true)
     })
 
     it("deletes a given index", func(assert) {
@@ -731,6 +736,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert("hello beautiful world".split(" ")[0], "hello")
       assert("we are seven".split("e")[1], " ar")
       assert("hello\nworld\n:D!".split("\n")[2], ":D!")
+      assert("whatsup".split("") == ["w", "h", "a", "t", "s", "u", "p"], true)
     })
 
     it("returns the index of a substring", func(assert) {

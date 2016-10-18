@@ -133,6 +133,12 @@ export = {
       result.push(haystack)
     }
 
+    # If the needle was an empty string
+    # remove the first element
+    if (needle_length == 0) {
+      result.delete(0)
+    }
+
     result
   }
 
