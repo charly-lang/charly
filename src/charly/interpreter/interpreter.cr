@@ -2,6 +2,7 @@ require "../syntax/ast/ast.cr"
 require "./stack/stack.cr"
 require "./types.cr"
 require "./session.cr"
+require "./event.cr"
 require "./internal-functions.cr"
 
 # Execute the AST by recursively traversing it's nodes
@@ -33,7 +34,11 @@ class Interpreter
     stack.write("program", global, declaration: true, constant: true, force: true)
     stack.write("export", TNull.new, declaration: true)
 
-    exec_block(program.children[0], stack)
+    begin
+      exec_block(program.children[0], stack)
+    rescue Events::Return
+      raise "Invalid return statement"
+    end
   end
 
   # Executes *node* inside *stack*
@@ -138,6 +143,10 @@ class Interpreter
 
     if node.is_a? NullLiteral
       return TNull.new
+    end
+
+    if node.is_a? ReturnStatement
+      return exec_return_statement(node, stack)
     end
 
     if node.is_a? NANLiteral
@@ -918,7 +927,11 @@ class Interpreter
     end
 
     # Execute the block
-    return exec_block(function.block, function_stack)
+    begin
+      return exec_block(function.block, function_stack)
+    rescue e : Events::Return
+      return e.payload
+    end
   end
 
   # Create an instance of a given class
@@ -1034,5 +1047,14 @@ class Interpreter
       bool = value
     end
     bool
+  end
+
+  def exec_return_statement(node, stack)
+    return_value = TNull.new
+    if (tmp = node.expression).is_a? ASTNode
+      return_value = exec_expression(node.expression, stack)
+    end
+
+    raise Events::Return.new(return_value)
   end
 end

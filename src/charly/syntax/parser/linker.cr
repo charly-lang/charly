@@ -167,6 +167,14 @@ class Linker
       return
     end
 
+    if node.is_a? ReturnStatement
+      node.linked = true
+      if node.children.size > 0
+        node.expression = node.children[0]
+      end
+      return
+    end
+
     node
   end
 end

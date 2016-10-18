@@ -353,8 +353,10 @@ class Parser
 
   def return_statement
     node_production(ReturnStatement, ->{
-      token(TokenType::Keyword, "return") &&
-      expression &&
+      skip_token(TokenType::Keyword, "return") &&
+      check_each([->{
+        expression
+      }, true]) &&
       skip_optional_token(TokenType::Semicolon)
     })
   end
