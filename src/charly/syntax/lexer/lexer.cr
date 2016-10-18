@@ -1,17 +1,21 @@
 require "./token.cr"
+require "./location.cr"
 require "../../file.cr"
 
 class Lexer
   property tokens : Array(Token)
-  property input : VirtualFile
+  property file : VirtualFile
   property reader : Char::Reader
   property token : Token
+  property row : Int32
+  property last_char : Char
 
-  def initialize(input)
-    @input = input
+  def initialize(@file)
     @token = Token.new
     @tokens = [] of Token
-    @reader = Char::Reader.new @input.content
+    @reader = Char::Reader.new @file.content
+    @row = 1
+    @last_char = ' '
   end
 
   # Get the current_char
@@ -21,6 +25,11 @@ class Lexer
 
   # Get the next char
   def next_char
+    last_char = current_char
+    if last_char == '\n'
+      @row += 1
+    end
+
     @reader.next_char
   end
 
@@ -37,9 +46,11 @@ class Lexer
 
   # Resets the current token list and the current token
   def reset_token
+    @token = Token.new
     @token.type = TokenType::Unknown
     @token.value = ""
     @token.raw = ""
+    @token.location = Location.new
   end
 
   # Returns the contents of @reader.string
@@ -53,7 +64,7 @@ class Lexer
 
     # Read as many tokens as we can
     while next_token.is_a? Token
-      @tokens << @token.dup
+      @tokens << @token
 
       # Break if we reached the end of the file
       if @token.type == TokenType::EOF
@@ -340,6 +351,8 @@ class Lexer
     end
 
     @token.raw = string_range(start)
+    @token.location.row = @row
+    @token.location.file = @file
     @token
   end
 

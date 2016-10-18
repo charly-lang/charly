@@ -32,7 +32,7 @@ class Parser
       token.type != TokenType::Comment
     end
 
-    if @session.flags.includes? "tokens"
+    if @session.flags.includes?("tokens") && @session.file == @file
       @tokens.each do |token|
         puts token
       end
@@ -72,7 +72,7 @@ class Parser
     linker.start
 
     # If the *--ast* cli option was passed, display the tree
-    if @session.flags.includes? "ast"
+    if @session.flags.includes?("ast") && @session.file == @file
       puts "--- AST: #{@file.filename} ---"
       puts @tree
     end

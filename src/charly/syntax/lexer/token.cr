@@ -1,3 +1,5 @@
+require "../../file.cr"
+
 # The different types of tokens
 enum TokenType
 
@@ -57,19 +59,26 @@ class Token
   property value : String
   property raw : String
   property touched : Bool
+  property location : Location
 
   def initialize(type = TokenType::Unknown, value = "", raw = "")
     @type = type
     @value = value
     @raw = raw
     @touched = false
+    @location = Location.new
   end
 
   def to_s(io)
+    io << "#{@location.file.try &.filename}:#{@location.row.to_s.ljust(4, ' ')} │ "
+
     if @value.size == 0
-      io << "#{@type}"
+      io << "#{@type.to_s.ljust(12, ' ')}"
+      io << "│"
     else
-      io << "#{@type}: '#{@value}'"
+      io << "#{@type.to_s.ljust(12, ' ')}"
+      io << "│"
+      io << "#{@value}"
     end
   end
 end
