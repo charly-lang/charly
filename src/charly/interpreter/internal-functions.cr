@@ -305,7 +305,7 @@ module InternalFunctions
 
     # Isolate the context
     context_stack = context.stack.dup
-    context_stack.parent = stack.top
+    context_stack.parent = prelude
     context = TObject.new(context_stack)
 
     # Create the interpreter fascade
