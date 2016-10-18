@@ -978,6 +978,50 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(got, "inner box")
     })
 
+    it("does explicit returns with an argument", func(assert) {
+      func foo() {
+        return 25
+      }
+
+      assert(foo(), 25)
+    })
+
+    it("does explicit returns without argument", func(assert) {
+      func foo() {
+        return 25
+      }
+
+      assert(foo(), 25)
+    })
+
+    it("does explicit returns from an object", func(assert) {
+      let Box = {
+        func foo() {
+          return 25
+        }
+      }
+
+      assert(Box.foo(), 25)
+    })
+
+    it("does explicit returns from nested ifs", func(assert) {
+      func foo(arg) {
+        if arg <= 10 {
+          return false
+        }
+
+        return true
+      }
+
+      assert(foo(0), false)
+      assert(foo(5), false)
+      assert(foo(10), false)
+
+      assert(foo(15), true)
+      assert(foo(20), true)
+      assert(foo(25), true)
+    })
+
   })
 
   describe("Classes", func(it) {
