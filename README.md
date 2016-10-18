@@ -193,12 +193,67 @@ charly repl these are all arguments
 [these, are, all, arguments]
 ```
 
-# Everything is an object... kind of
-When you write `5`, the interpreter actually treats it as a primitive. There are no funny castings or object instantiations. You can normally write code like `2 + 5` and it will work. Once you do something like `5.times(func() {})`, the interpreter searches the current scope for an object called `Numeric` and checks if there is a function called `times` on it. If it finds the method, it injects a variable called `self` into the function's stack and executes it.
+# Everything is an object
+When you write `5`, the interpreter actually treats it as a primitive. There are no funny castings or object instantiations. You can normally write code like `2 + 5` and it will work. Once you do something like `5.times(func() {})`, the interpreter searches the function for the given type. If it finds the method, it injects a variable called `self` into the function's stack and executes it.
 
 This allows the interpreter to reuse the same object for all primitives.
 
 This principle applies to all language primitives. The `Array` object for example, specifies a method called `push` which inserts an element into the array.
+
+# Stack layers
+Every file, function, class, object etc. gets it's own stack layer. A stack layer is in essence just a Hashmap that has a pointer to it's parent layer. When you write `myname`, the interpreter searches the current layer for a entry for this variable. If it's not found, it searches the parent layer. If a value is not found in this structure, an exception is raised stating _"'myname' is not defined"_.
+
+When you execute a file, let's say *foo.charly*, the layer structure looks like this:
+```
+-------------   
+| Top Layer |  Contains values like ARGV, IFLAGS and ENV
+-------------
+      ^
+      |
+--------------------  Contains bindings to stdout, stderr, stdin
+| Standard Prelude |  and various other functions
+--------------------  
+        ^
+        |
+        |       -------------- Contains the functions that are callable on primitive types
+        |<------| Primitives | See the upper paragraph *Everything is an object*
+        |       -------------- for a better explanation of what this is
+        |
+--------------------------
+| User file (foo.charly) | Contains all values declared within your program
+--------------------------
+```
+
+Let's assume the content of *foo.charly* is the following
+```charly
+func foo(arg) {
+  let myval = arg + 1
+}
+
+let value = 25
+foo(value)
+```
+
+The layer structure now looks like this:
+```
+  ^
+  |
+--------------------------
+| User file (foo.charly) |
+|                        |
+| value: 25              |
+| foo: Function          |
+--------------------------
+            ^
+            |
+            |
+-----------------
+| Function: foo |
+|               |
+| arg: 25       |
+| myval: 26     |
+-----------------
+```
 
 # Behaviour of *self* in methods
 The self keyword always points to the object a method was called on. Where the method currently lives is not taken into consideration. Example:
