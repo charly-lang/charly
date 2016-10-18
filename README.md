@@ -201,7 +201,7 @@ This allows the interpreter to reuse the same object for all primitives.
 This principle applies to all language primitives. The `Array` object for example, specifies a method called `push` which inserts an element into the array.
 
 # Stack layers
-Every file, function, class, object etc. gets it's own stack layer. A stack layer is in essence just a Hashmap that has a pointer to it's parent layer. When you write `myname`, the interpreter searches the current layer for a entry for this variable. If it's not found, it searches the parent layer. If a value is not found in this structure, an exception is raised stating _"'myname' is not defined"_.
+Every file, function, class, object etc. gets it's own stack layer. A stack layer is in essence just a Hashmap that has a pointer to it's parent layer. When you write `myname`, the interpreter searches the current layer for a entry for this variable. If it's not found, it searches the parent layer. If a value is not found in this structure, an exception is raised stating _'myname' is not defined_.
 
 When you execute a file, let's say *foo.charly*, the layer structure looks like this:
 ```
@@ -236,8 +236,8 @@ foo(value)
 
 The layer structure now looks like this:
 ```
-  ^
-  |
+      ^
+      |
 --------------------------
 | User file (foo.charly) |
 |                        |
@@ -247,12 +247,12 @@ The layer structure now looks like this:
             ^
             |
             |
------------------
-| Function: foo |
-|               |
-| arg: 25       |
-| myval: 26     |
------------------
+    -----------------
+    | Function: foo |
+    |               |
+    | arg: 25       |
+    | myval: 26     |
+    -----------------
 ```
 
 # Behaviour of *self* in methods
