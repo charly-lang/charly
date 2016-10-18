@@ -330,9 +330,13 @@ class Parser
       if_statement && skip_optional_token(TokenType::Semicolon)
     }, ->{
       token(TokenType::Keyword, "while") &&
-      skip_token(TokenType::LeftParen) &&
-      expression &&
-      skip_token(TokenType::RightParen) &&
+      check_each([->{
+        skip_token(TokenType::LeftParen) &&
+        expression &&
+        skip_token(TokenType::RightParen)
+      }, ->{
+        expression
+      }]) &&
       block &&
       skip_optional_token(TokenType::Semicolon)
     })
@@ -342,10 +346,14 @@ class Parser
     node_production(IfStatement, ->{
       match = false
       if token(TokenType::Keyword, "if") &&
+        check_each([->{
           skip_token(TokenType::LeftParen) &&
           expression &&
-          skip_token(TokenType::RightParen) &&
-          block
+          skip_token(TokenType::RightParen)
+        }, ->{
+          expression
+        }]) &&
+        block
 
         # Parse the else or else if clause
         match = check_each([->{
