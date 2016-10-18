@@ -38,6 +38,8 @@ class Interpreter
       exec_block(program.children[0], stack)
     rescue Events::Return
       raise "Invalid return statement"
+    rescue Events::Break
+      raise "Invalid break statement"
     end
   end
 
@@ -147,6 +149,10 @@ class Interpreter
 
     if node.is_a? ReturnStatement
       return exec_return_statement(node, stack)
+    end
+
+    if node.is_a? BreakStatement
+      return exec_break_statement(node, stack)
     end
 
     if node.is_a? NANLiteral
@@ -632,8 +638,11 @@ class Interpreter
 
     if test.is_a?(ASTNode) && consequent.is_a?(ASTNode)
       last_result = TNull.new
-      while eval_bool(exec_expression(test, stack), stack)
-        last_result = exec_block(consequent, Stack.new(stack))
+      begin
+        while eval_bool(exec_expression(test, stack), stack)
+          last_result = exec_block(consequent, Stack.new(stack))
+        end
+      rescue e : Events::Break
       end
       return last_result
     else
@@ -1056,5 +1065,9 @@ class Interpreter
     end
 
     raise Events::Return.new(return_value)
+  end
+
+  def exec_break_statement(node, stack)
+    raise Events::Break.new
   end
 end

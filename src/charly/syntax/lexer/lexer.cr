@@ -171,6 +171,28 @@ class Lexer
       next_char TokenType::RightBracket
     when '\0'
       @token.type = TokenType::EOF
+    when 'b'
+      case next_char
+      when 'r'
+        case next_char
+        when 'e'
+          case next_char
+          when 'a'
+            case next_char
+            when 'k'
+              check_ident_or_keyword(TokenType::Keyword, start)
+            else
+              consume_ident(start)
+            end
+          else
+            consume_ident(start)
+          end
+        else
+          consume_ident(start)
+        end
+      else
+        consume_ident(start)
+      end
     when 'c'
       case next_char
       when 'l'

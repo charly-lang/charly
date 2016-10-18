@@ -186,9 +186,12 @@ end
 class IdentifierList < ASTNode
 end
 
-# Return statement
+# Different control structures
 class ReturnStatement < ASTNode
   property expression : ASTNode?
+end
+
+class BreakStatement < ASTNode
 end
 
 # A terminal node

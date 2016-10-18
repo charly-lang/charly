@@ -348,6 +348,8 @@ class Parser
       skip_optional_token(TokenType::Semicolon)
     }, ->{
       return_statement
+    }, ->{
+      break_statement
     })
   end
 
@@ -357,6 +359,13 @@ class Parser
       check_each([->{
         expression
       }, true]) &&
+      skip_optional_token(TokenType::Semicolon)
+    })
+  end
+
+  def break_statement
+    node_production(BreakStatement, ->{
+      skip_token(TokenType::Keyword, "break") &&
       skip_optional_token(TokenType::Semicolon)
     })
   end

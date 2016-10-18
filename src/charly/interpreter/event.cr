@@ -16,4 +16,7 @@ module Events
 
   class Return < Event
   end
+
+  class Break < Event
+  end
 end
