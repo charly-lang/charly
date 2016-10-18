@@ -361,13 +361,13 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(d.type, Numeric)
 
       d = b || c
-      assert(d.type, String)
+      assert(d.type, Boolean)
 
       d = b || a
       assert(d.type, Numeric)
 
       d = c || b
-      assert(d.type, String)
+      assert(d.type, Null)
     })
 
   })
@@ -1339,8 +1339,8 @@ let testResult = UnitTest("Charly").begin(func(describe) {
   describe("Misc. standard library functions", func(it) {
 
     it("returns the type of a variable", func(assert) {
-      assert(false.type, String)
-      assert(true.type, String)
+      assert(false.type, Boolean)
+      assert(true.type, Boolean)
       assert("test".type, String)
       assert(25.type, Numeric)
       assert(25.5.type, Numeric)
@@ -1348,7 +1348,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert((class Test {}).type, Class)
       assert((func() {}).type, Function)
       assert({}.type, Object)
-      assert(null.type, String)
+      assert(null.type, Null)
     })
 
     it("casts string to numeric", func(assert) {
