@@ -80,7 +80,7 @@ class Token
     else
       io << "#{@type.to_s.ljust(12, ' ')}"
       io << "│ "
-      io << "(#{@raw})"
+      io << "#{@raw}"
     end
   end
 end
