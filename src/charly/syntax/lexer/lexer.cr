@@ -448,6 +448,11 @@ class Lexer
 
   # Consume a string literal
   def consume_string(start)
+
+    initial_row = @row
+    initial_column = @column
+    initial_pos = start
+
     start = start + 1
     io = MemoryIO.new
     while true
@@ -475,12 +480,30 @@ class Lexer
         when '"'
           io << "\""
         when '\0'
-          raise "Unterminated quoted string"
+
+          # Create a location for the presenter to show
+          loc = Location.new
+          loc.file = @file
+          loc.row = initial_row
+          loc.column = initial_column
+          loc.pos = initial_pos
+          loc.length = @reader.pos - initial_pos
+
+          raise SyntaxError.new(loc, "Unclosed string")
         end
       when '"'
         break
       when '\0'
-        raise "Unterminated quoted string"
+
+        # Create a location for the presenter to show
+        loc = Location.new
+        loc.file = @file
+        loc.row = initial_row
+        loc.column = initial_column
+        loc.pos = initial_pos
+        loc.length = @reader.pos - initial_pos
+
+        raise SyntaxError.new(loc, "Unclosed string")
       else
         io << char
       end

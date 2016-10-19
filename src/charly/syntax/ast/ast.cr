@@ -1,7 +1,6 @@
 require "../../helper.cr"
 require "../../file.cr"
 require "../../interpreter/stack/stack.cr"
-require "../lexer/location.cr"
 
 abstract class ASTNode
   property children : Array(ASTNode)
@@ -9,7 +8,6 @@ abstract class ASTNode
   property! value : Bool | Float64 | String
   property linked : Bool
   property group : Bool
-  property location : Location?
 
   def initialize(parent)
     @parent = parent
@@ -56,18 +54,6 @@ abstract class ASTNode
         end
       end
     end
-  end
-
-  def whole_location
-    if (loc = @location).is_a? Location
-      return location
-    end
-
-    if children.size > 0
-      return children[0].location_start
-    end
-
-    raise "Could not find location_start for node #{self.class.name}"
   end
 end
 

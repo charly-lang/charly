@@ -93,7 +93,6 @@ class Parser
     new_node = type.new(@node)
     new_node.value = @tokens[@next].value
     new_node.raw = @tokens[@next].raw
-    new_node.location = @tokens[@next].location
     new_node
   end
 
