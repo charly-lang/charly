@@ -7,7 +7,7 @@
 
 # The Charly programming language
 
-This is my try at writing an interpreter of a dynamic language from scratch with my bare hands. It is implemented in [Crystal](https://crystal-lang.org/).
+This is my try at writing an interpreter of a dynamic language from scratch with my bare hands. It is implemented in [Crystal](https://crystal-lang.org/). It is absolutely not production-ready and is meant only for learning-purposes.
 
 # Syntax
 
@@ -295,6 +295,23 @@ print(greet()) # will print Hello leonard
 ```
 
 This currently only works on objects. If you try to extract a method like *each* from an Array this won't work. It will just result in undefined behaviour.
+
+# Syntax errors
+When the interpreter finds a syntax error, it will be nicely presented to you via the following format:
+
+```
+SyntaxError in debug.charly
+Unexpected token: Identifier
+40.
+41. const buffer = files[i].content
+42. const size = buffer.length()
+43. const offset = size - position
+44.
+45. if (offset < 25 thisfails) {
+    ~~~~~~~~~~~~~~~~^
+```
+
+The offending piece will be highlighted red. If your terminal doesn't support colors, an arrow also points to the offensive part.
 
 # OS Support
 I'm developing on macOS 10.12 so it should work without any problems on that.
