@@ -1,5 +1,5 @@
 require "colorize"
-require "./lexer/location.cr"
+require "./syntax/lexer/location.cr"
 
 class ErrorPresenter
 
@@ -23,14 +23,15 @@ class ErrorPresenter
     @length = location.length
   end
 
-  def present
+  def present(output)
 
     # The range we want to color red
     column_range = (@column..(@column + @length - 1))
 
     # The range of rows we want to print
-    print_range = ((@row - 2)..(@row))
-    nocolor_range = ((@row - 2)..(@row - 1))
+    printback_range = 5
+    print_range = ((@row - printback_range)..(@row))
+    nocolor_range = ((@row - printback_range)..(@row - 1))
 
     # Iterate over all lines
     io = MemoryIO.new(@file.content)
@@ -50,12 +51,12 @@ class ErrorPresenter
       end
 
       # Print the line number
-      print "#{ln}.".colorize(:yellow)
-      print " "
+      output << "#{ln}.".colorize(:yellow)
+      output << " "
 
       # The lines we simply want to
       if nocolor_range === ln
-        print line
+        output << line
       else
 
         # This is the offending row
@@ -63,9 +64,9 @@ class ErrorPresenter
         line.each_char do |char|
 
           if column_range === c
-            print char.colorize(:white).back(:red)
+            output << print char.colorize(:white).back(:red)
           else
-            print char
+            output << char
           end
 
           c += 1
@@ -78,12 +79,12 @@ class ErrorPresenter
 
     # Show a nice arrow for terminals
     # that don't support coloring
-    print " " * "#{@row}".size
-    print "  "
+    output << " " * "#{@row}".size
+    output << "  "
     (@column - 1).times do
-      print '~'.colorize(:red)
+      output << '~'.colorize(:red)
     end
-    print '^'.colorize(:red)
-    print '\n'
+    output << '^'.colorize(:red)
+    output << '\n'
   end
 end

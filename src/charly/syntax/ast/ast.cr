@@ -44,20 +44,6 @@ abstract class ASTNode
       io << " - #{@children.size} children"
     end
 
-    if (loc = @location).is_a? Location
-      io << " - #{loc.row}:#{loc.column - loc.length}"
-    else
-      loc_start = location_start
-      loc_end = location_end
-
-      if loc_start.is_a?(Location) && loc_end.is_a?(Location)
-        io << " - "
-        io << "#{loc_start.row}:#{loc_start.column - loc_start.length}"
-        io << "::"
-        io << "#{loc_end.row}:#{loc_end.column - loc_end.length}"
-      end
-    end
-
     io << "\n"
 
     children.each do |child|
@@ -72,25 +58,13 @@ abstract class ASTNode
     end
   end
 
-  def location_start
+  def whole_location
     if (loc = @location).is_a? Location
       return location
     end
 
     if children.size > 0
       return children[0].location_start
-    end
-
-    raise "Could not find location_start for node #{self.class.name}"
-  end
-
-  def location_end
-    if (loc = @location).is_a? Location
-      return location
-    end
-
-    if children.size > 0
-      return children[children.size - 1].location_end
     end
 
     raise "Could not find location_start for node #{self.class.name}"

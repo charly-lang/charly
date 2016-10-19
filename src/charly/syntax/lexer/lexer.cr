@@ -1,9 +1,11 @@
 require "./token.cr"
 require "./location.cr"
-require "../error-presenter.cr"
+require "../../exceptions.cr"
 require "../../file.cr"
 
 class Lexer
+  include CharlyExceptions
+
   property tokens : Array(Token)
   property file : VirtualFile
   property reader : Char::Reader
@@ -537,9 +539,6 @@ class Lexer
     loc.column = @column
     loc.length = 1
 
-    presenter = ErrorPresenter.new(loc)
-    presenter.present
-
-    raise "Unexpected character: #{current_char.inspect}"
+    raise SyntaxError.new(loc, "Unexpected char '#{current_char}'")
   end
 end
