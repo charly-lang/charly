@@ -4,6 +4,8 @@ require "./structure.cr"
 require "./linker.cr"
 require "../../interpreter/session.cr"
 
+require "colorize"
+
 # Parses a list of tokens into a program
 class Parser
 
@@ -53,11 +55,69 @@ class Parser
     # Check if the whole program was parsed
     if @next < @tokens.size - 1
 
-      # Display the last 10 tokens that were touched by the parser
-      @tokens.select { |token|
+      # Get the offending token
+      offending_token = @tokens.select { |token|
         token.touched
-      }.last(20).each do |token|
-        puts token
+      }.last(1)[0]
+
+      # Display the offending line and the two before it
+      # Coloring the offending token red
+      location = offending_token.location
+      offending_row = location.row
+      offending_column_range = ((location.column)...(location.column + location.length))
+
+      content = location.file.try &.content
+      if content.is_a? String
+        io = MemoryIO.new(content)
+        i = 1
+        io.each_line do |line|
+
+          # If this line is in the wanted range
+          # but not the actual offending line
+          if ((offending_row - 2)..(offending_row - 1)) === i
+
+            # Print the line number
+            print "#{i}.".colorize(:yellow)
+            print " "
+            print line
+          end
+
+          # We have to print the offending right specially
+          # because we want to color the offending token red
+          if i == offending_row
+
+            # Print the line number
+            print "#{i}.".colorize(:yellow)
+            print " "
+
+            # Keep track of the column
+            c = 1
+            line.each_char do |char|
+
+              if offending_column_range === c
+                print char.colorize(:white).back(:red)
+              else
+                print char
+              end
+
+              c += 1
+            end
+          end
+
+          i += 1
+        end
+
+
+        # The spacer to account for the line numbers
+        print " " * location.row
+        print "  "
+
+        # Show a nice arrow for terminals that don't have color
+        (location.column - 1).times do |i|
+          print '~'.colorize(:red)
+        end
+        print '^'.colorize(:red)
+        print '\n'
       end
 
       raise "Could not parse #{@file.filename}"
@@ -86,27 +146,28 @@ class Parser
     new_node = type.new(@node)
     new_node.value = @tokens[@next].value
     new_node.raw = @tokens[@next].raw
+    new_node.location = @tokens[@next].location
     new_node
   end
 
   # Returns true if the next token is equal to *type*
   # and optionally to *value*
   # Doesn't increment the @next pointer
-  def peek_token(type, value = false, offset = 0)
+  def peek_token(type, value = false)
 
     # Check if there are any tokens left
-    if @next + offset >= @tokens.size
+    if @next >= @tokens.size
       return false
     end
 
     # Mark the token as touched
-    @tokens[@next + offset].touched = true
+    @tokens[@next].touched = true
 
     # Check for a match
     if !value.is_a?(Bool)
-      @tokens[@next + offset].type == type && @tokens[@next + offset].value == value
+      @tokens[@next].type == type && @tokens[@next].value == value
     else
-      @tokens[@next + offset].type == type
+      @tokens[@next].type == type
     end
   end
 

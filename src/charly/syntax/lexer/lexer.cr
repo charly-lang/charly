@@ -83,6 +83,7 @@ class Lexer
   def next_token
     reset_token
     start = @reader.pos
+    @token.location.pos = start + 1
 
     case current_char
     when ' ', '\t'
@@ -356,7 +357,7 @@ class Lexer
 
     @token.raw = string_range(start)
     @token.location.row = @row
-    @token.location.column = @column
+    @token.location.column = @column - @token.raw.size
     @token.location.length = @token.raw.size
     @token.location.file = @file
     @token

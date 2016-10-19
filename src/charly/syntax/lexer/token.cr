@@ -70,8 +70,7 @@ class Token
   end
 
   def to_s(io)
-    io << "#{@location.file.try &.filename}:"
-    io << "#{@location.row}:#{@location.column - @location.length}".ljust(4, ' ')
+    io << "#{@location}"
     io << " │ "
 
     if @value.size == 0

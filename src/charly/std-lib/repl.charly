@@ -12,9 +12,9 @@ let finished = false
 let input
 let result
 while (!finished) {
-  input = "> ".prompt().trim()
+  input = "> ".prompt()
 
-  if (input == ".exit") {
+  if (input == ".exit\n") {
     finished = true
   } else {
     history.push(input)
