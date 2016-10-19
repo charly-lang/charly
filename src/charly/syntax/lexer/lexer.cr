@@ -1,5 +1,6 @@
 require "./token.cr"
 require "./location.cr"
+require "../error-presenter.cr"
 require "../../file.cr"
 
 class Lexer
@@ -528,6 +529,17 @@ class Lexer
 
   # Called when a unknown token is received
   def unknown_token
+
+    # Create a location for the presenter to show
+    loc = Location.new
+    loc.file = @file
+    loc.row = @row
+    loc.column = @column
+    loc.length = 1
+
+    presenter = ErrorPresenter.new(loc)
+    presenter.present
+
     raise "Unexpected character: #{current_char.inspect}"
   end
 end
