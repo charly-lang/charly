@@ -1,5 +1,6 @@
 require "../ast/ast.cr"
 require "../lexer/lexer.cr"
+require "../error-presenter.cr"
 require "./structure.cr"
 require "./linker.cr"
 require "../../interpreter/session.cr"
@@ -63,62 +64,10 @@ class Parser
       # Display the offending line and the two before it
       # Coloring the offending token red
       location = offending_token.location
-      offending_row = location.row
-      offending_column_range = ((location.column)...(location.column + location.length))
 
-      content = location.file.try &.content
-      if content.is_a? String
-        io = MemoryIO.new(content)
-        i = 1
-        io.each_line do |line|
-
-          # If this line is in the wanted range
-          # but not the actual offending line
-          if ((offending_row - 2)..(offending_row - 1)) === i
-
-            # Print the line number
-            print "#{i}.".colorize(:yellow)
-            print " "
-            print line
-          end
-
-          # We have to print the offending right specially
-          # because we want to color the offending token red
-          if i == offending_row
-
-            # Print the line number
-            print "#{i}.".colorize(:yellow)
-            print " "
-
-            # Keep track of the column
-            c = 1
-            line.each_char do |char|
-
-              if offending_column_range === c
-                print char.colorize(:white).back(:red)
-              else
-                print char
-              end
-
-              c += 1
-            end
-          end
-
-          i += 1
-        end
-
-
-        # The spacer to account for the line numbers
-        print " " * location.row
-        print "  "
-
-        # Show a nice arrow for terminals that don't have color
-        (location.column - 1).times do |i|
-          print '~'.colorize(:red)
-        end
-        print '^'.colorize(:red)
-        print '\n'
-      end
+      # Get a ErrorPresenter
+      presenter = ErrorPresenter.new(location)
+      presenter.present
 
       raise "Could not parse #{@file.filename}"
     end
