@@ -11,8 +11,6 @@ This is my try at writing an interpreter of a dynamic language from scratch with
 
 # Syntax
 
-Semicolons are completely optional!
-
 __Declaring a variable__
 ```charly
 let number = 900
@@ -138,6 +136,46 @@ class Person {
 let leonard = Person("Leonard", 16)
 print(leonard.name) # "Leonard"
 print(leonard.age) # 16
+```
+
+# Semicolons & Parens
+
+Even though semicolons are completely optional, you should use them. For example the following two examples would be evaluated the same way:
+
+```charly
+2 test lol 2 * 2 test ()
+```
+
+```charly
+2;
+test;
+lol;
+2 * 2;
+test();
+```
+
+You can use semicolons after If and while statements:
+
+```charly
+if (true) {
+  # code
+};
+
+while (true) {
+  # code
+};
+```
+
+Also the parens around If and while statements are also optional:
+
+```charly
+if size < 100 {
+  # code
+}
+
+while should_exit {
+  # code
+}
 ```
 
 __CLI arguments and flags__
