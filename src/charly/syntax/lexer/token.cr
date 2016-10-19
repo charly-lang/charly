@@ -70,15 +70,17 @@ class Token
   end
 
   def to_s(io)
-    io << "#{@location.file.try &.filename}:#{@location.row.to_s.ljust(4, ' ')} │ "
+    io << "#{@location.file.try &.filename}:"
+    io << "#{@location.row}:#{@location.column - @location.length}".ljust(4, ' ')
+    io << " │ "
 
     if @value.size == 0
       io << "#{@type.to_s.ljust(12, ' ')}"
       io << "│"
     else
       io << "#{@type.to_s.ljust(12, ' ')}"
-      io << "│"
-      io << "#{@value}"
+      io << "│ "
+      io << "(#{@raw})"
     end
   end
 end

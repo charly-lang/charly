@@ -8,6 +8,7 @@ class Lexer
   property reader : Char::Reader
   property token : Token
   property row : Int32
+  property column : Int32
   property last_char : Char
 
   def initialize(@file)
@@ -15,6 +16,7 @@ class Lexer
     @tokens = [] of Token
     @reader = Char::Reader.new @file.content
     @row = 1
+    @column = 1
     @last_char = ' '
   end
 
@@ -26,8 +28,10 @@ class Lexer
   # Get the next char
   def next_char
     last_char = current_char
+    @column += 1
     if last_char == '\n'
       @row += 1
+      @column = 1
     end
 
     @reader.next_char
@@ -352,6 +356,8 @@ class Lexer
 
     @token.raw = string_range(start)
     @token.location.row = @row
+    @token.location.column = @column
+    @token.location.length = @token.raw.size
     @token.location.file = @file
     @token
   end
