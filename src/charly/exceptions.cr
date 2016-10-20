@@ -13,10 +13,13 @@ module CharlyExceptions
     def to_s(io)
 
       io << "SyntaxError in #{(@location.file.try &.filename).colorize(:yellow)}\n"
-      io << "#{@message}\n"
 
+      # Highlight offensive location
       presenter = ErrorPresenter.new(@location)
       presenter.present(io)
+
+      # Error message
+      io << "#{@message}\n"
     end
   end
 end
