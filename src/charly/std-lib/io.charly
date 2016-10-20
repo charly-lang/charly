@@ -19,8 +19,8 @@ const stderr = {
 }
 
 const stdin = {
-  func gets() {
-    call_internal("stdin_gets")
+  func gets(prepend, append_to_history) {
+    call_internal("stdin_gets", prepend, append_to_history)
   }
 
   func getc() {

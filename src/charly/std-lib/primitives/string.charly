@@ -24,8 +24,7 @@ export = {
 
   # Writes self to stdout and asks for user input
   func prompt() {
-    write(self)
-    gets()
+    gets(self, true)
   }
 
   # Writes self to stdout and ask for a single char
@@ -37,8 +36,7 @@ export = {
   # Writes self to stdout and ask for user input
   # Input will be casted to a numeric
   func promptn() {
-    write(self)
-    gets().to_n()
+    gets(self, true).to_n()
   }
 
   # Return each char in a string

@@ -1,6 +1,7 @@
 require "./stack/stack.cr"
 require "./types.cr"
 require "./require.cr"
+require "readline"
 
 # Defines all methods that are implemented in the interpreter directly
 # This includes print, dump, rand, various math functions, etc.
@@ -124,7 +125,10 @@ module InternalFunctions
     end
 
     def gets(arguments, stack)
-      return TString.new(::STDIN.gets || "")
+      arg1, arg2 = nil, nil
+      InternalFunctions.describe_args([TString, TBoolean])
+      prepend, append_to_history = arg1.value, arg2.value
+      return TString.new(Readline.readline(prepend, append_to_history) || "")
     end
   end
 
