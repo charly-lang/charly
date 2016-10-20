@@ -213,10 +213,10 @@ When you execute a file, let's say *foo.charly*, the layer structure looks like 
 --------------------  Contains bindings to stdout, stderr, stdin
 | Standard Prelude |  and various other functions
 --------------------  
-        ^
-        |
-        |       -------------- Contains the functions that are callable on primitive types
-        |<------| Primitives | See the upper paragraph *Everything is an object*
+        ^   ^
+        |   |
+        |   |   -------------- Contains the functions that are callable on primitive types
+        |   \---| Primitives | See the upper paragraph *Everything is an object*
         |       -------------- for a better explanation of what this is
         |
 --------------------------
