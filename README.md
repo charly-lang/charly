@@ -309,17 +309,17 @@ You will be prompted for your admin password (used to copy to `/usr/bin`).
 # CLI options
 ```
 $ charly -h
-Usage: charly [options] filename [arguments]
+Usage: charly filename [options] [arguments]
     -f FLAG, --flag FLAG             Set a flag
-    -h, --help                       Show this help
-    -v, --version                    Show the version number
+    -h, --help                       Print this help message
+    -v, --version                    Print the version number
 
 Flags:
-    ast                              Display AST's of parsed programs
-    tokens                           Display tokens of parsed programs
+    ast                              Display the AST of the userfile
+    tokens                           Display tokens of the userfile
     noexec                           Disable execution
     noprelude                        Don't load the prelude file
-    stackdump                        Dump the top-level stack at the end of execution
+    stackdump                        Dump the userfile stack at the end of execution
 ```
 
 # Contributors
