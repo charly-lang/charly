@@ -1,9 +1,11 @@
 require "./stack/stack.cr"
 require "./types.cr"
+require "./require.cr"
 
 # Defines all methods that are implemented in the interpreter directly
 # This includes print, dump, rand, various math functions, etc.
 module InternalFunctions
+  include CharlyTypes
   extend self
 
   # Helper macros to describe argument types and amount
@@ -33,8 +35,21 @@ module InternalFunctions
     {% end %}
   end
 
-  extend self
-  include CharlyTypes
+  def require(arguments, stack, session, userfile)
+    arg1 = nil
+    describe_args([TString])
+    filename = arg1.value
+
+    return Charly::Interpreter::Require.include(filename, session, userfile, true)
+  end
+
+  def include(arguments, stack, session, userfile)
+    arg1 = nil
+    describe_args([TString])
+    filename = arg1.value
+
+    return Charly::Interpreter::Require.include(filename, session, userfile, false)
+  end
 
   def sleep(arguments, stack)
     arg1 = nil
@@ -298,18 +313,18 @@ module InternalFunctions
     raise "Unknown math function #{func_name.value}"
   end
 
-  def eval(arguments, stack, primitives, prelude, session)
+  def eval(arguments, stack, session)
     arg1, arg2 = nil, nil
     describe_args([TString, TObject])
     source, context = arg1, arg2
 
     # Isolate the context
     context_stack = context.stack.dup
-    context_stack.parent = prelude
+    context_stack.parent = session.prelude
     context = TObject.new(context_stack)
 
     # Create the interpreter fascade
-    interpreter = InterpreterFascade.new(session, primitives, prelude)
+    interpreter = InterpreterFascade.new(session)
 
     # Catch exceptions
     begin

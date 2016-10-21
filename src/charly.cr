@@ -52,17 +52,17 @@ module Charly
     end
   end
 
-  # Create the usefile
-  userfile = RealFile.new(filename)
-
-  # The current session
-  session = Session.new(arguments, flags, userfile)
-
   # Initialise the different layers
   top_stack = Stack.new(nil)
   prelude_stack = Stack.new(top_stack)
   primitives_stack = Stack.new(prelude_stack) # The stack that hosts the primitive classes
   userfile_stack = Stack.new(prelude_stack)
+
+  # Create the usefile
+  userfile = RealFile.new(filename)
+
+  # The current session
+  session = Session.new(arguments, flags, userfile, primitives_stack, prelude_stack)
 
   # Insert ARGV, IFLAGS and ENV
   top_stack.write("ARGV", TArray.new_from_strings(arguments), declaration: true, constant: true)
@@ -71,7 +71,7 @@ module Charly
 
   # Execute the needed files
   begin
-    interpreter = InterpreterFascade.new(session, primitives_stack, prelude_stack)
+    interpreter = InterpreterFascade.new(session)
     interpreter.execute_file(RealFile.new(ENV["CHARLYDIR"] + "/prelude.charly"), prelude_stack)
     interpreter.execute_file(RealFile.new(ENV["CHARLYDIR"] + "/primitives/include.charly"), primitives_stack)
     interpreter.execute_file(userfile, userfile_stack)

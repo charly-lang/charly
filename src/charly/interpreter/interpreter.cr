@@ -9,14 +9,10 @@ class Interpreter
   include CharlyTypes
   property initial_stack : Stack
   property program_result : BaseType
-  property primitives : Stack
-  property prelude : Stack
   property session : Session
 
-  def initialize(programs, stack, session, primitives, prelude)
+  def initialize(programs, stack, session)
     @initial_stack = stack
-    @primitives = primitives
-    @prelude = prelude
     @session = session
     @program_result = exec_programs(programs, stack)
   end
@@ -694,8 +690,8 @@ class Interpreter
           internal_method :stdin_getc, ::STDIN.getc
 
           # Various language features
-          bind_internal_method :require, exec_require(arguments[1..-1], stack)
-          bind_internal_method :include, exec_include(arguments[1..-1], stack)
+          bind_internal_method :require, InternalFunctions.require(arguments, stack, @session, @initial_stack.file.not_nil!)
+          bind_internal_method :include, InternalFunctions.include(arguments, stack, @session, @initial_stack.file.not_nil!)
           bind_internal_method :time_ms, TNumeric.new(Time.now.epoch_ms.to_f64)
 
           # Misc. methods
@@ -714,11 +710,7 @@ class Interpreter
           internal_method :math
           internal_method :getvalue
           internal_method :setvalue
-
-          # The eval method needs access to the primitives
-          if name.value == "eval"
-            return InternalFunctions.eval(arguments, stack, @primitives, @prelude, @session)
-          end
+          bind_internal_method :eval, InternalFunctions.eval(arguments, stack, @session)
 
           raise "Internal function call to '#{name.value}' not implemented!"
         else
@@ -865,8 +857,8 @@ class Interpreter
     # we will search for an object called Numeric
     # This is defined in the classname method on CharlyTypes
     [identifier.class.to_s, "Object"].uniq.each do |identifier_name|
-      if @primitives.defined(identifier_name)
-        primitiveobject = @primitives.get(identifier_name)
+      if @session.primitives.defined(identifier_name)
+        primitiveobject = @session.primitives.get(identifier_name)
 
         # Typecheck
         if primitiveobject.is_a? TObject
@@ -1015,127 +1007,6 @@ class Interpreter
     end
 
     return TNull.new
-  end
-
-  # Require a file
-  #
-  # This is the exact same as writing include,
-  # except that the returned object is cached
-  # and the next requiring of this file will be served from that cache instead
-  def exec_require(arguments, stack)
-
-    # Check if a filename was passed
-    # The filename will be resolved relative
-    # to the directory of the current file
-    filename = arguments[0]
-    unless filename.is_a? TString
-      raise "Calls to require expect the first argument to be a string. #{filename.class} given."
-    end
-    filepath = include_file_lookup(filename.value)
-
-    # Check if this path is already cached
-    if @session.cached_require_calls.has_key?(filepath)
-
-      # Type & sanity check
-      cache = @session.cached_require_calls[filepath]
-
-      if cache.is_a?(BaseType)
-        return cache
-      else
-        return TNull.new
-      end
-    else
-      result = exec_include(arguments, stack, false)
-
-      # Save the combination in the current session
-      @session.cached_require_calls[filepath] = result
-      return result
-    end
-  end
-
-  # Include a file
-  #
-  # Loads the contents of the file
-  # The return value is the content of the *export* variable in the
-  # included file
-  def exec_include(arguments, stack, is_include = true)
-
-    # Name of the function for error messages
-    func = is_include ? "include" : "require"
-
-    # Check if a filename was passed
-    # The filename will be resolved relative
-    # to the directory of the current file
-    filename = arguments[0]
-    unless filename.is_a? TString
-      raise "Calls to #{func} expect the first argument to be a string. #{filename.class} given."
-    end
-    filepath = include_file_lookup(filename.value)
-
-    # Check that the path is readable
-    unless File.exists?(filepath) && File.readable?(filepath)
-      raise "Could not open file at #{filepath}"
-    end
-
-    # Check if the path is a file
-    if File.file?(filepath)
-
-      # Create a new file from that path
-      include_file = RealFile.new(filepath)
-
-      # Create the stack for the interpreter
-      include_stack = Stack.new(@prelude) # Top is the prelude's stack
-
-      # Create a new InterpreterFascade
-      # by passing it stack.top
-      # it still has access to all the standard library functions
-      # but doesn't have access to the current stack
-      interpreter = InterpreterFascade.new(@session, @primitives, @prelude)
-      result = interpreter.execute_file(include_file, include_stack)
-
-      return include_stack.get("export")
-    else
-      raise "Could not open file at #{filepath}"
-    end
-
-    TNull.new
-  end
-
-  # Returns the absolute filepath to *filename*
-  def include_file_lookup(filename)
-
-    # Construct the relative path
-    # by combining the current file and the file that's being included
-    currentfile = @initial_stack.file
-    unless currentfile.is_a? VirtualFile
-      raise "Could not read current file from stack."
-    end
-
-    # Resolve the filename
-    current_dir = currentfile.fulldirectorypath
-    if filename[0] == '/'
-      filepath = filename
-    else
-
-      # Check if a core module is being required
-      case filename
-      when "io"
-        filepath = ENV["CHARLYDIR"] + "/io.charly"
-      when "unit-test"
-        filepath = ENV["CHARLYDIR"] + "/unit-test.charly"
-      when "primitives"
-        filepath = ENV["CHARLYDIR"] + "/primitives/include.charly"
-      when "math"
-        filepath = ENV["CHARLYDIR"] + "/math.charly"
-      when "repl"
-        filepath = ENV["CHARLYDIR"] + "/repl.charly"
-      else
-        filepath = File.join(current_dir, filename)
-      end
-    end
-    filepath = File.expand_path(filepath) # Make it an absolute path
-
-    return filepath
   end
 
   # Returns the boolean representation of a value

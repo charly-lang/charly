@@ -6,33 +6,33 @@ let testResult = UnitTest("Charly").begin(func(describe) {
   describe("Including external files", func(it) {
 
     it("includes a file", func(assert) {
-      assert(include("external.charly").num, 25)
-      assert(include("external.charly").num, 25)
+      assert(include("./external.charly").num, 25)
+      assert(include("./external.charly").num, 25)
 
-      assert(include("external.charly").increment(0), 1)
-      assert(include("external.charly").increment(0), 1)
+      assert(include("./external.charly").increment(0), 1)
+      assert(include("./external.charly").increment(0), 1)
     })
 
     it("requires a file", func(assert) {
-      assert(require("external.charly").num, 25)
-      assert(require("external.charly").num, 25)
+      assert(require("./external.charly").num, 25)
+      assert(require("./external.charly").num, 25)
 
-      let external = require("external.charly")
+      let external = require("./external.charly")
       external.num = 50
 
-      assert(require("external.charly").num, 50)
+      assert(require("./external.charly").num, 50)
 
       # Reset for further tests
       external.num = 25
     })
 
     it("includes a file that's already required", func(assert) {
-      let external = require("external.charly")
+      let external = require("./external.charly")
       external.num = 50
 
-      assert(require("external.charly") == external, true)
-      assert(require("external.charly").num, 50)
-      assert(include("external.charly").num, 25)
+      assert(require("./external.charly") == external, true)
+      assert(require("./external.charly").num, 50)
+      assert(include("./external.charly").num, 25)
 
       # Reset for further tests
       external.num = 25
