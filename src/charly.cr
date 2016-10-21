@@ -64,6 +64,9 @@ module Charly
   primitives_stack = Stack.new(prelude_stack) # The stack that hosts the primitive classes
   userfile_stack = Stack.new(prelude_stack)
 
+  # The current session
+  session = Session.new(arguments, flags, prelude_stack, primitives_stack)
+
   # Insert ARGV, IFLAGS and ENV
   top_stack.write("ARGV", TArray.new_from_strings(arguments), declaration: true, constant: true)
   top_stack.write("IFLAGS", TArray.new_from_strings(flags), declaration: true, constant: true)

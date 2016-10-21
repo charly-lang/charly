@@ -1,6 +1,7 @@
 # The context in which all eval statements are run
 const context = {
   let $
+  const context = self
 };
 
 # Repeat until .exit is called

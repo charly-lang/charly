@@ -9,10 +9,8 @@ require "../syntax/parser/parser.cr"
 class InterpreterFascade
   property top : Stack
   property session : Session
-  property primitives : Stack
-  property prelude : Stack
 
-  def initialize(@session, @primitives, @prelude)
+  def initialize(@session)
     @top = Stack.new nil
   end
 
@@ -28,7 +26,7 @@ class InterpreterFascade
 
     # Execute the file in the interpreter
     unless @session.flags.includes? "noexec"
-      Interpreter.new([program], stack, @session, @primitives, @prelude).program_result
+      Interpreter.new([program], stack, @session).program_result
     else
       CharlyTypes::TNull.new
     end
