@@ -14,25 +14,25 @@ module Charly
   available_flags = <<-FLAGS
 
   Flags:
-      ast                              Display AST's of parsed programs
-      tokens                           Display tokens of parsed programs
+      ast                              Display the AST of the userfile
+      tokens                           Display tokens of the userfile
       noexec                           Disable execution
       noprelude                        Don't load the prelude file
-      stackdump                        Dump the top-level stack at the end of execution
+      stackdump                        Dump the userfile stack at the end of execution
   FLAGS
 
   OptionParser.parse! do |opts|
-    opts.banner = "Usage: charly [options] filename [arguments]"
+    opts.banner = "Usage: charly filename [options] [arguments]"
     opts.on("-f FLAG", "--flag FLAG", "Set a flag") { |flag|
       flags << flag
     }
-    opts.on("-h", "--help", "Show this help") {
+    opts.on("-h", "--help", "Print this help message") {
       puts opts
       puts available_flags
       exit
     }
-    opts.on("-v", "--version", "Show the version number") {
-      puts "0.0.0"
+    opts.on("-v", "--version", "Print the version number") {
+      puts "0.0.1"
       exit
     }
     opts.invalid_option {} # ignore
@@ -52,8 +52,11 @@ module Charly
     end
   end
 
+  # Create the usefile
+  userfile = RealFile.new(filename)
+
   # The current session
-  session = Session.new(arguments, flags)
+  session = Session.new(arguments, flags, userfile)
 
   # Initialise the different layers
   top_stack = Stack.new(nil)
@@ -67,10 +70,14 @@ module Charly
   top_stack.write("ENV", TObject.new_from_hash(ENV, prelude_stack), declaration: true, constant: true)
 
   # Execute the needed files
-  interpreter = InterpreterFascade.new(session, primitives_stack, prelude_stack)
-  interpreter.execute_file(RealFile.new(ENV["CHARLYDIR"] + "/prelude.charly"), prelude_stack)
-  interpreter.execute_file(RealFile.new(ENV["CHARLYDIR"] + "/primitives/include.charly"), primitives_stack)
-  interpreter.execute_file(RealFile.new(filename), userfile_stack)
+  begin
+    interpreter = InterpreterFascade.new(session, primitives_stack, prelude_stack)
+    interpreter.execute_file(RealFile.new(ENV["CHARLYDIR"] + "/prelude.charly"), prelude_stack)
+    interpreter.execute_file(RealFile.new(ENV["CHARLYDIR"] + "/primitives/include.charly"), primitives_stack)
+    interpreter.execute_file(userfile, userfile_stack)
+  rescue e : CharlyExceptions::BaseException
+    puts e
+  end
 
   # If the stackdump flag was set
   # display the userstack at the end of execution

@@ -2,35 +2,29 @@
 const context = {
   let $
 };
-context.context = context;
-
-# Input history
-const history = [];
 
 # Repeat until .exit is called
-let finished = false
 let input
 let result
-while (!finished) {
-  input = "> ".prompt().trim()
 
-  if (input == ".exit") {
-    finished = true
+while ((input = "> ".prompt()) ! ".exit\n") {
+  result = eval(input, context)
+  context.$ = result
+
+  # Different coloring based on their types
+  if (result.type() == "String") {
+    print(result.colorize(32))
+  } else if (
+    (result.type() == "Numeric") ||
+    (result.type() == "Boolean") ||
+    (result.type() == "Object") ||
+    (result.type() == "Class")) {
+
+    print(result.colorize(33))
+  } else if (result.type() == "Null") {
+    print(result.colorize(30))
   } else {
-    history.push(input)
-    result = eval(input, context)
-    context.$ = result
-
-    # Different coloring based on their types
-    if (result.type() == "String") {
-      print(result.colorize(32))
-    } else if (result.type() == "Numeric") {
-      print(result.colorize(33))
-    } else if (result.type() == "Null") {
-      print(result.colorize(30))
-    } else {
-      print(result)
-    }
+    print(result)
   }
 }
 

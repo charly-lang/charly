@@ -1,11 +1,15 @@
 require "../ast/ast.cr"
 require "../lexer/lexer.cr"
+require "../../exceptions.cr"
 require "./structure.cr"
 require "./linker.cr"
 require "../../interpreter/session.cr"
 
+require "colorize"
+
 # Parses a list of tokens into a program
 class Parser
+  include CharlyExceptions
 
   # A single production
   alias Prod = Proc(Bool)
@@ -29,10 +33,11 @@ class Parser
     @tokens.select! do |token|
       token.type != TokenType::Whitespace &&
       token.type != TokenType::Newline &&
-      token.type != TokenType::Comment
+      token.type != TokenType::Comment &&
+      token.type != TokenType::EOF
     end
 
-    if @session.flags.includes? "tokens"
+    if @session.flags.includes?("tokens") && @session.file == @file
       @tokens.each do |token|
         puts token
       end
@@ -51,16 +56,18 @@ class Parser
     block_body
 
     # Check if the whole program was parsed
-    if @next < @tokens.size - 1
+    if @next < @tokens.size
 
-      # Display the last 10 tokens that were touched by the parser
-      @tokens.select { |token|
+      # Get the offending token
+      offending_token = @tokens.select { |token|
         token.touched
-      }.last(20).each do |token|
-        puts token
-      end
+      }.last(1)[0]
 
-      raise "Could not parse #{@file.filename}"
+      # Display the offending line and the two before it
+      # Coloring the offending token red
+      location = offending_token.location
+
+      raise SyntaxError.new(location, "Unexpected token: #{offending_token.type}")
     end
 
     # Re-Structure the tree
@@ -72,7 +79,7 @@ class Parser
     linker.start
 
     # If the *--ast* cli option was passed, display the tree
-    if @session.flags.includes? "ast"
+    if @session.flags.includes?("ast") && @session.file == @file
       puts "--- AST: #{@file.filename} ---"
       puts @tree
     end
@@ -92,21 +99,21 @@ class Parser
   # Returns true if the next token is equal to *type*
   # and optionally to *value*
   # Doesn't increment the @next pointer
-  def peek_token(type, value = false, offset = 0)
+  def peek_token(type, value = false)
 
     # Check if there are any tokens left
-    if @next + offset >= @tokens.size
+    if @next >= @tokens.size
       return false
     end
 
     # Mark the token as touched
-    @tokens[@next + offset].touched = true
+    @tokens[@next].touched = true
 
     # Check for a match
     if !value.is_a?(Bool)
-      @tokens[@next + offset].type == type && @tokens[@next + offset].value == value
+      @tokens[@next].type == type && @tokens[@next].value == value
     else
-      @tokens[@next + offset].type == type
+      @tokens[@next].type == type
     end
   end
 
@@ -412,36 +419,36 @@ class Parser
     node_production(Expression, ->{
       if unary_expression
         check_each([->{
-          token(TokenType::Plus) && optional_token(TokenType::Assignment)
+          token(TokenType::Plus) && optional_token(TokenType::Assignment) && expression
         }, ->{
-          token(TokenType::Minus) && optional_token(TokenType::Assignment)
+          token(TokenType::Minus) && optional_token(TokenType::Assignment) && expression
         }, ->{
-          token(TokenType::Mult) && optional_token(TokenType::Assignment)
+          token(TokenType::Mult) && optional_token(TokenType::Assignment) && expression
         }, ->{
-          token(TokenType::Divd) && optional_token(TokenType::Assignment)
+          token(TokenType::Divd) && optional_token(TokenType::Assignment) && expression
         }, ->{
-          token(TokenType::Mod) && optional_token(TokenType::Assignment)
+          token(TokenType::Mod) && optional_token(TokenType::Assignment) && expression
         }, ->{
-          token(TokenType::Pow) && optional_token(TokenType::Assignment)
+          token(TokenType::Pow) && optional_token(TokenType::Assignment) && expression
         }, ->{
-          token(TokenType::Greater)
+          token(TokenType::Greater) && expression
         }, ->{
-          token(TokenType::Less)
+          token(TokenType::Less) && expression
         }, ->{
-          token(TokenType::LessEqual)
+          token(TokenType::LessEqual) && expression
         }, ->{
-          token(TokenType::GreaterEqual)
+          token(TokenType::GreaterEqual) && expression
         }, ->{
-          token(TokenType::Equal)
+          token(TokenType::Equal) && expression
         }, ->{
-          token(TokenType::Not)
+          token(TokenType::Not) && expression
         }, ->{
-          token(TokenType::Assignment)
+          token(TokenType::Assignment) && expression
         }, ->{
-          token(TokenType::OR)
+          token(TokenType::OR) && expression
         }, ->{
-          token(TokenType::AND)
-        }]) && expression
+          token(TokenType::AND) && expression
+        }])
         return true
       end
       return false

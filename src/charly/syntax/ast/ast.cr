@@ -1,6 +1,6 @@
 require "../../helper.cr"
-require "../../interpreter/stack/stack.cr"
 require "../../file.cr"
+require "../../interpreter/stack/stack.cr"
 
 abstract class ASTNode
   property children : Array(ASTNode)

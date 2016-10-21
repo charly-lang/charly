@@ -7,11 +7,9 @@
 
 # The Charly programming language
 
-This is my try at writing an interpreter of a dynamic language from scratch with my bare hands. It is implemented in [Crystal](https://crystal-lang.org/).
+This is my try at writing an interpreter of a dynamic language from scratch with my bare hands. It is implemented in [Crystal](https://crystal-lang.org/). It is absolutely not production-ready and is meant only for learning-purposes.
 
 # Syntax
-
-Semicolons are completely optional!
 
 __Declaring a variable__
 ```charly
@@ -140,6 +138,46 @@ print(leonard.name) # "Leonard"
 print(leonard.age) # 16
 ```
 
+# Semicolons & Parens
+
+Even though semicolons are completely optional, you should use them. For example the following two examples would be evaluated the same way:
+
+```charly
+2 test lol 2 * 2 test ()
+```
+
+```charly
+2;
+test;
+lol;
+2 * 2;
+test();
+```
+
+You can use semicolons after If and while statements:
+
+```charly
+if (true) {
+  # code
+};
+
+while (true) {
+  # code
+};
+```
+
+The parens around If and while statements are also optional:
+
+```charly
+if size < 100 {
+  # code
+}
+
+while should_exit {
+  # code
+}
+```
+
 __CLI arguments and flags__
 
 You can access flags passed to the interpreter via the global `IFLAGS` array. Flags are stored as a String.
@@ -201,7 +239,7 @@ This allows the interpreter to reuse the same object for all primitives.
 This principle applies to all language primitives. The `Array` object for example, specifies a method called `push` which inserts an element into the array.
 
 # Stack layers
-Every file, function, class, object etc. gets it's own stack layer. A stack layer is in essence just a Hashmap that has a pointer to it's parent layer. When you write `myname`, the interpreter searches the current layer for a entry for this variable. If it's not found, it searches the parent layer. If a value is not found in this structure, an exception is raised stating _'myname' is not defined_.
+Every file, function, class, object etc. gets it's own stack layer. A stack layer is in essence just a Hashmap that has a pointer to it's parent layer. When you write `myname`, the interpreter searches the current layer for a entry for this variable. If it's not found, it searches the parent layer. If a value is not found in this structure, an exception is raised stating `myname` is not defined.
 
 When you execute a file, let's say *foo.charly*, the layer structure looks like this:
 ```
@@ -236,8 +274,6 @@ foo(value)
 
 The layer structure now looks like this:
 ```
-      ^
-      |
 --------------------------
 | User file (foo.charly) |
 |                        |
@@ -295,6 +331,23 @@ print(greet()) # will print Hello leonard
 ```
 
 This currently only works on objects. If you try to extract a method like *each* from an Array this won't work. It will just result in undefined behaviour.
+
+# Syntax errors
+When the interpreter finds a syntax error, it will be nicely presented to you via the following format:
+
+```
+SyntaxError in debug.charly
+Unexpected token: Identifier
+40.
+41. const buffer = files[i].content
+42. const size = buffer.length()
+43. const offset = size - position
+44.
+45. if (offset < 25 thisfails) {
+    ~~~~~~~~~~~~~~~~^
+```
+
+The offending piece will be highlighted red. If your terminal doesn't support colors, an arrow also points to the offensive part.
 
 # OS Support
 I'm developing on macOS 10.12 so it should work without any problems on that.

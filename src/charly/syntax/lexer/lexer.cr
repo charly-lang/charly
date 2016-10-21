@@ -1,17 +1,26 @@
 require "./token.cr"
+require "./location.cr"
+require "../../exceptions.cr"
 require "../../file.cr"
 
 class Lexer
+  include CharlyExceptions
+
   property tokens : Array(Token)
-  property input : VirtualFile
+  property file : VirtualFile
   property reader : Char::Reader
   property token : Token
+  property row : Int32
+  property column : Int32
+  property last_char : Char
 
-  def initialize(input)
-    @input = input
+  def initialize(@file)
     @token = Token.new
     @tokens = [] of Token
-    @reader = Char::Reader.new @input.content
+    @reader = Char::Reader.new @file.content
+    @row = 1
+    @column = 1
+    @last_char = ' '
   end
 
   # Get the current_char
@@ -21,6 +30,13 @@ class Lexer
 
   # Get the next char
   def next_char
+    last_char = current_char
+    @column += 1
+    if last_char == '\n'
+      @row += 1
+      @column = 1
+    end
+
     @reader.next_char
   end
 
@@ -37,9 +53,11 @@ class Lexer
 
   # Resets the current token list and the current token
   def reset_token
+    @token = Token.new
     @token.type = TokenType::Unknown
     @token.value = ""
     @token.raw = ""
+    @token.location = Location.new
   end
 
   # Returns the contents of @reader.string
@@ -53,7 +71,7 @@ class Lexer
 
     # Read as many tokens as we can
     while next_token.is_a? Token
-      @tokens << @token.dup
+      @tokens << @token
 
       # Break if we reached the end of the file
       if @token.type == TokenType::EOF
@@ -68,6 +86,7 @@ class Lexer
   def next_token
     reset_token
     start = @reader.pos
+    @token.location.pos = start + 1
 
     case current_char
     when ' ', '\t'
@@ -340,6 +359,10 @@ class Lexer
     end
 
     @token.raw = string_range(start)
+    @token.location.row = @row
+    @token.location.column = @column - @token.raw.size
+    @token.location.length = @token.raw.size
+    @token.location.file = @file
     @token
   end
 
@@ -425,6 +448,11 @@ class Lexer
 
   # Consume a string literal
   def consume_string(start)
+
+    initial_row = @row
+    initial_column = @column
+    initial_pos = start
+
     start = start + 1
     io = MemoryIO.new
     while true
@@ -452,12 +480,30 @@ class Lexer
         when '"'
           io << "\""
         when '\0'
-          raise "Unterminated quoted string"
+
+          # Create a location for the presenter to show
+          loc = Location.new
+          loc.file = @file
+          loc.row = initial_row
+          loc.column = initial_column
+          loc.pos = initial_pos
+          loc.length = @reader.pos - initial_pos
+
+          raise SyntaxError.new(loc, "Unclosed string")
         end
       when '"'
         break
       when '\0'
-        raise "Unterminated quoted string"
+
+        # Create a location for the presenter to show
+        loc = Location.new
+        loc.file = @file
+        loc.row = initial_row
+        loc.column = initial_column
+        loc.pos = initial_pos
+        loc.length = @reader.pos - initial_pos
+
+        raise SyntaxError.new(loc, "Unclosed string")
       else
         io << char
       end
@@ -508,6 +554,14 @@ class Lexer
 
   # Called when a unknown token is received
   def unknown_token
-    raise "Unexpected character: #{current_char.inspect}"
+
+    # Create a location for the presenter to show
+    loc = Location.new
+    loc.file = @file
+    loc.row = @row
+    loc.column = @column
+    loc.length = 1
+
+    raise SyntaxError.new(loc, "Unexpected char '#{current_char}'")
   end
 end
