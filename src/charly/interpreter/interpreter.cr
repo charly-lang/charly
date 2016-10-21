@@ -36,10 +36,18 @@ class Interpreter
 
     begin
       exec_block(program.children[0], stack)
-    rescue Events::Return
+    rescue e : Events::Return
       raise "Invalid return statement"
-    rescue Events::Break
+    rescue e : Events::Break
       raise "Invalid break statement"
+    rescue e : Events::Exit
+      code = e.payload
+
+      if code.is_a? TNumeric
+        exit code.value.to_i
+      else
+        exit 0
+      end
     end
   end
 

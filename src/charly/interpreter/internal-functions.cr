@@ -1,6 +1,7 @@
 require "./stack/stack.cr"
 require "./types.cr"
 require "./require.cr"
+require "./event.cr"
 require "readline"
 
 # Defines all methods that are implemented in the interpreter directly
@@ -242,13 +243,7 @@ module InternalFunctions
   def exit(arguments, stack)
     arg1 = nil
     describe_args([BaseType])
-    code = arg1
-
-    if code.is_a? TNumeric
-      exit code.value.to_i
-    else
-      exit 0
-    end
+    raise Events::Exit.new(arg1)
   end
 
   # Returns the type of a literal as a string

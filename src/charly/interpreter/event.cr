@@ -19,4 +19,7 @@ module Events
 
   class Break < Event
   end
+
+  class Exit < Event
+  end
 end
