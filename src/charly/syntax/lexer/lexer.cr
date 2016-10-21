@@ -195,6 +195,23 @@ class Lexer
       end
     when 'c'
       case next_char
+      when 'a'
+        case next_char
+        when 't'
+          case next_char
+          when 'c'
+            case next_char
+            when 'h'
+              check_ident_or_keyword(TokenType::Keyword, start)
+            else
+              consume_ident(start)
+            end
+          else
+            consume_ident(start)
+          end
+        else
+          consume_ident(start)
+        end
       when 'l'
         case next_char
         when 'a'
@@ -352,6 +369,8 @@ class Lexer
           else
             consume_ident(start)
           end
+        when 'y'
+          check_ident_or_keyword(TokenType::Keyword, start)
         else
           consume_ident(start)
         end
