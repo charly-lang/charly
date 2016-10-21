@@ -347,9 +347,13 @@ class Parser
       block &&
       skip_optional_token(TokenType::Semicolon)
     }, ->{
-      return_statement
+      try_catch_statement && skip_optional_token(TokenType::Semicolon)
     }, ->{
-      break_statement
+      return_statement && skip_optional_token(TokenType::Semicolon)
+    }, ->{
+      break_statement && skip_optional_token(TokenType::Semicolon)
+    }, ->{
+      throw_statement && skip_optional_token(TokenType::Semicolon)
     })
   end
 
@@ -358,45 +362,56 @@ class Parser
       skip_token(TokenType::Keyword, "return") &&
       check_each([->{
         expression
-      }, true]) &&
-      skip_optional_token(TokenType::Semicolon)
+      }, true])
     })
   end
 
   def break_statement
     node_production(BreakStatement, ->{
-      skip_token(TokenType::Keyword, "break") &&
-      skip_optional_token(TokenType::Semicolon)
+      skip_token(TokenType::Keyword, "break")
+    })
+  end
+
+  def throw_statement
+    node_production(ThrowStatement, ->{
+      skip_token(TokenType::Keyword, "throw") &&
+      check_each([->{
+        expression
+      }, true])
+    })
+  end
+
+  def try_catch_statement
+    node_production(TryCatchStatement, ->{
+      skip_token(TokenType::Keyword, "try") &&
+      block &&
+      skip_token(TokenType::Keyword, "catch") &&
+      skip_token(TokenType::LeftParen) &&
+      optional_token(TokenType::Identifier) &&
+      skip_token(TokenType::RightParen) &&
+      block
     })
   end
 
   def if_statement
     node_production(IfStatement, ->{
-      match = false
-      if token(TokenType::Keyword, "if") &&
+      token(TokenType::Keyword, "if") &&
+      check_each([->{
+        skip_token(TokenType::LeftParen) &&
+        expression &&
+        skip_token(TokenType::RightParen)
+      }, ->{
+        expression
+      }]) &&
+      block &&
+      check_each([->{
+        token(TokenType::Keyword, "else") &&
         check_each([->{
-          skip_token(TokenType::LeftParen) &&
-          expression &&
-          skip_token(TokenType::RightParen)
+          block
         }, ->{
-          expression
-        }]) &&
-        block
-
-        # Parse the else or else if clause
-        match = check_each([->{
-          match = false
-          if token(TokenType::Keyword, "else")
-            match = check_each([->{
-              block
-            }, ->{
-              if_statement
-            }, true])
-          end
-          match
+          if_statement
         }, true])
-      end
-      match
+      }, true])
     })
   end
 
