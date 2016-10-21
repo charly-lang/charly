@@ -369,8 +369,6 @@ class Lexer
           else
             consume_ident(start)
           end
-        when 'y'
-          check_ident_or_keyword(TokenType::Keyword, start)
         else
           consume_ident(start)
         end
@@ -388,6 +386,8 @@ class Lexer
           else
             consume_ident(start)
           end
+        when 'y'
+          check_ident_or_keyword(TokenType::Keyword, start)
         else
           consume_ident(start)
         end

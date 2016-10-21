@@ -8,7 +8,7 @@ const context = {
 let input
 let result
 
-while ((input = "> ".prompt()) ! ".exit\n") {
+while ((input = "> ".prompt()) ! ".exit") {
   result = eval(input, context)
   context.$ = result
 
