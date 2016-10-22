@@ -6,26 +6,30 @@ const context = {
 
 # Repeat until .exit is called
 let input
-let result
 
 while ((input = "> ".prompt()) ! ".exit") {
-  result = eval(input, context)
-  context.$ = result
+
+  try {
+    context.$ = eval(input, context)
+  } catch (e) {
+    print(e)
+    context.$ = null
+  }
 
   # Different coloring based on their types
-  if (result.type() == "String") {
-    print(result.colorize(32))
+  if (context.$.type() == "String") {
+    print(context.$.colorize(32))
   } else if (
-    (result.type() == "Numeric") ||
-    (result.type() == "Boolean") ||
-    (result.type() == "Object") ||
-    (result.type() == "Class")) {
+    (context.$.type() == "Numeric") ||
+    (context.$.type() == "Boolean") ||
+    (context.$.type() == "Object") ||
+    (context.$.type() == "Class")) {
 
-    print(result.colorize(33))
-  } else if (result.type() == "Null") {
-    print(result.colorize(30))
+    print(context.$.colorize(33))
+  } else if (context.$.type() == "Null") {
+    print(context.$.colorize(30))
   } else {
-    print(result)
+    print(context.$)
   }
 }
 

@@ -325,14 +325,9 @@ module InternalFunctions
     # Create the interpreter fascade
     interpreter = InterpreterFascade.new(session)
 
-    # Catch exceptions
-    begin
-      result = interpreter.execute_file(EvalFile.new(source.value), context.stack)
-      return result
-    rescue e : CharlyExceptions::SyntaxError
-      puts e
-      return TNull.new
-    end
+    # We want to catch all exceptions
+    result = interpreter.execute_file(EvalFile.new(source.value), context.stack)
+    return result
   end
 
   # Return a given value from an object

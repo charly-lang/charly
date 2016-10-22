@@ -1068,18 +1068,25 @@ class Interpreter
       raise "catch_block is not a block. This is a parsing error."
     end
 
+    # The stack in which the catch block will be run in
+    catch_stack = Stack.new(stack)
+
     begin
       return exec_block(try_block, Stack.new(stack))
-    rescue e : Events::Throw
-      catch_stack = Stack.new(stack)
+    rescue e : CharlyExceptions::BaseException
+      if (name = node.exception_name).is_a? IdentifierLiteral
 
-      # Check if a name for the exception was given
+        io = MemoryIO.new
+        e.to_s(io)
+        catch_stack.write(name.value.as(String), TString.new(io.to_s), declaration: true)
+      end
+    rescue e : Events::Throw
       if (name = node.exception_name).is_a? IdentifierLiteral
         catch_stack.write(name.value.as(String), e.payload, declaration: true)
       end
-
-      return exec_block(catch_block, catch_stack)
     end
+
+    return exec_block(catch_block, catch_stack)
   end
 
   # Returns the boolean representation of a value

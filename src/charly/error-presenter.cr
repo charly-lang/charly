@@ -64,7 +64,7 @@ class ErrorPresenter
         line.each_char do |char|
 
           if column_range === c
-            output << print char.colorize(:white).back(:red)
+            output << char.colorize(:white).back(:red)
           else
             output << char
           end
