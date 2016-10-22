@@ -163,6 +163,10 @@ class Interpreter
       return exec_break_statement(node, stack)
     end
 
+    if node.is_a? ThrowStatement
+      return exec_throw_statement(node, stack)
+    end
+
     if node.is_a? NANLiteral
       return TNumeric.new(Float64::NAN)
     end
@@ -1084,7 +1088,16 @@ class Interpreter
     raise Events::Return.new(return_value)
   end
 
+  def exec_throw_statement(node, stack)
+    throw_value = TNull.new
+    if (tmp = node.expression).is_a? ASTNode
+      throw_value = exec_expression(node.expression, stack)
+    end
+
+    raise Events::Throw.new(throw_value)
+  end
+
   def exec_break_statement(node, stack)
-    raise Events::Break.new
+    raise Events::Break.new(TNull.new)
   end
 end

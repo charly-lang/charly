@@ -77,6 +77,9 @@ module Charly
     interpreter.execute_file(userfile, userfile_stack)
   rescue e : CharlyExceptions::BaseException
     puts e
+  rescue e : Events::Throw
+    puts "Uncaugt exception:"
+    puts e.payload
   end
 
   # If the stackdump flag was set

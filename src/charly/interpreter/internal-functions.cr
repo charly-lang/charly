@@ -329,7 +329,7 @@ module InternalFunctions
     begin
       result = interpreter.execute_file(EvalFile.new(source.value), context.stack)
       return result
-    rescue e
+    rescue e : CharlyExceptions::SyntaxError
       puts e
       return TNull.new
     end

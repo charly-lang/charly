@@ -8,8 +8,8 @@ module Events
     property payload : BaseType
     property catchable : Bool
 
-    def initialize(@payload = TNull.new)
-      @message = ""
+    def initialize(@payload)
+      @message = "Exception: #{self.class.name}"
       @catchable = false
     end
   end
@@ -18,6 +18,13 @@ module Events
   end
 
   class Break < Event
+  end
+
+  class Throw < Event
+    def initialize(@payload)
+      super
+      @catchable = true
+    end
   end
 
   class Exit < Event
