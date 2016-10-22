@@ -17,7 +17,6 @@ module Charly
       ast                              Display the AST of the userfile
       tokens                           Display tokens of the userfile
       noexec                           Disable execution
-      noprelude                        Don't load the prelude file
       stackdump                        Dump the userfile stack at the end of execution
   FLAGS
 
