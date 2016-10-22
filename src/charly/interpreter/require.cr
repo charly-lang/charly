@@ -1,8 +1,10 @@
 require "./session.cr"
+require "../exceptions.cr"
 require "./stack/stack.cr"
 require "../file.cr"
 
 module Charly::Interpreter::Require
+  include CharlyExceptions
   extend self
 
   CORE_MODULES = [
@@ -25,7 +27,7 @@ module Charly::Interpreter::Require
     end
 
     # filepath = File.expand_path(filepath)
-    raise "Could not load #{filename}"
+    raise RunTimeError.new("Could not load #{filename}")
   end
 
   def resolve(filename, current_dir)
@@ -46,7 +48,7 @@ module Charly::Interpreter::Require
       return filename
     end
 
-    raise "Can't find #{filename}"
+    raise RunTimeError.new("Can't find #{filename}")
   end
 
   def load_as_file(path, session, use_cache)

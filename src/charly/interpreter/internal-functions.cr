@@ -8,6 +8,7 @@ require "readline"
 # This includes print, dump, rand, various math functions, etc.
 module InternalFunctions
   include CharlyTypes
+  include CharlyExceptions
   extend self
 
   # Helper macros to describe argument types and amount
@@ -23,7 +24,7 @@ module InternalFunctions
 
     # Check for the argument count
     unless arguments.size == {{types.size}}
-      raise "#{%name} expected #{{{types.size}}} arguments, got: #{arguments.size}"
+      raise RunTimeError.new("#{%name} expected #{{{types.size}}} arguments, got: #{arguments.size}")
     end
 
     # Check argument types
@@ -32,7 +33,7 @@ module InternalFunctions
       arg{{index + 1}} = arguments[{{index}}]
 
       unless arg{{index + 1}}.is_a?({{type}})
-        raise "#{%name} expected argument #{{{index}} + 1} to be of type #{{{type}}}, got #{arguments[{{index}}].class}"
+        raise RunTimeError.new("#{%name} expected argument #{{{index}} + 1} to be of type #{{{type}}}, got #{arguments[{{index}}].class}")
       end
     {% end %}
   end
@@ -284,7 +285,7 @@ module InternalFunctions
       end
       return TArray.new(bytes)
     else
-      raise "ord expected the string to have at least 1 char in it."
+      raise RunTimeError.new("ord expected the string to have at least 1 char in it.")
     end
   end
 
@@ -309,7 +310,7 @@ module InternalFunctions
       return TNumeric.new(value.value.floor)
     end
 
-    raise "Unknown math function #{func_name.value}"
+    raise RunTimeError.new("Unknown math function #{func_name.value}")
   end
 
   def eval(arguments, stack, session)

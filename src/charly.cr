@@ -1,4 +1,5 @@
 require "./charly/file.cr"
+require "./charly/exceptions.cr"
 require "./charly/interpreter/fascade.cr"
 require "./charly/interpreter/session.cr"
 require "./charly/interpreter/types.cr"
@@ -6,6 +7,7 @@ require "option_parser"
 
 module Charly
   include CharlyTypes
+  include CharlyExceptions
 
   arguments = [] of String
   flags = [] of String
@@ -74,7 +76,7 @@ module Charly
     interpreter.execute_file(RealFile.new(ENV["CHARLYDIR"] + "/prelude.charly"), prelude_stack)
     interpreter.execute_file(RealFile.new(ENV["CHARLYDIR"] + "/primitives/include.charly"), primitives_stack)
     interpreter.execute_file(userfile, userfile_stack)
-  rescue e : CharlyExceptions::BaseException
+  rescue e : BaseException
     puts e
   rescue e : Events::Throw
     puts "Uncaugt exception:"

@@ -8,6 +8,8 @@ require "./internal-functions.cr"
 # Execute the AST by recursively traversing it's nodes
 class Interpreter
   include CharlyTypes
+  include CharlyExceptions
+
   property initial_stack : Stack
   property program_result : BaseType
   property session : Session
@@ -37,9 +39,9 @@ class Interpreter
     begin
       exec_block(program.children[0], stack)
     rescue e : Events::Return
-      raise "Invalid return statement"
+      raise RunTimeError.new("Invalid return statement")
     rescue e : Events::Break
-      raise "Invalid break statement"
+      raise RunTimeError.new("Invalid break statement")
     rescue e : Events::Exit
       code = e.payload
 
@@ -175,7 +177,7 @@ class Interpreter
       return TNumeric.new(Float64::NAN)
     end
 
-    raise "Unknown node encountered #{node} #{stack}"
+    raise RunTimeError.new("Unknown node encountered #{node} #{stack}")
   end
 
   # Initializes a variable in the current stack
@@ -232,12 +234,12 @@ class Interpreter
 
       # Only TObjects are allowed
       unless identifier.is_a?(TObject)
-        raise "#{identifier} is not an object"
+        raise RunTimeError.new("#{identifier} is not an object")
       end
 
       # Typecheck the member
       unless member.is_a?(IdentifierLiteral)
-        raise "Member node is not an identifier. You've found a bug in the interpeter."
+        raise RunTimeError.new("Member node is not an identifier. You've found a bug in the interpeter.")
       end
 
       identifier.stack.write(member.value.as(String), value, true, false)
@@ -256,7 +258,7 @@ class Interpreter
 
         # Check that there is at least 1 expression
         unless member.children.size > 0
-          raise "Missing index for array index expression"
+          raise RunTimeError.new("Missing index for array index expression")
         end
 
         # Resolve the member
@@ -267,14 +269,14 @@ class Interpreter
 
           # Out-of-bounds check
           if member.value < 0 || member.value > identifier.value.size - 1
-            raise "Index out of bounds!"
+            raise RunTimeError.new("Index out of bounds!")
           end
 
           # Write to the index
           identifier.value[member.value.to_i64] = value
           return value
         else
-          raise "Can't use #{member} in array index expression."
+          raise RunTimeError.new("Can't use #{member} in array index expression.")
         end
       end
 
@@ -347,7 +349,7 @@ class Interpreter
       return TBoolean.new(!eval_bool(right, stack))
     end
 
-    raise "Invalid operator or right-hand-side in unary expression"
+    raise RunTimeError.new("Invalid operator or right-hand-side in unary expression")
   end
 
   def exec_binary_expression(node, stack)
@@ -441,7 +443,7 @@ class Interpreter
       end
     end
 
-    raise "Invalid types or values inside binary expression"
+    raise RunTimeError.new("Invalid types or values inside binary expression")
   end
 
   # Perform a comparison
@@ -609,7 +611,7 @@ class Interpreter
         return right
       end
     else
-      raise "Unknown logical operator #{op}"
+      raise RunTimeError.new("Unknown logical operator #{op}")
     end
   end
 
@@ -746,9 +748,9 @@ class Interpreter
           internal_method :setvalue
           bind_internal_method :eval, InternalFunctions.eval(arguments, stack, @session)
 
-          raise "Internal function call to '#{name.value}' not implemented!"
+          raise RunTimeError.new("Internal function call to '#{name.value}' not implemented!")
         else
-          raise "The first argument to call_internal has to be a string."
+          raise RunTimeError.new("The first argument to call_internal has to be a string.")
         end
       else
         target = stack.get(identifier.value)
@@ -771,7 +773,7 @@ class Interpreter
         target = redirect_property(me_identifier, me_member.value.as(String), stack)
         context = me_identifier
       else
-        raise "Member node is not an identifier. You've found a bug in the interpeter."
+        raise RunTimeError.new("Member node is not an identifier. You've found a bug in the interpeter.")
       end
     else
       target = exec_expression(identifier, stack)
@@ -786,7 +788,7 @@ class Interpreter
       context = target.parent_stack.get("self") unless context
       return exec_function(target, arguments, context)
     else
-      raise "#{identifier} is not a function!"
+      raise RunTimeError.new("#{identifier} is not a function!")
     end
   end
 
@@ -808,12 +810,12 @@ class Interpreter
 
     # Sanity check
     unless member.is_a? ASTNode
-      raise "Member node is not an identifier. You've found a bug in the interpeter."
+      raise RunTimeError.new("Member node is not an identifier. You've found a bug in the interpeter.")
     end
 
     # Check if there is at least 1 item in the index expression
     unless member.children.size > 0
-      raise "Missing expression in index expression"
+      raise RunTimeError.new("Missing expression in index expression")
     end
 
     # Array index lookup
@@ -833,7 +835,7 @@ class Interpreter
         # Return the value from the index
         return identifier.value[member.value.to_i64]
       else
-        raise "Invalid type #{member.class} for array index expression"
+        raise RunTimeError.new("Invalid type #{member.class} for array index expression")
       end
     elsif identifier.is_a? TString
 
@@ -851,7 +853,7 @@ class Interpreter
         # Return the value from the index
         return TString.new(identifier.value[member.value.to_i64].to_s)
       else
-        raise "Invalid type #{member.class} for string index expression"
+        raise RunTimeError.new("Invalid type #{member.class} for string index expression")
       end
     else
 
@@ -870,7 +872,7 @@ class Interpreter
       end
     end
 
-    raise "Could not perform index expression on #{identifier}"
+    raise RunTimeError.new("Could not perform index expression on #{identifier}")
   end
 
   # Redirects a property from a literal to one of the languages primitive classes
@@ -918,7 +920,7 @@ class Interpreter
     if (parent_stack = function.parent_stack).is_a? Stack
       function_stack = Stack.new(parent_stack)
     else
-      raise "Could not find a valid stack for the function to run in. You've found a bug in the interpreter."
+      raise RunTimeError.new("Could not find a valid stack for the function to run in. You've found a bug in the interpreter.")
     end
 
     # Get the identities of the arguments that are required
@@ -948,7 +950,7 @@ class Interpreter
 
     # Check if the correct amount of arguments was passed
     if arguments.size < argument_ids.size
-      raise "Function expected #{argument_ids.size} argument(s), got #{arguments.size}"
+      raise RunTimeError.new("Function expected #{argument_ids.size} argument(s), got #{arguments.size}")
     end
 
     # Execute the block
@@ -957,7 +959,7 @@ class Interpreter
     rescue e : Events::Return
       return e.payload
     rescue e : Events::Break
-      raise "Invalid break statement"
+      raise RunTimeError.new("Invalid break statement")
     end
   end
 
@@ -978,9 +980,9 @@ class Interpreter
     begin
       exec_block(classliteral.block, object_stack)
     rescue e : Events::Return
-      raise "Invalid return statement"
+      raise RunTimeError.new("Invalid return statement")
     rescue e : Events::Break
-      raise "Invalid break statement"
+      raise RunTimeError.new("Invalid break statement")
     end
 
 
@@ -1042,7 +1044,7 @@ class Interpreter
       return TNull.new
     end
 
-    raise "Invalid literal found #{node.class}"
+    raise RunTimeError.new("Invalid literal found #{node.class}")
   end
 
   # Executes a container literal
@@ -1061,11 +1063,11 @@ class Interpreter
   def exec_try_catch(node, stack)
 
     unless (try_block = node.try_block).is_a? ASTNode
-      raise "try_block is not a block. This is a parsing error."
+      raise RunTimeError.new("try_block is not a block. This is a parsing error.")
     end
 
     unless (catch_block = node.catch_block).is_a? ASTNode
-      raise "catch_block is not a block. This is a parsing error."
+      raise RunTimeError.new("catch_block is not a block. This is a parsing error.")
     end
 
     # The stack in which the catch block will be run in
@@ -1073,7 +1075,7 @@ class Interpreter
 
     begin
       return exec_block(try_block, Stack.new(stack))
-    rescue e : CharlyExceptions::BaseException
+    rescue e : BaseException
       if (name = node.exception_name).is_a? IdentifierLiteral
 
         io = MemoryIO.new

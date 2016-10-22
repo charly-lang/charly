@@ -1,10 +1,13 @@
 require "../types.cr"
 require "../../file.cr"
+require "../../exceptions.cr"
 require "./entry.cr"
 
 # A single stack containing variables
 class Stack
   include CharlyTypes
+  include CharlyExceptions
+
   property parent : Stack?
   property file : VirtualFile?
   property values : Hash(HashKey, StackEntry)
@@ -106,12 +109,12 @@ class Stack
 
       # Check if the stack is locked
       if @locked && !force
-        raise "Can't mutate '#{key}', stack is locked!"
+        raise RunTimeError.new("Can't mutate '#{key}', stack is locked!")
       else
 
         # Check if the value already exists
         if !force && contains(key) && @values[key].locked
-          raise "Can't reinitialize constant '#{key}'"
+          raise RunTimeError.new("Can't reinitialize constant '#{key}'")
         end
 
         value = StackEntry.new(value)
@@ -125,7 +128,7 @@ class Stack
     parent = @parent
     if contains key
       if (entry = @values[key]).locked
-        raise "Can't change '#{key}', variable is a constant"
+        raise RunTimeError.new("Can't change '#{key}', variable is a constant")
       else
         @values[key] = StackEntry.new(value)
       end
@@ -133,7 +136,7 @@ class Stack
     elsif check_parent && parent.is_a?(Stack)
       return parent.write(key, value, false, true)
     else
-      raise "'#{key}' is not declared"
+      raise RunTimeError.new("'#{key}' is not declared")
     end
   end
 
@@ -150,7 +153,7 @@ class Stack
     elsif check_parent && parent.is_a? Stack
       return parent.delete(key, check_parent)
     else
-      raise "Could not delete '#{key}', not found!"
+      raise RunTimeError.new("Could not delete '#{key}', not found!")
     end
   end
 
@@ -164,7 +167,7 @@ class Stack
     elsif check_parent && parent.is_a? Stack
       return parent.get(key)
     else
-      raise "'#{key}' is not defined"
+      raise RunTimeError.new("'#{key}' is not defined")
     end
   end
 

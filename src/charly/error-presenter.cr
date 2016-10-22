@@ -12,11 +12,7 @@ class ErrorPresenter
 
   def initialize(location)
 
-    unless (file = location.file).is_a? VirtualFile
-      raise "ErrorPresenter could not find valid file"
-    end
-
-    @file = file
+    @file = location.file.not_nil!
     @row = location.row
     @column = location.column
     @pos = location.pos

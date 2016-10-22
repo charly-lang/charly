@@ -1,8 +1,11 @@
 require "../ast/ast.cr"
+require "../../exceptions.cr"
 
 # Link the nodes instance variables to their children
 # This is just for pure convenience when writing the interpreter
 class Linker
+  include CharlyExceptions
+
   property program : ASTNode
   property finished : Bool
 
@@ -15,7 +18,7 @@ class Linker
 
     # Check if a program is given
     unless @program.is_a? Program
-      raise "Not a program"
+      raise RunTimeError.new("Not a program")
     end
 
     # This should only run once

@@ -1,9 +1,12 @@
 require "../ast/ast.cr"
+require "../../exceptions.cr"
 
 # Change the structure of the program
 # e.g: Expressions that are nested twice should be resolved
 # etc.
 class Structure
+  include CharlyExceptions
+
   property program : ASTNode
   property finished : Bool
 
@@ -16,7 +19,7 @@ class Structure
 
     # Check if a program was put into the structurizer
     unless @program.is_a? Program
-      raise "Not a program"
+      raise RunTimeError.new("Not a program")
     end
 
     # Run the restructure step until finished is set to true
@@ -59,7 +62,7 @@ class Structure
       if (op = node.children[2]).is_a?(AssignmentOperator)
 
         unless (t = node.children[0]).is_a?(IdentifierLiteral)
-          raise "Invalid left side in AND assignment"
+          raise RunTimeError.new("Invalid left side in AND assignment")
         end
 
         @finished = false
