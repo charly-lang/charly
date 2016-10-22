@@ -80,6 +80,7 @@ module Charly
   rescue e : Events::Throw
     puts "Uncaugt exception:"
     puts e.payload
+    exit 1
   end
 
   # If the stackdump flag was set

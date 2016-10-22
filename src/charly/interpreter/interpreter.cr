@@ -167,6 +167,10 @@ class Interpreter
       return exec_throw_statement(node, stack)
     end
 
+    if node.is_a? TryCatchStatement
+      return exec_try_catch(node, stack)
+    end
+
     if node.is_a? NANLiteral
       return TNumeric.new(Float64::NAN)
     end
@@ -1050,6 +1054,31 @@ class Interpreter
     end
 
     return TNull.new
+  end
+
+  # Executes a block and catches any catchable exception
+  def exec_try_catch(node, stack)
+
+    unless (try_block = node.try_block).is_a? ASTNode
+      raise "try_block is not a block. This is a parsing error."
+    end
+
+    unless (catch_block = node.catch_block).is_a? ASTNode
+      raise "catch_block is not a block. This is a parsing error."
+    end
+
+    begin
+      return exec_block(try_block, Stack.new(stack))
+    rescue e : Events::Throw
+      catch_stack = Stack.new(stack)
+
+      # Check if a name for the exception was given
+      if (name = node.exception_name).is_a? IdentifierLiteral
+        catch_stack.write(name.value.as(String), e.payload, declaration: true)
+      end
+
+      return exec_block(catch_block, catch_stack)
+    end
   end
 
   # Returns the boolean representation of a value
