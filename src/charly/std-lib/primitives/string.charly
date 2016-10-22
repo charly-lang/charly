@@ -24,8 +24,7 @@ export = {
 
   # Writes self to stdout and asks for user input
   func prompt() {
-    write(self)
-    gets()
+    gets(self, true)
   }
 
   # Writes self to stdout and ask for a single char
@@ -37,8 +36,7 @@ export = {
   # Writes self to stdout and ask for user input
   # Input will be casted to a numeric
   func promptn() {
-    write(self)
-    gets().to_n()
+    gets(self, true).to_n()
   }
 
   # Return each char in a string
@@ -148,11 +146,9 @@ export = {
     let end_pos = self.length() - needle.length()
     self.each(func(char, i) {
       if (found_index == -1) {
-        if (i <= end_pos) {
-          if (i >= offset) {
-            if (self.substring(i, needle.length()) == needle) {
-              found_index = i
-            }
+        if ((i <= end_pos) && (i >= offset)) {
+          if (self.substring(i, needle.length()) == needle) {
+            found_index = i
           }
         }
       }

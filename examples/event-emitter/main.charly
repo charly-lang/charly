@@ -19,7 +19,7 @@ myEmitter.add_handler("exit", func(code) {
 # Main event loop
 let input
 while (true) {
-  input = gets().trim()
+  input = "> ".prompt().trim()
 
   if (input == "exit") {
     myEmitter.fire_event("exit", 0)

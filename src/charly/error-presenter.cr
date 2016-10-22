@@ -79,6 +79,7 @@ class ErrorPresenter
 
     # Show a nice arrow for terminals
     # that don't support coloring
+    output << '\n'
     output << " " * "#{@row}".size
     output << "  "
     (@column - 1).times do

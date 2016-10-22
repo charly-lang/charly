@@ -167,6 +167,38 @@ class Linker
       return
     end
 
+    if node.is_a? ReturnStatement
+      node.linked = true
+      if node.children.size > 0
+        node.expression = node.children[0]
+      end
+      return
+    end
+
+    if node.is_a? ThrowStatement
+      node.linked = true
+      if node.children.size > 0
+        node.expression = node.children[0]
+      end
+      return
+    end
+
+    if node.is_a? TryCatchStatement
+      node.linked = true
+
+      # Check if this is an anonymous function
+      if node.children.size == 3
+        node.try_block = node.children[0]
+        node.exception_name = node.children[1]
+        node.catch_block = node.children[2]
+      else
+        node.try_block = node.children[0]
+        node.catch_block = node.children[1]
+      end
+
+      return
+    end
+
     node
   end
 end

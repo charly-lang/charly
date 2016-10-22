@@ -69,12 +69,10 @@ export = {
 
     while (i < length) {
       if (!found) {
-        if (self[i].type() == element.type()) {
-          if (self[i] == element) {
-            index = i
-            found = true
-            i = length
-          }
+        if ((self[i].type() == element.type()) && (self[i] == element)) {
+          index = i
+          found = true
+          i = length
         }
       }
       i += 1
@@ -232,27 +230,26 @@ export = {
   # Compare an array to something else
   func __equal(other) {
 
-    # Check the type first off
     if (other.type() ! self.type()) {
-      false
-    } else if (other.type() == "Boolean") {
-      other
-    } else {
-
-      # Check the length
-      if (other.length() ! self.length()) {
-        false
-      } else {
-
-        # Iterate over the contents
-        let equal = true
-        other.each(func(e, i) {
-          if (equal) {
-            equal = e == self[i]
-          }
-        })
-        equal
-      }
+      return false
     }
+
+    if (other.type() == "Boolean") {
+      return other
+    }
+
+    # Check the length
+    if (other.length() ! self.length()) {
+      return false
+    }
+
+    # Iterate over the contents
+    let equal = true
+    other.each(func(e, i) {
+      if (equal) {
+        equal = e == self[i]
+      }
+    })
+    equal
   }
 }

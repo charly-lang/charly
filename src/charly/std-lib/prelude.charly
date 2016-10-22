@@ -30,3 +30,6 @@ const print = stdout.print
 const write = stdout.write
 const gets = stdin.gets
 const getc = stdin.getc
+
+# Exceptions
+unpack(require("./exceptions.charly"))

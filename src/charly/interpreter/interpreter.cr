@@ -2,6 +2,7 @@ require "../syntax/ast/ast.cr"
 require "./stack/stack.cr"
 require "./types.cr"
 require "./session.cr"
+require "./event.cr"
 require "./internal-functions.cr"
 
 # Execute the AST by recursively traversing it's nodes
@@ -33,7 +34,21 @@ class Interpreter
     stack.write("program", global, declaration: true, constant: true, force: true)
     stack.write("export", TNull.new, declaration: true)
 
-    exec_block(program.children[0], stack)
+    begin
+      exec_block(program.children[0], stack)
+    rescue e : Events::Return
+      raise "Invalid return statement"
+    rescue e : Events::Break
+      raise "Invalid break statement"
+    rescue e : Events::Exit
+      code = e.payload
+
+      if code.is_a? TNumeric
+        exit code.value.to_i
+      else
+        exit 0
+      end
+    end
   end
 
   # Executes *node* inside *stack*
@@ -138,6 +153,22 @@ class Interpreter
 
     if node.is_a? NullLiteral
       return TNull.new
+    end
+
+    if node.is_a? ReturnStatement
+      return exec_return_statement(node, stack)
+    end
+
+    if node.is_a? BreakStatement
+      return exec_break_statement(node, stack)
+    end
+
+    if node.is_a? ThrowStatement
+      return exec_throw_statement(node, stack)
+    end
+
+    if node.is_a? TryCatchStatement
+      return exec_try_catch(node, stack)
     end
 
     if node.is_a? NANLiteral
@@ -623,8 +654,11 @@ class Interpreter
 
     if test.is_a?(ASTNode) && consequent.is_a?(ASTNode)
       last_result = TNull.new
-      while eval_bool(exec_expression(test, stack), stack)
-        last_result = exec_block(consequent, Stack.new(stack))
+      begin
+        while eval_bool(exec_expression(test, stack), stack)
+          last_result = exec_block(consequent, Stack.new(stack))
+        end
+      rescue e : Events::Break
       end
       return last_result
     else
@@ -918,7 +952,13 @@ class Interpreter
     end
 
     # Execute the block
-    return exec_block(function.block, function_stack)
+    begin
+      return exec_block(function.block, function_stack)
+    rescue e : Events::Return
+      return e.payload
+    rescue e : Events::Break
+      raise "Invalid break statement"
+    end
   end
 
   # Create an instance of a given class
@@ -932,9 +972,17 @@ class Interpreter
 
     # Inject the self keyword into the class block
     object_stack.write("self", object, declaration: true, constant: true, force: true)
+    object_stack.write("instance_type", classliteral, declaration: true, constant: true, force: true)
 
     # Execute the class block inside the object_stack
-    exec_block(classliteral.block, object_stack)
+    begin
+      exec_block(classliteral.block, object_stack)
+    rescue e : Events::Return
+      raise "Invalid return statement"
+    rescue e : Events::Break
+      raise "Invalid break statement"
+    end
+
 
     # Search for the constructor of the class
     # and execute it in the object_stack if it was found
@@ -1009,6 +1057,31 @@ class Interpreter
     return TNull.new
   end
 
+  # Executes a block and catches any catchable exception
+  def exec_try_catch(node, stack)
+
+    unless (try_block = node.try_block).is_a? ASTNode
+      raise "try_block is not a block. This is a parsing error."
+    end
+
+    unless (catch_block = node.catch_block).is_a? ASTNode
+      raise "catch_block is not a block. This is a parsing error."
+    end
+
+    begin
+      return exec_block(try_block, Stack.new(stack))
+    rescue e : Events::Throw
+      catch_stack = Stack.new(stack)
+
+      # Check if a name for the exception was given
+      if (name = node.exception_name).is_a? IdentifierLiteral
+        catch_stack.write(name.value.as(String), e.payload, declaration: true)
+      end
+
+      return exec_block(catch_block, catch_stack)
+    end
+  end
+
   # Returns the boolean representation of a value
   def eval_bool(value, stack)
 
@@ -1034,5 +1107,27 @@ class Interpreter
       bool = value
     end
     bool
+  end
+
+  def exec_return_statement(node, stack)
+    return_value = TNull.new
+    if (tmp = node.expression).is_a? ASTNode
+      return_value = exec_expression(node.expression, stack)
+    end
+
+    raise Events::Return.new(return_value)
+  end
+
+  def exec_throw_statement(node, stack)
+    throw_value = TNull.new
+    if (tmp = node.expression).is_a? ASTNode
+      throw_value = exec_expression(node.expression, stack)
+    end
+
+    raise Events::Throw.new(throw_value)
+  end
+
+  def exec_break_statement(node, stack)
+    raise Events::Break.new(TNull.new)
   end
 end

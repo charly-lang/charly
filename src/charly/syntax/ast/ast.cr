@@ -32,7 +32,7 @@ abstract class ASTNode
 
   # Render the current node
   def to_s(io)
-    io << "#: #{self.class.name}"
+    io << "#{self.class.name}"
 
     if @value.is_a?(String | Float64 | Bool)
       io << " - #{@value}"
@@ -47,10 +47,10 @@ abstract class ASTNode
     children.each do |child|
       lines = child.to_s.each_line.each
       lines.each do |line|
-        if line[0] == '#'
-          io << line.indent(1, "├╴")
+        if !['┣', '┃'].includes?(line[0])
+          io << line.indent(1, "┣╸")
         elsif line.size > 0
-          io << line.indent(1, "│ ")
+          io << line.indent(1, "┃ ")
         end
       end
     end
@@ -184,6 +184,25 @@ end
 
 # A list of identifier seperated by commas
 class IdentifierList < ASTNode
+end
+
+# Different control structures
+class ReturnStatement < ASTNode
+  property expression : ASTNode?
+end
+
+class BreakStatement < ASTNode
+end
+
+class ThrowStatement < ASTNode
+  property expression : ASTNode?
+end
+
+# Try catch
+class TryCatchStatement < ASTNode
+  property try_block : ASTNode?
+  property exception_name : ASTNode?
+  property catch_block : ASTNode?
 end
 
 # A terminal node

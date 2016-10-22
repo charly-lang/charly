@@ -1,6 +1,8 @@
 require "./stack/stack.cr"
 require "./types.cr"
 require "./require.cr"
+require "./event.cr"
+require "readline"
 
 # Defines all methods that are implemented in the interpreter directly
 # This includes print, dump, rand, various math functions, etc.
@@ -124,7 +126,10 @@ module InternalFunctions
     end
 
     def gets(arguments, stack)
-      return TString.new(::STDIN.gets || "")
+      arg1, arg2 = nil, nil
+      InternalFunctions.describe_args([TString, TBoolean])
+      prepend, append_to_history = arg1.value, arg2.value
+      return TString.new(Readline.readline(prepend, append_to_history) || "")
     end
   end
 
@@ -215,7 +220,7 @@ module InternalFunctions
     # the value variable we got from values is an entry in the stack
     # we need to unpack the value from the value
     object.stack.not_nil!.values.each do |key, value|
-      unless key == "self"
+      unless ["self", "program", "export", "instance_type"].includes? key
         stack.parent.not_nil!.write(key, value.value, declaration: true, constant: value.locked)
       end
     end
@@ -238,13 +243,7 @@ module InternalFunctions
   def exit(arguments, stack)
     arg1 = nil
     describe_args([BaseType])
-    code = arg1
-
-    if code.is_a? TNumeric
-      exit code.value.to_i
-    else
-      exit 0
-    end
+    raise Events::Exit.new(arg1)
   end
 
   # Returns the type of a literal as a string
@@ -330,7 +329,7 @@ module InternalFunctions
     begin
       result = interpreter.execute_file(EvalFile.new(source.value), context.stack)
       return result
-    rescue e
+    rescue e : CharlyExceptions::SyntaxError
       puts e
       return TNull.new
     end

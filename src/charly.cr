@@ -17,7 +17,6 @@ module Charly
       ast                              Display the AST of the userfile
       tokens                           Display tokens of the userfile
       noexec                           Disable execution
-      noprelude                        Don't load the prelude file
       stackdump                        Dump the userfile stack at the end of execution
   FLAGS
 
@@ -77,6 +76,10 @@ module Charly
     interpreter.execute_file(userfile, userfile_stack)
   rescue e : CharlyExceptions::BaseException
     puts e
+  rescue e : Events::Throw
+    puts "Uncaugt exception:"
+    puts e.payload
+    exit 1
   end
 
   # If the stackdump flag was set

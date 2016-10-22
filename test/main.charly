@@ -978,6 +978,50 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(got, "inner box")
     })
 
+    it("does explicit returns with an argument", func(assert) {
+      func foo() {
+        return 25
+      }
+
+      assert(foo(), 25)
+    })
+
+    it("does explicit returns without argument", func(assert) {
+      func foo() {
+        return 25
+      }
+
+      assert(foo(), 25)
+    })
+
+    it("does explicit returns from an object", func(assert) {
+      let Box = {
+        func foo() {
+          return 25
+        }
+      }
+
+      assert(Box.foo(), 25)
+    })
+
+    it("does explicit returns from nested ifs", func(assert) {
+      func foo(arg) {
+        if arg <= 10 {
+          return false
+        }
+
+        return true
+      }
+
+      assert(foo(0), false)
+      assert(foo(5), false)
+      assert(foo(10), false)
+
+      assert(foo(15), true)
+      assert(foo(20), true)
+      assert(foo(25), true)
+    })
+
   })
 
   describe("Classes", func(it) {
@@ -1341,6 +1385,18 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(sum, 124750)
     })
 
+    it("breaks a loop", func(assert) {
+      let i = 0
+      while (true) {
+        if i > 99 {
+          break
+        }
+
+        i += 1
+      }
+      assert(i, 100)
+    })
+
   })
 
   describe("Misc. standard library functions", func(it) {
@@ -1499,6 +1555,62 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(Math.floor(0.00000001).close_to(0, 0), true)
       assert(Math.floor(9.01).close_to(9, 0), true)
       assert(Math.floor(-90).close_to(-90, 0), true)
+    })
+
+  })
+
+  describe("try & catch", func(it) {
+
+    it("throws an exception", func(assert) {
+      try {
+        throw Exception("Something failed")
+      } catch (e) {
+        assert(e.message, "Something failed")
+      }
+    })
+
+    it("throws primitive values", func(assert) {
+      try {
+        throw 2
+      } catch (e) {
+        assert(e, 2)
+        assert(e.type(), "Numeric")
+      }
+    })
+
+    it("stops execution of the block", func(assert) {
+      try {
+        throw 2
+        assert(true, false)
+      } catch (e) {
+        assert(e, 2)
+      }
+    })
+
+    it("throws exceptions beyond functions", func(assert) {
+      func foo() {
+        throw Exception("lol")
+      }
+
+      try {
+        foo()
+      } catch (e) {
+        assert(e.message, "lol")
+      }
+    })
+
+    it("throws exceptions inside object constructors", func(assert) {
+      class Foo {
+        func constructor() {
+          throw 2
+        }
+      }
+
+      try {
+        let a = Foo()
+      } catch (e) {
+        assert(e, 2)
+      }
     })
 
   })

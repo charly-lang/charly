@@ -171,8 +171,47 @@ class Lexer
       next_char TokenType::RightBracket
     when '\0'
       @token.type = TokenType::EOF
+    when 'b'
+      case next_char
+      when 'r'
+        case next_char
+        when 'e'
+          case next_char
+          when 'a'
+            case next_char
+            when 'k'
+              check_ident_or_keyword(TokenType::Keyword, start)
+            else
+              consume_ident(start)
+            end
+          else
+            consume_ident(start)
+          end
+        else
+          consume_ident(start)
+        end
+      else
+        consume_ident(start)
+      end
     when 'c'
       case next_char
+      when 'a'
+        case next_char
+        when 't'
+          case next_char
+          when 'c'
+            case next_char
+            when 'h'
+              check_ident_or_keyword(TokenType::Keyword, start)
+            else
+              consume_ident(start)
+            end
+          else
+            consume_ident(start)
+          end
+        else
+          consume_ident(start)
+        end
       when 'l'
         case next_char
         when 'a'
@@ -309,8 +348,52 @@ class Lexer
       else
         consume_ident(start)
       end
+    when 'r'
+      case next_char
+      when 'e'
+        case next_char
+        when 't'
+          case next_char
+          when 'u'
+            case next_char
+            when 'r'
+              case next_char
+              when 'n'
+                check_ident_or_keyword(TokenType::Keyword, start)
+              else
+                consume_ident(start)
+              end
+            else
+              consume_ident(start)
+            end
+          else
+            consume_ident(start)
+          end
+        else
+          consume_ident(start)
+        end
+      else
+        consume_ident(start)
+      end
     when 't'
       case next_char
+      when 'h'
+        case next_char
+        when 'r'
+          case next_char
+          when 'o'
+            case next_char
+            when 'w'
+              check_ident_or_keyword(TokenType::Keyword, start)
+            else
+              consume_ident(start)
+            end
+          else
+            consume_ident(start)
+          end
+        else
+          consume_ident(start)
+        end
       when 'r'
         case next_char
         when 'u'
@@ -320,6 +403,8 @@ class Lexer
           else
             consume_ident(start)
           end
+        when 'y'
+          check_ident_or_keyword(TokenType::Keyword, start)
         else
           consume_ident(start)
         end

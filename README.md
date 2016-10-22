@@ -80,11 +80,11 @@ while (i < 10) {
 __User Input__
 ```charly
 # Strings
-let input = gets()
+let input = "> ".prompt()
 print(input)
 
 # Numbers
-let input_number = gets().to_n()
+let input_number = "> ".promptn()
 print(input_number)
 ```
 
@@ -201,7 +201,7 @@ ENV.SHELL     # /bin/bash
 
 # Using the built-in REPL
 
-Currently it's not possible to use the left-arrow or right-arrow keys to position your cursor. I know this sucks and I will change it in the future.
+You can use the arrow keys to navigate the cursor. Up and down will scroll through the history.
 
 ```
 $ charly repl
@@ -371,7 +371,6 @@ Flags:
     ast                              Display the AST of the userfile
     tokens                           Display tokens of the userfile
     noexec                           Disable execution
-    noprelude                        Don't load the prelude file
     stackdump                        Dump the userfile stack at the end of execution
 ```
 
