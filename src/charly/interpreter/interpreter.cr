@@ -972,6 +972,7 @@ class Interpreter
 
     # Inject the self keyword into the class block
     object_stack.write("self", object, declaration: true, constant: true, force: true)
+    object_stack.write("instance_type", classliteral, declaration: true, constant: true, force: true)
 
     # Execute the class block inside the object_stack
     begin

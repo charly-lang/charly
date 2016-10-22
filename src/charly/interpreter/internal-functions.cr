@@ -220,7 +220,7 @@ module InternalFunctions
     # the value variable we got from values is an entry in the stack
     # we need to unpack the value from the value
     object.stack.not_nil!.values.each do |key, value|
-      unless ["self", "program", "export"].includes? key
+      unless ["self", "program", "export", "instance_type"].includes? key
         stack.parent.not_nil!.write(key, value.value, declaration: true, constant: value.locked)
       end
     end
