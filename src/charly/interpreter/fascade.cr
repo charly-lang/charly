@@ -4,9 +4,11 @@ require "./interpreter.cr"
 require "./session.cr"
 
 # Parsing
-require "../syntax/parser/parser.cr"
+require "../syntax/parser.cr"
 
 class InterpreterFascade
+  include Charly::Parser
+
   property top : Stack
   property session : Session
 
@@ -26,7 +28,7 @@ class InterpreterFascade
 
     # Execute the file in the interpreter
     unless @session.flags.includes? "noexec"
-      Interpreter.new([program], stack, @session).program_result
+      # Interpreter.new([program], stack, @session).program_result
     else
       CharlyTypes::TNull.new
     end

@@ -1,4 +1,4 @@
-require "./syntax/lexer/location.cr"
+require "./syntax/location.cr"
 require "./error-presenter.cr"
 
 module CharlyExceptions

@@ -1,5 +1,5 @@
 require "colorize"
-require "./syntax/lexer/location.cr"
+require "./syntax/location.cr"
 
 class ErrorPresenter
 
@@ -11,7 +11,6 @@ class ErrorPresenter
   property length : Int32
 
   def initialize(location)
-
     @file = location.file.not_nil!
     @row = location.row
     @column = location.column
@@ -33,6 +32,7 @@ class ErrorPresenter
     io = MemoryIO.new(@file.content)
     ln = 1
     io.each_line do |line|
+      line = line.strip
 
       # Skip over lines we don't want to print
       unless print_range === ln
@@ -44,6 +44,11 @@ class ErrorPresenter
       # we want to print, break
       if ln > @row
         break
+      end
+
+      # Print a newline, except for the first line
+      unless ln == 1
+        output << '\n'
       end
 
       # Print the line number

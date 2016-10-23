@@ -1,7 +1,7 @@
 require "./token.cr"
 require "./location.cr"
-require "../../exceptions.cr"
-require "../../file.cr"
+require "../exceptions.cr"
+require "../file.cr"
 
 class Lexer
   include CharlyExceptions

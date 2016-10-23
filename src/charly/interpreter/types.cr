@@ -1,7 +1,8 @@
-require "../syntax/ast/ast.cr"
+require "../syntax/ast.cr"
 require "./stack/stack.cr"
 
 module CharlyTypes
+  include Charly::Parser::AST
 
   # Internal representations of the types
   alias HashKey = String

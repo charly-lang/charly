@@ -54,7 +54,7 @@ module Charly::Parser
       end
 
       # Parse a block body
-      @tree << block_body
+      @tree << parse_block_body
 
       # Print the tree if the ast flag was set
       if @session.flags.includes?("ast") && @session.file == @file
@@ -72,7 +72,7 @@ module Charly::Parser
     # Returns the next token
     def peek?
       if @pos + 1 >= @tokens.size
-        unexpected_eof
+        return unexpected_eof
       end
 
       @tokens[@pos + 1]
@@ -81,12 +81,11 @@ module Charly::Parser
     # Advances the pointer to the next token
     def advance?
       if @pos + 1 >= @tokens.size
-        unexpected_eof
+        return unexpected_eof
       end
 
       @pos += 1
       @token = @tokens[@pos]
-      @tokens[@pos - 1]
     end
 
     # Throws a SyntaxError
@@ -95,21 +94,65 @@ module Charly::Parser
     end
 
     def unexpected_eof
-      raise SyntaxError.new(@token.location, "Unexpected EOF")
+      new_token = Token.new(TokenType::EOF)
+      new_token.location = @token.location.dup
+      new_token.location.column += new_token.location.length - 1
+      new_token.location.length = 0
+
+      @token = new_token
+      @pos += 1
+
+      return new_token
     end
 
-    def productions(*prods : Proc(ASTNode | Bool))
+    # Tries all productions
+    # Catches SyntaxErrors
+    # The first production that succeeds will be returned
+    # If no production succeeded this will raise the last
+    # SyntaxError thrown by the productions
+    def try(*prods : Proc(ASTNode | Bool))
+      start_pos = @pos
+      result = nil
 
+      prods.each_with_index do |prod, index|
+        begin
+          result = prod.call
+          break
+        rescue e : SyntaxError
+          if index == prods.last
+            raise e
+          end
+
+          @pos = start_pos
+          @token = @tokens[@pos]
+        end
+      end
+
+      if result.is_a?(Nil)
+        raise "fail"
+      end
+
+      return result
+    end
+
+    def optional(*prods)
+      begin
+        return try(*prods)
+      rescue e : SyntaxError
+        return Empty.new
+      end
     end
 
     # Parses a block body surrounded by Curly Braces
-    def block
+    def parse_block
       case @token.type
       when TokenType::LeftCurly
-        body = block_body
+        advance?
+        body = parse_block_body
 
         case advance?.type
         when TokenType::RightCurly
+          advance?
           return body
         else
           unexpected_token
@@ -120,353 +163,100 @@ module Charly::Parser
     end
 
     # Parses the body of a block
-    def block_body
+    def parse_block_body
       exps = [] of ASTNode
 
-      until @token.type == TokenType::RightCurly
-        exps << statement
+      until (@token.type == TokenType::RightCurly) || (@token.type == TokenType::EOF)
+        exps << parse_statement
       end
 
       return Block.new(exps)
     end
 
-    def statement
+    def parse_statement
       case @token.type
-    end
+      when TokenType::Keyword
+        case @token.value
+        when "let"
+          case advance?.type
+          when TokenType::Identifier
+            identifier = IdentifierLiteral.new(@token.value)
 
-    def statement
-      node_production(Statement, ->{
-        match = false
-        if token(TokenType::Keyword, "let") && token(TokenType::Identifier)
-          match = check_each([->{
-            token(TokenType::Assignment) && expression && skip_optional_token(TokenType::Semicolon)
-          }, ->{
-            skip_optional_token(TokenType::Semicolon)
-          }])
-        end
-        match
-      }, ->{
-        token(TokenType::Keyword, "const") &&
-        token(TokenType::Identifier) &&
-        token(TokenType::Assignment) &&
-        expression &&
-        skip_optional_token(TokenType::Semicolon)
-      }, ->{
-        expression && skip_optional_token(TokenType::Semicolon)
-      }, ->{
-        if_statement && skip_optional_token(TokenType::Semicolon)
-      }, ->{
-        token(TokenType::Keyword, "while") &&
-        check_each([->{
-          skip_token(TokenType::LeftParen) &&
-          expression &&
-          skip_token(TokenType::RightParen)
-        }, ->{
-          expression
-        }]) &&
-        block &&
-        skip_optional_token(TokenType::Semicolon)
-      }, ->{
-        try_catch_statement && skip_optional_token(TokenType::Semicolon)
-      }, ->{
-        return_statement && skip_optional_token(TokenType::Semicolon)
-      }, ->{
-        break_statement && skip_optional_token(TokenType::Semicolon)
-      }, ->{
-        throw_statement && skip_optional_token(TokenType::Semicolon)
-      })
-    end
+            case advance?.type
+            when TokenType::Semicolon
+              advance?
+              return VariableDeclaration.new(identifier)
+            when TokenType::Assignment
+              advance?
+              value = parse_expression
 
-    def return_statement
-      node_production(ReturnStatement, ->{
-        skip_token(TokenType::Keyword, "return") &&
-        check_each([->{
-          expression
-        }, true])
-      })
-    end
+              if @token.type == TokenType::Semicolon
+                advance?
+              end
 
-    def break_statement
-      node_production(BreakStatement, ->{
-        skip_token(TokenType::Keyword, "break")
-      })
-    end
-
-    def throw_statement
-      node_production(ThrowStatement, ->{
-        skip_token(TokenType::Keyword, "throw") &&
-        check_each([->{
-          expression
-        }, true])
-      })
-    end
-
-    def try_catch_statement
-      node_production(TryCatchStatement, ->{
-        skip_token(TokenType::Keyword, "try") &&
-        block &&
-        skip_token(TokenType::Keyword, "catch") &&
-        skip_token(TokenType::LeftParen) &&
-        optional_token(TokenType::Identifier) &&
-        skip_token(TokenType::RightParen) &&
-        block
-      })
-    end
-
-    def if_statement
-      node_production(IfStatement, ->{
-        token(TokenType::Keyword, "if") &&
-        check_each([->{
-          skip_token(TokenType::LeftParen) &&
-          expression &&
-          skip_token(TokenType::RightParen)
-        }, ->{
-          expression
-        }]) &&
-        block &&
-        check_each([->{
-          token(TokenType::Keyword, "else") &&
-          check_each([->{
-            block
-          }, ->{
-            if_statement
-          }, true])
-        }, true])
-      })
-    end
-
-    def expression_list
-      node_production(ExpressionList, ->{
-        match = false
-        if expression
-          match = check_each([->{
-            found_at_least_one = false
-
-            # We are peeking before because we are expanding two different nodes
-            while peek_token(TokenType::Comma) && skip_token(TokenType::Comma) && expression
-              found_at_least_one = true unless found_at_least_one
+              return VariableInitialisation.new(identifier, value)
+            else
+              return VariableDeclaration.new(identifier)
             end
-            found_at_least_one
-          }, true])
-        end
-        match
-      }, true)
-    end
+          else
+            unexpected_token
+          end
+        when "const"
+          case advance?.type
+          when TokenType::Identifier
+            identifier = IdentifierLiteral.new(@token.value)
 
-    def identifier_list
-      node_production(IdentifierList, ->{
-        match = false
-        if token(TokenType::Identifier)
-          match = check_each([->{
-            found_at_least_one = false
+            case advance?.type
+            when TokenType::Assignment
+              advance?
+              value = parse_expression
 
-            # We are peeking before because we are expanding two different nodes
-            while peek_token(TokenType::Comma) && skip_token(TokenType::Comma) && token(TokenType::Identifier)
-              found_at_least_one = true unless found_at_least_one
+              if @token.type == TokenType::Semicolon
+                advance?
+              end
+
+              return ConstantInitialisation.new(identifier, value)
+            else
+              unexpected_token
             end
-            found_at_least_one
-          }, true])
+          else
+            unexpected_token
+          end
+        when "if"
+        when "while"
+        when "try"
+        when "return"
+          advance?
+          return ReturnStatement.new(optional ->{parse_expression})
+        when "break"
+          advance?
+          return BreakStatement.new
+        when "throw"
+          advance?
+          return ThrowStatement.new(optional ->{parse_expression})
+        else
+          begin
+            return parse_expression
+          rescue e : SyntaxError
+            unexpected_token
+          end
         end
-        match
-      }, true)
+      else
+        unexpected_token
+      end
+
+      unexpected_token
     end
 
-    def expression
-      node_production(Expression, ->{
-        if unary_expression
-          check_each([->{
-            token(TokenType::Plus) && optional_token(TokenType::Assignment) && expression
-          }, ->{
-            token(TokenType::Minus) && optional_token(TokenType::Assignment) && expression
-          }, ->{
-            token(TokenType::Mult) && optional_token(TokenType::Assignment) && expression
-          }, ->{
-            token(TokenType::Divd) && optional_token(TokenType::Assignment) && expression
-          }, ->{
-            token(TokenType::Mod) && optional_token(TokenType::Assignment) && expression
-          }, ->{
-            token(TokenType::Pow) && optional_token(TokenType::Assignment) && expression
-          }, ->{
-            token(TokenType::Greater) && expression
-          }, ->{
-            token(TokenType::Less) && expression
-          }, ->{
-            token(TokenType::LessEqual) && expression
-          }, ->{
-            token(TokenType::GreaterEqual) && expression
-          }, ->{
-            token(TokenType::Equal) && expression
-          }, ->{
-            token(TokenType::Not) && expression
-          }, ->{
-            token(TokenType::Assignment) && expression
-          }, ->{
-            token(TokenType::OR) && expression
-          }, ->{
-            token(TokenType::AND) && expression
-          }])
-          return true
-        end
-        return false
-      })
-    end
-
-    def unary_expression
-      node_production(UnaryExpression, ->{
-        check_each([->{
-          token(TokenType::Minus) && term
-        }, ->{
-          token(TokenType::Not) && unary_expression
-        }, ->{
-          term
-        }])
-      })
-    end
-
-    def term
-      node_production(Expression, ->{
-        token(TokenType::Numeric) && consume_postfix
-      }, ->{
-        token(TokenType::String) && consume_postfix
-      }, ->{
-        token(TokenType::Boolean) && consume_postfix
-      }, ->{
-        token(TokenType::Null) && consume_postfix
-      }, ->{
-        token(TokenType::NAN) && consume_postfix
-      }, ->{
-        token(TokenType::Identifier) && consume_postfix
-      }, ->{
-        group
-      }, ->{
-        array_literal && consume_postfix
-      }, ->{
-        function_literal && consume_postfix
-      }, ->{
-        class_literal && consume_postfix
-      }, ->{
-        container_literal && consume_postfix
-      })
-    end
-
-    def term
+    def parse_expression
       case @token.type
-
-    end
-
-    def group
-      node_production(Group, ->{
-        skip_token(TokenType::LeftParen) &&
-        expression &&
-        skip_token(TokenType::RightParen) && consume_postfix
-      })
-    end
-
-    def function_literal
-      node_production(FunctionLiteral, ->{
-        token(TokenType::Keyword, "func") &&
-        optional_token(TokenType::Identifier) &&
-        skip_token(TokenType::LeftParen) &&
-        identifier_list &&
-        skip_token(TokenType::RightParen) &&
-        block
-      })
-    end
-
-    def array_literal
-      node_production(ArrayLiteral, ->{
-        skip_token(TokenType::LeftBracket) &&
-        expression_list &&
-        skip_token(TokenType::RightBracket)
-      })
-    end
-
-    def class_literal
-      node_production(ClassLiteral, ->{
-        token(TokenType::Keyword, "class") &&
-        optional_token(TokenType::Identifier) &&
-        block
-      })
-    end
-
-    def container_literal
-      node_production(ContainerLiteral, ->{
-        block
-      })
-    end
-
-    # Alias for consume_call_expression && consume_member_expression
-    def consume_postfix
-      consume_call_expression && consume_member_expression && consume_index_expression
-    end
-
-    def consume_call_expression
-      if peek_token(TokenType::LeftParen)
-        node_save = @node
-        children_save = @node.children.dup
-        @node.children.clear
-        @node = @node.parent
-
-        match = node_production(CallExpression, ->{
-          left_side = node_save.class.new(node_save.parent)
-          left_side.children = children_save
-          @node << left_side
-
-          skip_token(TokenType::LeftParen) &&
-          expression_list &&
-          skip_token(TokenType::RightParen) &&
-          consume_postfix
-        })
-        @node = node_save
-        return match
+      when TokenType::Numeric
+        node = NumericLiteral.new(@token.value.to_f64)
+        advance?
+        return node
+      else
+        unexpected_token
       end
-      true
-    end
-
-    def consume_member_expression
-      if peek_token(TokenType::Point)
-        node_save = @node
-        children_save = @node.children.dup
-        @node.children.clear
-        @node = @node.parent
-
-        match = node_production(MemberExpression, ->{
-          left_side = node_save.class.new(node_save.parent)
-          left_side.children = children_save
-          @node << left_side
-
-          skip_token(TokenType::Point) &&
-          token(TokenType::Identifier) &&
-          consume_postfix
-        })
-        @node = node_save
-        return match
-      end
-      true
-    end
-
-    def consume_index_expression
-      if peek_token(TokenType::LeftBracket)
-        node_save = @node
-        children_save = @node.children.dup
-        @node.children.clear
-        @node = @node.parent
-
-        match = node_production(IndexExpression, ->{
-          left_side = node_save.class.new(node_save.parent)
-          left_side.children = children_save
-          @node << left_side
-
-          skip_token(TokenType::LeftBracket) &&
-          expression_list &&
-          skip_token(TokenType::RightBracket) &&
-          consume_postfix
-        })
-        @node = node_save
-        return match
-      end
-      true
     end
   end
-
 end

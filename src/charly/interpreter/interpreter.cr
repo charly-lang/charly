@@ -1,4 +1,4 @@
-require "../syntax/ast/ast.cr"
+require "../syntax/ast.cr"
 require "./stack/stack.cr"
 require "./types.cr"
 require "./session.cr"

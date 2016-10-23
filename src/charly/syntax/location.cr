@@ -8,12 +8,7 @@ class Location
   property passed_return : Bool
   property file : VirtualFile?
 
-  def initialize
-    @pos = 0
-    @row = 0
-    @column = 0
-    @length = 0
-    @passed_return = false
+  def initialize(@pos = 0, @row = 0, @column = 0, @length = 0, @passed_return = false)
   end
 
   def to_s(io)

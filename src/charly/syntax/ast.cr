@@ -1,13 +1,31 @@
-require "../../helper.cr"
-require "../../file.cr"
-require "../../interpreter/stack/stack.cr"
+require "../helper.cr"
+require "../file.cr"
+require "./location.cr"
+require "../interpreter/stack/stack.cr"
 
 module Charly::Parser::AST
   abstract class ASTNode
     property children : Array(ASTNode)
 
+    # The location where this node begins
+    property! location : Location?
+
+    # The location where this node ends
+    property! location_end : Location?
+
     def initialize
       @children = [] of ASTNode
+    end
+
+    def at(start)
+      @location = start
+      return self
+    end
+
+    def at(from start, to end)
+      @location = start
+      @end = end
+      return self
     end
 
     # Appends *node* to the children of this node
@@ -30,10 +48,10 @@ module Charly::Parser::AST
 
     # Render the current node
     def to_s(io)
-      io << "#{self.class.name}"
+      io << "#{self.class.name.split("::").last}"
 
-      if @children.size > 0
-        io << " - #{@children.size} children"
+      if size > 0
+        io << " - #{size} children"
       end
 
       io << "\n"
@@ -51,187 +69,197 @@ module Charly::Parser::AST
     end
   end
 
-  macro ast_node(name, parent, properties)
-    class {{name}} < {{parent}}
-      {% for prop in properties %}
-        property {{prop}}
+  macro ast_node(name, *properties)
+    class {{name.id}} < ASTNode
+      {% for property in properties %}
+        {% if property.is_a?(Assign) %}
+          property {{property.target.id}}
+        {% elsif property.is_a?(TypeDeclaration) %}
+          property {{property.var}} : {{property.type}}
+        {% else %}
+          property :{{property.id}}
+        {% end %}
       {% end %}
 
       {% if properties.size == 0 %}
-        def initialize(@children : Array(ASTNode))
+        def initialize(@children = [] of ASTNode)
         end
       {% else %}
-        def initialize({{properties.argify}})
-          {% for prop in properties %}
-            @{{prop.var}} = {{prop.var}}
-          {% end %}
+        def initialize({{
+          *properties.map do |field|
+            "@#{field.id}".id
+          end
+        }})
+          @children = [{{
+            *properties.map do |field|
+              field.var
+            end
+          }}] of ASTNode
         end
       {% end %}
+
+      {{yield}}
     end
   end
+
+  ast_node Empty
+  ast_node Program
+  ast_node Block
+  ast_node Statement
+
+  ast_node IfStatement,
+    test : ASTNode,
+    consequent : Block,
+    alternate : ASTNode
+
+  ast_node WhileStatement,
+    test : ASTNode,
+    consequent : Block
+
+  ast_node Group
+  ast_node Expression
+
+  ast_node UnaryExpression,
+    operator : ASTNode,
+    right : ASTNode
+
+  ast_node BinaryExpression,
+    operator : ASTNode,
+    left : ASTNode,
+    right : ASTNode
+
+  ast_node ComparisonExpression,
+    operator : ASTNode,
+    left : ASTNode,
+    right : ASTNode
+
+  ast_node LogicalExpression,
+    operator : ASTNode,
+    left : ASTNode,
+    right : ASTNode
+
+  ast_node VariableDeclaration,
+    identifier : IdentifierLiteral
+
+  ast_node VariableInitialisation,
+    identifier : IdentifierLiteral,
+    expression : ASTNode
+
+  ast_node ConstantInitialisation,
+    identifier : IdentifierLiteral,
+    expression : ASTNode
+
+  ast_node VariableAssignment,
+    identifier : ASTNode,
+    expression : ASTNode
+
+  ast_node ClassLiteral,
+    block : Block
+
+  ast_node CallExpression,
+    identifier : ASTNode,
+    argumentlist : ExpressionList
+
+  ast_node MemberExpression,
+    identifier : ASTNode,
+    member : IdentifierLiteral
+
+  ast_node IndexExpression,
+    identifier : ASTNode,
+    member : ASTNode
+
+  ast_node ExpressionList
+  ast_node IdentifierList
+
+  ast_node ReturnStatement,
+    expression : ASTNode
+
+  ast_node ThrowStatement,
+    expression : ASTNode
+
+  ast_node BreakStatement
+
+  ast_node TryCatchStatement,
+    try_block : Block,
+    exception_name : IdentifierLiteral,
+    catch_block : Block
+
+  ast_node NullLiteral
+  ast_node NANLiteral
+  ast_node IdentifierLiteral,
+    name : String do
+      def initialize(@name : String)
+        @children = [] of ASTNode
+      end
+    end
+
+  ast_node StringLiteral,
+    value : String do
+      def initialize(@value : String)
+        @children = [] of ASTNode
+      end
+    end
+
+  ast_node NumericLiteral,
+    value : Float64 do
+      def initialize(@value : Float64)
+        @children = [] of ASTNode
+      end
+    end
+
+  ast_node KeywordLiteral,
+    name : String do
+      def initialize(@name : String)
+        @children = [] of ASTNode
+      end
+    end
+
+  ast_node BooleanLiteral,
+    value : Bool do
+      def initialize(@value : Bool)
+        @children = [] of ASTNode
+      end
+    end
+
+  ast_node ArrayLiteral
+
+  ast_node FunctionLiteral,
+    argumentlist : IdentifierList,
+    block : Block
+
+  ast_node ContainerLiteral,
+    block : Block
+
+  ast_node LeftParenLiteral
+  ast_node RightParenLiteral
+  ast_node LeftCurlyLiteral
+  ast_node RightCurlyLiteral
+  ast_node LeftBracketLiteral
+  ast_node RightBracketLiteral
+
+  # Punctuators
+  ast_node SemicolonLiteral
+  ast_node CommaLiteral
+  ast_node PointLiteral
+
+  # Operators
+  ast_node AssignmentOperator
+  ast_node PlusOperator
+  ast_node MinusOperator
+  ast_node MultOperator
+  ast_node DivdOperator
+  ast_node ModOperator
+  ast_node PowOperator
+
+  # Comparisons
+  ast_node LessOperator
+  ast_node GreaterOperator
+  ast_node LessEqualOperator
+  ast_node GreaterEqualOperator
+  ast_node EqualOperator
+  ast_node NotOperator
+
+  # Logical Operators
+  ast_node ANDOperator
+  ast_node OROperator
 end
-
-ast_node Empty, ASTNode, []
-ast_node Program, ASTNode, []
-ast_node Block, ASTNode, []
-ast_node Statement, ASTNode, []
-
-ast_node IfStatement, ASTNode, [
-  test : ASTNode,
-  consequent : Block,
-  alternate : ASTNode
-]
-
-ast_node WhileStatement, ASTNode, [
-  test : ASTNode,
-  consequent : Block
-]
-
-ast_node Group, ASTNode, []
-ast_node Expression, ASTNode, []
-
-ast_node UnaryExpression, ASTNode, [
-  operator : ASTNode,
-  right : ASTNode
-]
-
-ast_node BinaryExpression, ASTNode, [
-  operator : ASTNode,
-  left : ASTNode,
-  right : ASTNode
-]
-
-ast_node ComparisonExpression, ASTNode, [
-  operator : ASTNode,
-  left : ASTNode,
-  right : ASTNode
-]
-
-ast_node LogicalExpression, ASTNode, [
-  operator : ASTNode,
-  left : ASTNode,
-  right : ASTNode
-]
-
-ast_node VariableDeclaration, ASTNode, [
-  identifier : Identifier
-]
-
-ast_node VariableInitialisation, ASTNode, [
-  identifier : Identifier,
-  expression : ASTNode
-]
-
-ast_node ConstantInitialisation, ASTNode, [
-  identifier : Identifier,
-  expression : ASTNode
-]
-
-ast_node VariableAssignment, ASTNode, [
-  identifier : ASTNode,
-  expression : ASTNode
-]
-
-ast_node ClassLiteral, ASTNode, [
-  block : Block
-]
-
-ast_node CallExpression, ASTNode, [
-  identifier : ASTNode,
-  argumentlist : ExpressionList
-]
-
-ast_node MemberExpression, ASTNode, [
-  identifier : ASTNode,
-  member : Identifier
-]
-
-ast_node IndexExpression, ASTNode, [
-  identifier : ASTNode,
-  member : ASTNode
-]
-
-ast_node ExpressionList, ASTNode, []
-ast_node IdentifierList, ASTNode, []
-
-ast_node ReturnStatement, ASTNode, [
-  expression : ASTNode
-]
-
-ast_node ThrowStatement, ASTNode, [
-  expression : ASTNode
-]
-
-ast_node BreakStatement, ASTNode, []
-
-ast_node TryCatchStatement, ASTNode, [
-  try_block : Block,
-  exception_name : Identifier,
-  catch_block : Block
-]
-
-ast_node NullLiteral, ASTNode, []
-ast_node NANLiteral, ASTNode, []
-ast_node IdentifierLiteral, ASTNode, [
-  name : String
-]
-
-ast_node StringLiteral, ASTNode, [
-  value : String
-]
-
-ast_node NumericLiteral, ASTNode, [
-  value : Float64
-]
-
-ast_node KeywordLiteral, ASTNode, [
-  name : String
-]
-
-ast_node BooleanLiteral, ASTNode, [
-  value : Bool
-]
-
-ast_node ArrayLiteral, ASTNode, []
-
-ast_node FunctionLiteral, ASTNode, [
-  argumentlist : IdentifierList,
-  block : Block
-]
-
-ast_node ContainerLiteral, ASTNode, [
-  block : Block
-]
-
-ast_node LeftParenLiteral, ASTNode, []
-ast_node RightParenLiteral, ASTNode, []
-ast_node LeftCurlyLiteral, ASTNode, []
-ast_node RightCurlyLiteral, ASTNode, []
-ast_node LeftBracketLiteral, ASTNode, []
-ast_node RightBracketLiteral, ASTNode, []
-
-# Punctuators
-ast_node SemicolonLiteral, ASTNode, []
-ast_node CommaLiteral, ASTNode, []
-ast_node PointLiteral, ASTNode, []
-
-# Operators
-ast_node AssignmentOperator, ASTNode, []
-ast_node PlusOperator, ASTNode, []
-ast_node MinusOperator, ASTNode, []
-ast_node MultOperator, ASTNode, []
-ast_node DivdOperator, ASTNode, []
-ast_node ModOperator, ASTNode, []
-ast_node PowOperator, ASTNode, []
-
-# Comparisons
-ast_node LessOperator, ASTNode, []
-ast_node GreaterOperator, ASTNode, []
-ast_node LessEqualOperator, ASTNode, []
-ast_node GreaterEqualOperator, ASTNode, []
-ast_node EqualOperator, ASTNode, []
-ast_node NotOperator, ASTNode, []
-
-# Logical Operators
-ast_node ANDOperator, ASTNode, []
-ast_node OROperator, ASTNode, []
