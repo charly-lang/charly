@@ -296,7 +296,7 @@ module Charly::Parser
         begin
           expression = parse_expression
 
-          assure_token TokenType::Semicolon do
+          if_token TokenType::Semicolon do
             advance
           end
 
