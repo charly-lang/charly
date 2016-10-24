@@ -310,6 +310,10 @@ module InternalFunctions
       return TNumeric.new(value.value.floor)
     end
 
+    if func_name.value == "rand"
+      return TNumeric.new(rand)
+    end
+
     raise RunTimeError.new("Unknown math function #{func_name.value}")
   end
 

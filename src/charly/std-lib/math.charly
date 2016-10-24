@@ -28,4 +28,6 @@ export = {
   func floor(value) { call_internal("math", "floor", value) }
 
   func log(value) { call_internal("math", "log", value) }
+
+  func rand() { call_internal("math", "rand", 0) }
 }
