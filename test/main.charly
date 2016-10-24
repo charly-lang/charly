@@ -582,6 +582,15 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(["hello", -25.9, "test", [1, 2]].join(""), "hello-25.9test[1, 2]")
     })
 
+    it("gives back a range from an array", func(assert) {
+      assert([1, 2, 3, 4].range(0, 2), [1, 2])
+      assert([1, 2, 3, 4].range(2, 4), [3, 4])
+      assert([1, 2, 3, 4].range(4, 0), [1, 2, 3, 4])
+      assert([1, 2, 3, 4].range(0, 0), [])
+      assert([1, 2, 3, 4].range(0, 500), [1, 2, 3, 4])
+      assert([].range(0, 1), [])
+    })
+
   })
 
   describe("Numerics", func(it) {
@@ -605,11 +614,11 @@ let testResult = UnitTest("Charly").begin(func(describe) {
 
     it("calls downto", func(assert) {
       let sum = 0
-      10.downto(0, func(n) {
+      10.downto(1, func(n) {
         sum += n
       })
 
-      assert(sum, 55)
+      assert(sum, 54)
     })
 
     it("calls upto", func(assert) {
@@ -618,7 +627,7 @@ let testResult = UnitTest("Charly").begin(func(describe) {
         sum += n
       })
 
-      assert(sum, 45)
+      assert(sum, 35)
     })
 
   })

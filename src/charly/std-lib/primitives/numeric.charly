@@ -17,13 +17,9 @@ export = {
   # 5.downto(2, func(i) {})
   # will receive: 5, 4, 3, 2
   func downto(num, callback) {
-    if (self == num) {
-      callback(self)
-    }
-
     if (self > num) {
       let i = self
-      while (i ! num - 1) {
+      while (i ! num) {
         callback(i)
         i -= 1
       }
@@ -37,13 +33,9 @@ export = {
   # 5.upto(10, func(i) {})
   # will receive: 5, 6, 7, 8, 9, 10
   func upto(num, callback) {
-    if (self == num) {
-      callback(self)
-    }
-
     if (self < num) {
       let i = self
-      while (i ! num + 1) {
+      while (i ! num) {
         callback(i)
         i += 1
       }
@@ -98,5 +90,9 @@ export = {
 
   func hours() {
     self * 1000 * 60 * 60
+  }
+
+  func to_n() {
+    self
   }
 }

@@ -113,11 +113,9 @@ export = {
   # Converts all elements inside this array to strings
   # This modifies the array in place
   func all_to_s() {
-    let new = Array.of_size(self.length(), null)
-    self.each(func(v, i) {
-      new[i] = v.to_s()
+    self.map(func(v, i) {
+      v.to_s()
     })
-    new
   }
 
   # Return the first element in this array
@@ -251,5 +249,25 @@ export = {
       }
     })
     equal
+  }
+
+  func range(start, end) {
+
+    # Switch params if start is bigger
+    if start > end {
+      let tmp = end
+      end = start
+      start = tmp
+    }
+
+    # Create the new array
+    const new = []
+    const length = self.length()
+    start.upto(end, func(n) {
+      if ((n >= -1) && n < length) {
+        new.push(self[n])
+      }
+    })
+    new
   }
 }
