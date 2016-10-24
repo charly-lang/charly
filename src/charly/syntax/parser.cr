@@ -79,7 +79,7 @@ module Charly::Parser
     end
 
     # Advances the pointer to the next token
-    def advance?
+    def advance
       if @pos + 1 >= @tokens.size
         return unexpected_eof
       end
@@ -147,12 +147,12 @@ module Charly::Parser
     def parse_block
       case @token.type
       when TokenType::LeftCurly
-        advance?
+        advance
         body = parse_block_body
 
         case @token.type
         when TokenType::RightCurly
-          advance?
+          advance
           return body
         else
           unexpected_token
@@ -184,20 +184,20 @@ module Charly::Parser
       when TokenType::Keyword
         case @token.value
         when "let"
-          case advance?.type
+          case advance.type
           when TokenType::Identifier
             identifier = IdentifierLiteral.new(@token.value)
 
-            case advance?.type
+            case advance.type
             when TokenType::Semicolon
-              advance?
+              advance
               return VariableDeclaration.new(identifier)
             when TokenType::Assignment
-              advance?
+              advance
               value = parse_expression
 
               if @token.type == TokenType::Semicolon
-                advance?
+                advance
               end
 
               return VariableInitialisation.new(identifier, value)
@@ -208,17 +208,17 @@ module Charly::Parser
             unexpected_token
           end
         when "const"
-          case advance?.type
+          case advance.type
           when TokenType::Identifier
             identifier = IdentifierLiteral.new(@token.value)
 
-            case advance?.type
+            case advance.type
             when TokenType::Assignment
-              advance?
+              advance
               value = parse_expression
 
               if @token.type == TokenType::Semicolon
-                advance?
+                advance
               end
 
               return ConstantInitialisation.new(identifier, value)
@@ -231,15 +231,16 @@ module Charly::Parser
         when "if"
           return parse_if_statement
         when "while"
+          return parse_while_statement
         when "try"
         when "return"
-          advance?
+          advance
           return ReturnStatement.new(optional ->{parse_expression})
         when "break"
-          advance?
+          advance
           return BreakStatement.new
         when "throw"
-          advance?
+          advance
           return ThrowStatement.new(optional ->{parse_expression})
         end
       else
@@ -247,7 +248,7 @@ module Charly::Parser
           expression = parse_expression
           case @token.type
           when TokenType::Semicolon
-            advance?
+            advance
           end
           return expression
         rescue e : SyntaxError
@@ -259,19 +260,24 @@ module Charly::Parser
     end
 
     def parse_if_statement
-      case advance?.type
-      when TokenType::LeftParen
-        advance?
 
-        test = try ->{ parse_expression }
+      unless @token.type == TokenType::Keyword && @token.value == "if"
+        unexpected_token
+      end
+
+      case advance.type
+      when TokenType::LeftParen
+        advance
+
+        test = parse_expression
         case @token.type
         when TokenType::RightParen
-          advance?
+          advance
         else
           unexpected_token
         end
       else
-        test = try ->{ parse_expression }
+        test = parse_expression
       end
 
       consequent = parse_block
@@ -279,7 +285,7 @@ module Charly::Parser
       alternate = Empty.new
       if @token.type == TokenType::Keyword
         if @token.value == "else"
-          advance?
+          advance
 
           case @token.type
           when TokenType::Keyword
@@ -298,11 +304,36 @@ module Charly::Parser
       return IfStatement.new(test, consequent, alternate)
     end
 
+    def parse_while_statement
+
+      unless @token.type == TokenType::Keyword && @token.value == "while"
+        unexpected_token
+      end
+
+      case advance.type
+      when TokenType::LeftParen
+        advance
+        test = parse_expression
+
+        case @token.type
+        when TokenType::RightParen
+          advance
+        else
+          unexpected_token
+        end
+      else
+        test = parse_expression
+      end
+
+      consequent = parse_block
+      return WhileStatement.new(test, consequent)
+    end
+
     def parse_expression
       case @token.type
       when TokenType::Numeric
         node = NumericLiteral.new(@token.value.to_f64)
-        advance?
+        advance
         return node
       else
         unexpected_token
