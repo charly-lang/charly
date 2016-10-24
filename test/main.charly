@@ -1441,6 +1441,48 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert("9e-2".to_n(), 0.09)
     })
 
+    it("pipes an array to different functions", func(assert) {
+      let res1
+      let res2
+      let res3
+
+      func setRes1(v) {
+        res1 = v
+      }
+
+      func setRes2(v) {
+        res2 = v
+      }
+
+      func setRes3(v) {
+        res3 = v
+      }
+
+      5.pipe(setRes1, setRes2, setRes3)
+
+      assert(res1, 5)
+      assert(res2, 5)
+      assert(res3, 5)
+    })
+
+    it("transforms an array", func(assert) {
+      func reverse(array) {
+        array.reverse()
+      }
+
+      func addOne(array) {
+        array.map(func(e) { e + 1 })
+      }
+
+      func multiplyByTwo(array) {
+        array.map(func(e) { e * 2 })
+      }
+
+      const nums = [1, 2, 3, 4, 5]
+      const result = nums.transform(multiplyByTwo, reverse, addOne)
+      assert(result, [11, 9, 7, 5, 3])
+    })
+
   })
 
   describe("CLI", func(it) {
