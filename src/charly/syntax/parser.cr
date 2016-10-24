@@ -54,7 +54,7 @@ module Charly::Parser
       end
 
       # Parse a block body
-      @tree << parse_block_body
+      @tree << parse_block_body(false)
 
       # Print the tree if the ast flag was set
       if @session.flags.includes?("ast") && @session.file == @file
@@ -119,7 +119,7 @@ module Charly::Parser
           result = prod.call
           break
         rescue e : SyntaxError
-          if index == prods.last
+          if index == prods.size - 1
             raise e
           end
 
@@ -150,7 +150,7 @@ module Charly::Parser
         advance?
         body = parse_block_body
 
-        case advance?.type
+        case @token.type
         when TokenType::RightCurly
           advance?
           return body
@@ -163,11 +163,17 @@ module Charly::Parser
     end
 
     # Parses the body of a block
-    def parse_block_body
+    def parse_block_body(stop_on_curly = true)
       exps = [] of ASTNode
 
-      until (@token.type == TokenType::RightCurly) || (@token.type == TokenType::EOF)
-        exps << parse_statement
+      if stop_on_curly
+        until @token.type == TokenType::RightCurly
+          exps << parse_statement
+        end
+      else
+        until @token.type == TokenType::EOF
+          exps << parse_statement
+        end
       end
 
       return Block.new(exps)
@@ -223,6 +229,7 @@ module Charly::Parser
             unexpected_token
           end
         when "if"
+          return parse_if_statement
         when "while"
         when "try"
         when "return"
@@ -234,18 +241,61 @@ module Charly::Parser
         when "throw"
           advance?
           return ThrowStatement.new(optional ->{parse_expression})
-        else
-          begin
-            return parse_expression
-          rescue e : SyntaxError
-            unexpected_token
-          end
         end
       else
-        unexpected_token
+        begin
+          expression = parse_expression
+          case @token.type
+          when TokenType::Semicolon
+            advance?
+          end
+          return expression
+        rescue e : SyntaxError
+          unexpected_token
+        end
       end
 
       unexpected_token
+    end
+
+    def parse_if_statement
+      case advance?.type
+      when TokenType::LeftParen
+        advance?
+
+        test = try ->{ parse_expression }
+        case @token.type
+        when TokenType::RightParen
+          advance?
+        else
+          unexpected_token
+        end
+      else
+        test = try ->{ parse_expression }
+      end
+
+      consequent = parse_block
+
+      alternate = Empty.new
+      if @token.type == TokenType::Keyword
+        if @token.value == "else"
+          advance?
+
+          case @token.type
+          when TokenType::Keyword
+            case @token.value
+            when "if"
+              alternate = parse_if_statement
+            else
+              unexpected_token
+            end
+          else
+            alternate = parse_block
+          end
+        end
+      end
+
+      return IfStatement.new(test, consequent, alternate)
     end
 
     def parse_expression

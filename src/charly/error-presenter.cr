@@ -32,7 +32,7 @@ class ErrorPresenter
     io = MemoryIO.new(@file.content)
     ln = 1
     io.each_line do |line|
-      line = line.strip
+      line = line.rstrip
 
       # Skip over lines we don't want to print
       unless print_range === ln
