@@ -31,7 +31,7 @@ module Charly::Parser
         token.type != TokenType::Comment &&
         token.type != TokenType::EOF
       end
-      @token = @tokens[0]
+      @token = Token.new
 
       # Print tokens
       if @session.flags.includes?("tokens") && @session.file == @file
@@ -50,11 +50,10 @@ module Charly::Parser
       # If no interesting tokens were found in this file, don't try to parse it
       if @tokens.size == 0
         @tree << Block.new([] of ASTNode)
-        return @tree
+      else
+        @token = @tokens[0]
+        @tree << parse_block_body(false)
       end
-
-      # Parse a block body
-      @tree << parse_block_body(false)
 
       # Print the tree if the ast flag was set
       if @session.flags.includes?("ast") && @session.file == @file
@@ -62,7 +61,7 @@ module Charly::Parser
       end
 
       # Return the tree
-      @tree
+      return @tree
     end
 
     def has_next?
@@ -143,7 +142,7 @@ module Charly::Parser
       end
     end
 
-    def assure_token(type : TokenType)
+    def assert_token(type : TokenType)
       unless @token.type == type
         unexpected_token
       end
@@ -151,7 +150,7 @@ module Charly::Parser
       true
     end
 
-    def assure_token(type : TokenType)
+    def assert_token(type : TokenType)
       unless @token.type == type
         unexpected_token
       end
@@ -159,7 +158,7 @@ module Charly::Parser
       yield
     end
 
-    def assure_token(type : TokenType, value : String)
+    def assert_token(type : TokenType, value : String)
       unless @token.type == type && @token.value == value
         unexpected_token
       end
@@ -167,7 +166,7 @@ module Charly::Parser
       true
     end
 
-    def assure_token(type : TokenType, value : String)
+    def assert_token(type : TokenType, value : String)
       unless @token.type == type && @token.value == value
         unexpected_token
       end
@@ -244,7 +243,7 @@ module Charly::Parser
               advance
               value = parse_expression
 
-              assure_token TokenType::Semicolon do
+              if_token TokenType::Semicolon do
                 advance
               end
 
@@ -265,7 +264,7 @@ module Charly::Parser
               advance
               value = parse_expression
 
-              assure_token TokenType::Semicolon do
+              if_token TokenType::Semicolon do
                 advance
               end
 
@@ -284,13 +283,25 @@ module Charly::Parser
           return parse_try_statement
         when "return"
           advance
-          return ReturnStatement.new(optional ->{ parse_expression })
+          node = ReturnStatement.new(optional ->{ parse_expression })
+
+          if_token TokenType::Semicolon do
+            advance
+          end
+
+          return node
         when "break"
           advance
-          return BreakStatement.new
+          node = BreakStatement.new
         when "throw"
           advance
-          return ThrowStatement.new(optional ->{ parse_expression })
+          node = ThrowStatement.new(optional ->{ parse_expression })
+
+          if_token TokenType::Semicolon do
+            advance
+          end
+
+          return node
         end
       else
         begin
@@ -319,7 +330,7 @@ module Charly::Parser
 
         test = parse_expression
 
-        assure_token TokenType::RightParen do
+        assert_token TokenType::RightParen do
           advance
         end
       else
@@ -382,7 +393,7 @@ module Charly::Parser
       advance
       try_block = parse_block
 
-      assure_token TokenType::Keyword, "catch" do
+      assert_token TokenType::Keyword, "catch" do
         advance
       end
 
@@ -390,16 +401,16 @@ module Charly::Parser
       when TokenType::LeftParen
         advance
 
-        assure_token TokenType::Identifier do
+        assert_token TokenType::Identifier do
           exception_name = IdentifierLiteral.new(@token.value)
           advance
 
-          assure_token TokenType::RightParen do
+          assert_token TokenType::RightParen do
             advance
           end
         end
       else
-        assure_token TokenType::Identifier do
+        assert_token TokenType::Identifier do
           exception_name = IdentifierLiteral.new(@token.value)
           advance
         end
@@ -411,14 +422,91 @@ module Charly::Parser
     end
 
     def parse_expression
+      return parse_literal
+    end
+
+    def parse_literal
       case @token.type
+      when TokenType::Identifier
+        node = IdentifierLiteral.new(@token.value)
+        advance
       when TokenType::Numeric
         node = NumericLiteral.new(@token.value.to_f64)
         advance
-        return node
+      when TokenType::String
+        node = StringLiteral.new(@token.value)
+        advance
+      when TokenType::Boolean
+        node = BooleanLiteral.new(@token.value == "true")
+        advance
+      when TokenType::Null
+        node = NullLiteral.new
+        advance
+      when TokenType::NAN
+        node = NANLiteral.new
+        advance
+      when TokenType::LeftBracket
+        node = parse_array_literal
+      when TokenType::LeftCurly
+        node = parse_container_literal
+      when TokenType::Keyword
+        case @token.value
+        when "func"
+          node = parse_func_literal
+        when "class"
+          node = parse_class_literal
+        else
+          unexpected_token
+        end
       else
         unexpected_token
       end
+
+      return node
+    end
+
+    def parse_expression_list(end_token : TokenType)
+      exps = [] of ASTNode
+
+      should_read = @token.type != end_token
+      while should_read
+        should_read = false
+
+        exps << parse_expression
+
+        if @token.type == TokenType::Comma
+          should_read = true
+          advance
+        end
+      end
+
+      return ExpressionList.new(exps)
+    end
+
+    def parse_array_literal
+      assert_token TokenType::LeftBracket do
+        advance
+      end
+
+      exps = parse_expression_list(TokenType::RightBracket)
+
+      assert_token TokenType::RightBracket do
+        advance
+      end
+
+      return ArrayLiteral.new(exps.children)
+    end
+
+    def parse_container_literal
+      return ContainerLiteral.new(Block.new([] of ASTNode))
+    end
+
+    def parse_func_literal
+      return FunctionLiteral.new(IdentifierList.new([] of ASTNode), Block.new([] of ASTNode))
+    end
+
+    def parse_class_literal
+      return ClassLiteral.new(Block.new([] of ASTNode))
     end
   end
 end

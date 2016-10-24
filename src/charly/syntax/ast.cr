@@ -153,9 +153,6 @@ module Charly::Parser::AST
     identifier : ASTNode,
     expression : ASTNode
 
-  ast_node ClassLiteral,
-    block : Block
-
   ast_node CallExpression,
     identifier : ASTNode,
     argumentlist : ExpressionList
@@ -228,6 +225,9 @@ module Charly::Parser::AST
     block : Block
 
   ast_node ContainerLiteral,
+    block : Block
+
+  ast_node ClassLiteral,
     block : Block
 
   ast_node LeftParenLiteral
