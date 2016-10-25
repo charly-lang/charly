@@ -302,6 +302,14 @@ module Charly::Parser
           end
 
           return node
+        when "func", "class"
+          expression = parse_expression
+
+          if_token TokenType::Semicolon do
+            advance
+          end
+
+          return expression
         end
       else
         begin
@@ -483,6 +491,27 @@ module Charly::Parser
       return ExpressionList.new(exps)
     end
 
+    def parse_identifier_list(end_token : TokenType)
+      exps = [] of ASTNode
+
+      should_read = @token.type != end_token
+      while should_read
+        should_read = false
+
+        assert_token TokenType::Identifier do
+          exps << IdentifierLiteral.new(@token.value)
+          advance
+        end
+
+        if @token.type == TokenType::Comma
+          should_read = true
+          advance
+        end
+      end
+
+      return IdentifierList.new(exps)
+    end
+
     def parse_array_literal
       assert_token TokenType::LeftBracket do
         advance
@@ -503,10 +532,38 @@ module Charly::Parser
     end
 
     def parse_func_literal
-      return FunctionLiteral.new(IdentifierList.new([] of ASTNode), Block.new([] of ASTNode))
+
+      assert_token TokenType::Keyword, "func" do
+        advance
+      end
+
+      identifier = Empty.new
+      if_token TokenType::Identifier do
+        identifier = IdentifierLiteral.new(@token.value)
+        advance
+      end
+
+      arguments = IdentifierList.new
+      assert_token TokenType::LeftParen do
+        advance
+        arguments = parse_identifier_list(TokenType::RightParen)
+
+        assert_token TokenType::RightParen do
+          advance
+        end
+      end
+
+      block = parse_block
+
+      if identifier.is_a? IdentifierLiteral
+        return VariableInitialisation.new(identifier, FunctionLiteral.new(arguments, block))
+      else
+        return FunctionLiteral.new(arguments, block)
+      end
     end
 
     def parse_class_literal
+      advance
       return ClassLiteral.new(Block.new([] of ASTNode))
     end
   end
