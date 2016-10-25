@@ -445,7 +445,7 @@ module Charly::Parser
         node = StringLiteral.new(@token.value)
         advance
       when TokenType::Boolean
-        node = BooleanLiteral.new(@token.value == "true")
+        node = BooleanLiteral.new(@token.value[0] == 't')
         advance
       when TokenType::Null
         node = NullLiteral.new
