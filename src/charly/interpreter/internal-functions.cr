@@ -207,22 +207,15 @@ module InternalFunctions
 
   # Dump all values from an object into it's parent stack
   def unpack(arguments, stack)
-    arg1 = nil
-    describe_args([TObject])
-    object = arg1
+    arg1, arg2 = nil, nil
+    describe_args([TObject, TObject])
+    object, target = arg1, arg2
 
-    # Get the correct stack
-    # We assume this is called via the unpack method and not
-    # call_internal("unpack", ...)
-    #
-    # This means we have to go up two stacks in order to
-    # be able to write to the correct one
-    #
-    # the value variable we got from values is an entry in the stack
+    # The value variable we got from values is an entry in the stack
     # we need to unpack the value from the value
     object.stack.not_nil!.values.each do |key, value|
       unless ["self", "program", "export", "instance_type"].includes? key
-        stack.parent.not_nil!.write(key, value.value, declaration: true, constant: value.locked)
+        target.stack.write(key, value.value, declaration: true, constant: value.locked)
       end
     end
 

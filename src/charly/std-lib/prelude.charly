@@ -17,19 +17,19 @@ func require(filename) {
 }
 
 # Dumps the objects values into the parent stack
-func unpack(object) {
-  call_internal("unpack", object)
+func unpack(object, target) {
+  call_internal("unpack", object, target)
 }
 
 # Bindings to the primitives
-unpack(require("./bindings/include.charly"))
+unpack(require("./bindings/include.charly"), self)
 
 # Include IO and bind some common-used methods
-unpack(require("io"))
+unpack(require("io"), self)
 const print = stdout.print
 const write = stdout.write
 const gets = stdin.gets
 const getc = stdin.getc
 
 # Exceptions
-unpack(require("./exceptions.charly"))
+unpack(require("./exceptions.charly"), self)
