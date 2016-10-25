@@ -1103,6 +1103,28 @@ let testResult = UnitTest("Charly").begin(func(describe) {
       assert(myBox.name, "test")
     })
 
+    it("unpacks other objects", func(assert) {
+      const greetable = {
+        func getName() {
+          self.name
+        }
+      }
+
+      class Person {
+        unpack(greetable, self)
+
+        let name
+
+        func constructor(name) {
+          self.name = name
+        }
+      }
+
+      const leonard = Person("leonard")
+      assert(leonard.getName(), "leonard")
+
+    })
+
   })
 
   describe("Objects", func(it) {
