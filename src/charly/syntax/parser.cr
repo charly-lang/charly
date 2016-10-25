@@ -563,8 +563,24 @@ module Charly::Parser
     end
 
     def parse_class_literal
-      advance
-      return ClassLiteral.new(Block.new([] of ASTNode))
+
+      assert_token TokenType::Keyword, "class" do
+        advance
+      end
+
+      identifier = Empty.new
+      if_token TokenType::Identifier do
+        identifier = IdentifierLiteral.new(@token.value)
+        advance
+      end
+
+      block = parse_block
+
+      if identifier.is_a? IdentifierLiteral
+        return VariableInitialisation.new(identifier, ClassLiteral.new(block))
+      else
+        return ClassLiteral.new(block)
+      end
     end
   end
 end
