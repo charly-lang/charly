@@ -498,7 +498,8 @@ module Charly::Parser
     end
 
     def parse_container_literal
-      return ContainerLiteral.new(Block.new([] of ASTNode))
+      block = parse_block
+      return ContainerLiteral.new(block)
     end
 
     def parse_func_literal
