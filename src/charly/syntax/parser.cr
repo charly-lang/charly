@@ -289,6 +289,12 @@ module Charly::Parser
         when "break"
           advance
           node = BreakStatement.new
+
+          if_token TokenType::Semicolon do
+            advance
+          end
+
+          return node
         when "throw"
           advance
           node = ThrowStatement.new(optional ->{ parse_expression })
@@ -495,7 +501,17 @@ module Charly::Parser
     parse_operator :less_greater, :add_sub, "ComparisonExpression.new operator, left, right", "Less", "Greater", "LessEqual", "GreaterEqual"
     parse_operator :add_sub, :mult_div, "BinaryExpression.new operator, left, right", "Plus", "Minus"
     parse_operator :mult_div, :mod_pow, "BinaryExpression.new operator, left, right", "Mult", "Divd"
-    parse_operator :mod_pow, :call_expression, "BinaryExpression.new operator, left, right", "Pow", "Mod"
+    parse_operator :mod_pow, :unary_expression, "BinaryExpression.new operator, left, right", "Pow", "Mod"
+
+    def parse_unary_expression
+      case @token.type
+      when TokenType::Minus, TokenType::Not
+        advance
+        return UnaryExpression.new(@token.type, parse_unary_expression)
+      else
+        parse_call_expression
+      end
+    end
 
     def parse_call_expression
       identifier = parse_literal
