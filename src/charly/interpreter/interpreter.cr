@@ -278,7 +278,6 @@ class Interpreter
   def exec_unary_expression(node, stack)
 
     # Resolve the right side
-    operator = node.operator
     right = exec_expression(node.right, stack)
 
     # Search for a operator overload on comparison expressions
@@ -298,7 +297,7 @@ class Interpreter
       end
     end
 
-    case operator
+    case node.operator
     when TokenType::Minus
       if right.is_a? TNumeric
         return TNumeric.new(-right.value)
@@ -306,6 +305,8 @@ class Interpreter
     when TokenType::Not
       return TBoolean.new(!eval_bool(right, stack))
     end
+
+    puts node
 
     raise RunTimeError.new("Invalid operator or right-hand-side in unary expression")
   end
@@ -515,13 +516,42 @@ class Interpreter
       end
     end
 
-    # If both sides are TNull
-    if left.is_a?(TNull) && right.is_a?(TNull)
+    if left.is_a? TNull
+
       case operator
       when TokenType::Equal
-        return TBoolean.new(true)
+
+        if right.is_a? TBoolean
+          return TBoolean.new(!right.value)
+        end
+
+        return TBoolean.new(right.is_a? TNull)
       when TokenType::Not
-        return TBoolean.new(false)
+
+        if right.is_a? TBoolean
+          return TBoolean.new(right.value)
+        end
+
+        return TBoolean.new(!right.is_a?(TNull))
+      end
+    end
+
+    if right.is_a? TNull
+      case operator
+      when TokenType::Equal
+
+        if left.is_a? TBoolean
+          return TBoolean.new(left.value)
+        end
+
+        return TBoolean.new(left.is_a? TNull)
+      when TokenType::Not
+
+        if left.is_a? TBoolean
+          return TBoolean.new(!left.value)
+        end
+
+        return TBoolean.new(!left.is_a?(TNull))
       end
     end
 

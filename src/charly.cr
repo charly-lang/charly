@@ -73,8 +73,8 @@ module Charly
   # Execute the needed files
   begin
     interpreter = InterpreterFascade.new(session)
-    # interpreter.execute_file(RealFile.new(ENV["CHARLYDIR"] + "/prelude.charly"), prelude_stack)
-    # interpreter.execute_file(RealFile.new(ENV["CHARLYDIR"] + "/primitives/include.charly"), primitives_stack)
+    interpreter.execute_file(RealFile.new(ENV["CHARLYDIR"] + "/prelude.charly"), prelude_stack)
+    interpreter.execute_file(RealFile.new(ENV["CHARLYDIR"] + "/primitives/include.charly"), primitives_stack)
     interpreter.execute_file(userfile, userfile_stack)
   rescue e : BaseException
     puts e

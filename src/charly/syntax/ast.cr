@@ -134,7 +134,12 @@ module Charly::Parser::AST
 
   ast_node UnaryExpression,
     operator : TokenType,
-    right : ASTNode
+    right : ASTNode do
+
+      def info
+        "#{@operator}"
+      end
+    end
 
   ast_node BinaryExpression,
     operator : TokenType,

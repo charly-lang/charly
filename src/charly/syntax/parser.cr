@@ -504,10 +504,10 @@ module Charly::Parser
     parse_operator :mod_pow, :unary_expression, "BinaryExpression.new operator, left, right", "Pow", "Mod"
 
     def parse_unary_expression
-      case @token.type
+      case operator = @token.type
       when TokenType::Minus, TokenType::Not
         advance
-        return UnaryExpression.new(@token.type, parse_unary_expression)
+        return UnaryExpression.new(operator, parse_unary_expression)
       else
         parse_call_expression
       end

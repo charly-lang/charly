@@ -14,7 +14,8 @@ class Progress {
 
   func print() {
     self.reset()
-    write("#" * (pos / max) * width, "\r")
+    let amount = pos / max * width
+    write("#" * amount, "\r")
   }
 
   func reset() {
