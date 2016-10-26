@@ -20,8 +20,6 @@ module Charly::Parser
     property token : Token
     property pos : Int32
 
-    property tree : Program
-
     # Create a new parser from a virtualfile
     def initialize(@file, @session)
       @pos = 0
@@ -39,9 +37,6 @@ module Charly::Parser
           puts token
         end
       end
-
-      # Initialize the tree
-      @tree = Program.new
     end
 
     # Begin parsing
@@ -49,19 +44,20 @@ module Charly::Parser
 
       # If no interesting tokens were found in this file, don't try to parse it
       if @tokens.size == 0
-        @tree << Block.new([] of ASTNode)
+        tree = Program.new(Block.new([] of ASTNode))
       else
         @token = @tokens[0]
-        @tree << parse_block_body(false)
+        block = parse_block_body(stop_on_curly: false)
+        tree = Program.new(block)
       end
 
       # Print the tree if the ast flag was set
       if @session.flags.includes?("ast") && @session.file == @file
-        puts @tree
+        puts tree
       end
 
       # Return the tree
-      return @tree
+      return tree
     end
 
     def has_next?
@@ -429,12 +425,47 @@ module Charly::Parser
       return TryCatchStatement.new(try_block, exception_name, catch_block)
     end
 
-    def parse_expression
-      return parse_literal
+    macro parse_operator(name, next_operator, node, *operators)
+      def parse_{{name.id}}
+        left = parse_{{next_operator.id}}
+        while true
+          case @token.type
+          when {{
+              *operators.map { |field|
+                "TokenType::#{field.id}".id
+              }
+            }}
+            operator = @token.type
+            advance
+            right = parse_{{next_operator.id}}
+            left = ({{node.id}})
+          else
+            return left
+          end
+        end
+      end
     end
+
+    def parse_expression
+      return parse_logical_and
+    end
+
+    parse_operator :logical_and, :logical_or, "And.new left, right", "AND"
+    parse_operator :logical_or, :equal_not, "Or.new left, right", "OR"
+    parse_operator :equal_not, :less_greater, "ComparisonExpression.new operator, left, right", "Equal", "Not"
+    parse_operator :less_greater, :add_sub, "ComparisonExpression.new operator, left, right", "Less", "Greater", "LessEqual", "GreaterEqual"
+    parse_operator :add_sub, :mult_div, "BinaryExpression.new operator, left, right", "Plus", "Minus"
+    parse_operator :mult_div, :mod_pow, "BinaryExpression.new operator, left, right", "Mult", "Divd"
+    parse_operator :mod_pow, :literal, "BinaryExpression.new operator, left, right", "Pow", "Mod"
 
     def parse_literal
       case @token.type
+      when TokenType::LeftParen
+        advance
+        node = parse_expression
+        assert_token TokenType::RightParen do
+          advance
+        end
       when TokenType::Identifier
         node = IdentifierLiteral.new(@token.value)
         advance

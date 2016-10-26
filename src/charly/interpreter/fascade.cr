@@ -20,8 +20,7 @@ class InterpreterFascade
 
     # Parsing
     parser = Parser.new file, @session
-    parser.parse
-    program = parser.tree
+    program = parser.parse
 
     # Setup the stack
     stack.file = file

@@ -48,12 +48,12 @@ module Charly::Parser::AST
 
     # Render the current node
     def to_s(io)
-      io << "#{self.class.name.split("::").last}"
 
-      if size > 0
-        io << " - #{size} children"
+      if (meta = info).size > 0
+        io << meta
+      else
+        io << "#{self.class.name.split("::").last}"
       end
-
       io << "\n"
 
       children.each do |child|
@@ -66,6 +66,10 @@ module Charly::Parser::AST
           end
         end
       end
+    end
+
+    def info
+      ""
     end
   end
 
@@ -90,11 +94,19 @@ module Charly::Parser::AST
             "@#{field.id}".id
           end
         }})
-          @children = [{{
+          arg = [{{
             *properties.map do |field|
               field.var
             end
-          }}] of ASTNode
+          }}] of ASTNode | TokenType
+
+          tmp_children = [] of ASTNode
+
+          arg.each do |field|
+            tmp_children << field if field.is_a? ASTNode
+          end
+
+          @children = tmp_children
         end
       {% end %}
 
@@ -102,8 +114,10 @@ module Charly::Parser::AST
     end
   end
 
+  ast_node Program,
+    block : Block
+
   ast_node Empty
-  ast_node Program
   ast_node Block
   ast_node Statement
 
@@ -120,21 +134,34 @@ module Charly::Parser::AST
   ast_node Expression
 
   ast_node UnaryExpression,
-    operator : ASTNode,
+    operator : TokenType,
     right : ASTNode
 
   ast_node BinaryExpression,
-    operator : ASTNode,
+    operator : TokenType,
     left : ASTNode,
-    right : ASTNode
+    right : ASTNode do
+
+      def info
+        "#{@operator}"
+      end
+    end
 
   ast_node ComparisonExpression,
-    operator : ASTNode,
+    operator : TokenType,
+    left : ASTNode,
+    right : ASTNode do
+
+      def info
+        "#{@operator}"
+      end
+    end
+
+  ast_node And,
     left : ASTNode,
     right : ASTNode
 
-  ast_node LogicalExpression,
-    operator : ASTNode,
+  ast_node Or,
     left : ASTNode,
     right : ASTNode
 
@@ -188,12 +215,20 @@ module Charly::Parser::AST
       def initialize(@name : String)
         @children = [] of ASTNode
       end
+
+      def info
+        "#{@name}"
+      end
     end
 
   ast_node StringLiteral,
     value : String do
       def initialize(@value : String)
         @children = [] of ASTNode
+      end
+
+      def info
+        "#{@value}"
       end
     end
 
@@ -202,6 +237,10 @@ module Charly::Parser::AST
       def initialize(@value : Float64)
         @children = [] of ASTNode
       end
+
+      def info
+        "#{@value}"
+      end
     end
 
   ast_node KeywordLiteral,
@@ -209,12 +248,20 @@ module Charly::Parser::AST
       def initialize(@name : String)
         @children = [] of ASTNode
       end
+
+      def info
+        "#{@name}"
+      end
     end
 
   ast_node BooleanLiteral,
     value : Bool do
       def initialize(@value : Bool)
         @children = [] of ASTNode
+      end
+
+      def info
+        "#{@value}"
       end
     end
 
@@ -241,25 +288,4 @@ module Charly::Parser::AST
   ast_node SemicolonLiteral
   ast_node CommaLiteral
   ast_node PointLiteral
-
-  # Operators
-  ast_node AssignmentOperator
-  ast_node PlusOperator
-  ast_node MinusOperator
-  ast_node MultOperator
-  ast_node DivdOperator
-  ast_node ModOperator
-  ast_node PowOperator
-
-  # Comparisons
-  ast_node LessOperator
-  ast_node GreaterOperator
-  ast_node LessEqualOperator
-  ast_node GreaterEqualOperator
-  ast_node EqualOperator
-  ast_node NotOperator
-
-  # Logical Operators
-  ast_node ANDOperator
-  ast_node OROperator
 end
