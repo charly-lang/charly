@@ -511,6 +511,28 @@ module Charly::Parser
           end
 
           identifier = CallExpression.new(identifier, args)
+        when TokenType::LeftBracket
+          advance
+
+          args = parse_expression_list(TokenType::RightBracket)
+
+          assert_token TokenType::RightBracket do
+            advance
+          end
+
+          identifier = IndexExpression.new(identifier, args)
+        when TokenType::Point
+          advance
+
+          member = Empty.new
+          assert_token TokenType::Identifier do
+            member = IdentifierLiteral.new(@token.value)
+            advance
+          end
+
+          if member.is_a? IdentifierLiteral
+            identifier = MemberExpression.new(identifier, member)
+          end
         else
           return identifier
         end
