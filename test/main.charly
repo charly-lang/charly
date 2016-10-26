@@ -1125,6 +1125,18 @@ let testResult = UnitTest("Charly").begin(func(describe) {
 
     })
 
+    it("creates anonymous classes", func(assert) {
+      let leonard = class {
+        let name
+
+        func constructor(name) {
+          self.name = name
+        }
+      }("Leonard")
+
+      assert(leonard.name, "Leonard")
+    })
+
   })
 
   describe("Objects", func(it) {
