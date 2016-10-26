@@ -22,6 +22,12 @@ enum TokenType
 
   # Misc Operators
   Assignment
+  PlusAssignment
+  MinusAssignment
+  MultAssignment
+  DivdAssignment
+  ModAssignment
+  PowAssignment
 
   # Comparison operators
   Equal

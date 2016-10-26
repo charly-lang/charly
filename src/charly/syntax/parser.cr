@@ -447,8 +447,47 @@ module Charly::Parser
     end
 
     def parse_expression
-      return parse_logical_and
+      return parse_assignment
     end
+
+    def parse_assignment
+      left = parse_logical_and
+      while true
+        case @token.type
+        when TokenType::Assignment,
+              TokenType::PlusAssignment,
+              TokenType::MinusAssignment,
+              TokenType::MultAssignment,
+              TokenType::DivdAssignment,
+              TokenType::ModAssignment,
+              TokenType::PowAssignment
+          operator = @token.type
+          advance
+          right = parse_logical_and
+
+          # Mapping between the assignment operators and the actual operators
+          operator_mapping = {
+            TokenType::PlusAssignment => TokenType::Plus,
+            TokenType::MinusAssignment => TokenType::Minus,
+            TokenType::MultAssignment => TokenType::Mult,
+            TokenType::DivdAssignment => TokenType::Divd,
+            TokenType::ModAssignment => TokenType::Mod,
+            TokenType::PowAssignment => TokenType::Pow
+          } of TokenType => TokenType
+
+          if operator == TokenType::Assignment
+            left = VariableAssignment.new(left, right)
+          else
+            left = VariableAssignment.new(left,
+              BinaryExpression.new(operator_mapping[operator], left, right)
+            )
+          end
+        else
+          return left
+        end
+      end
+    end
+
 
     parse_operator :logical_and, :logical_or, "And.new left, right", "AND"
     parse_operator :logical_or, :equal_not, "Or.new left, right", "OR"

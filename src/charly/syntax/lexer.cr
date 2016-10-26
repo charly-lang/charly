@@ -104,21 +104,21 @@ class Lexer
     when '0'..'9'
       consume_numeric(start)
     when '+'
-      next_char TokenType::Plus
+      consume_operator_or_assignment TokenType::Plus
     when '-'
-      next_char TokenType::Minus
+      consume_operator_or_assignment TokenType::Minus
     when '/'
-      next_char TokenType::Divd
+      consume_operator_or_assignment TokenType::Divd
     when '*'
       case peek_char
       when '*'
         next_char
-        next_char TokenType::Pow
+        consume_operator_or_assignment TokenType::Pow
       else
-        next_char TokenType::Mult
+        consume_operator_or_assignment TokenType::Mult
       end
     when '%'
-      next_char TokenType::Mod
+      consume_operator_or_assignment TokenType::Mod
     when '='
       case peek_char
       when '='
@@ -449,6 +449,36 @@ class Lexer
     @token.location.length = @token.raw.size
     @token.location.file = @file
     @token
+  end
+
+  # Consumes operators or += assignment statements
+  def consume_operator_or_assignment(operator)
+    if peek_char == '='
+      case operator
+      when TokenType::Plus
+        next_char
+        next_char TokenType::PlusAssignment
+      when TokenType::Minus
+        next_char
+        next_char TokenType::MinusAssignment
+      when TokenType::Mult
+        next_char
+        next_char TokenType::MultAssignment
+      when TokenType::Divd
+        next_char
+        next_char TokenType::DivdAssignment
+      when TokenType::Mod
+        next_char
+        next_char TokenType::ModAssignment
+      when TokenType::Pow
+        next_char
+        next_char TokenType::PowAssignment
+      else
+        next_char operator
+      end
+    else
+      next_char operator
+    end
   end
 
   # Consumes whitespaces (space and tabs)
