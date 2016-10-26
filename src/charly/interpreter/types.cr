@@ -129,18 +129,15 @@ module CharlyTypes
 
   class TFunc < BaseType
     property value : Bool
-    property argumentlist : Array(ASTNode)
+    property argumentlist : IdentifierList
     property block : Block
     property parent_stack : Stack
-    property anonymous : Bool
 
-    def initialize(argumentlist, block, parent_stack, anonymous = false)
+    def initialize(argumentlist, block, parent_stack)
       @value = false
       @argumentlist = argumentlist
       @block = block
-      @block.parent_stack = parent_stack
       @parent_stack = parent_stack
-      @anonymous = anonymous
     end
 
     def value_to_s(io)
@@ -160,7 +157,6 @@ module CharlyTypes
     def initialize(block, parent_stack)
       @value = false
       @block = block
-      @block.parent_stack = parent_stack
       @parent_stack = parent_stack
     end
 

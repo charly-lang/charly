@@ -297,7 +297,7 @@ module Charly::Parser
           return node
         when "throw"
           advance
-          node = ThrowStatement.new(optional ->{ parse_expression })
+          node = ThrowStatement.new(parse_expression)
 
           if_token TokenType::Semicolon do
             advance

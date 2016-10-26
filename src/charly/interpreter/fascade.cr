@@ -27,7 +27,7 @@ class InterpreterFascade
 
     # Execute the file in the interpreter
     unless @session.flags.includes? "noexec"
-      # Interpreter.new([program], stack, @session).program_result
+      Interpreter.new(program, stack, @session).program_result
     else
       CharlyTypes::TNull.new
     end

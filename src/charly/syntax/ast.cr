@@ -48,11 +48,10 @@ module Charly::Parser::AST
 
     # Render the current node
     def to_s(io)
+      io << "#{self.class.name.split("::").last}"
 
       if (meta = info).size > 0
-        io << meta
-      else
-        io << "#{self.class.name.split("::").last}"
+        io << " | #{meta}"
       end
       io << "\n"
 
@@ -172,12 +171,12 @@ module Charly::Parser::AST
     identifier : IdentifierLiteral,
     expression : ASTNode
 
-  ast_node ConstantInitialisation,
-    identifier : IdentifierLiteral,
-    expression : ASTNode
-
   ast_node VariableAssignment,
     identifier : ASTNode,
+    expression : ASTNode
+
+  ast_node ConstantInitialisation,
+    identifier : IdentifierLiteral,
     expression : ASTNode
 
   ast_node CallExpression,
@@ -190,7 +189,7 @@ module Charly::Parser::AST
 
   ast_node IndexExpression,
     identifier : ASTNode,
-    member : ASTNode
+    argumentlist : ExpressionList
 
   ast_node ExpressionList
   ast_node IdentifierList
