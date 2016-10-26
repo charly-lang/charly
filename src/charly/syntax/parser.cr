@@ -495,7 +495,27 @@ module Charly::Parser
     parse_operator :less_greater, :add_sub, "ComparisonExpression.new operator, left, right", "Less", "Greater", "LessEqual", "GreaterEqual"
     parse_operator :add_sub, :mult_div, "BinaryExpression.new operator, left, right", "Plus", "Minus"
     parse_operator :mult_div, :mod_pow, "BinaryExpression.new operator, left, right", "Mult", "Divd"
-    parse_operator :mod_pow, :literal, "BinaryExpression.new operator, left, right", "Pow", "Mod"
+    parse_operator :mod_pow, :call_expression, "BinaryExpression.new operator, left, right", "Pow", "Mod"
+
+    def parse_call_expression
+      identifier = parse_literal
+      while true
+        case @token.type
+        when TokenType::LeftParen
+          advance
+
+          args = parse_expression_list(TokenType::RightParen)
+
+          assert_token TokenType::RightParen do
+            advance
+          end
+
+          identifier = CallExpression.new(identifier, args)
+        else
+          return identifier
+        end
+      end
+    end
 
     def parse_literal
       case @token.type
