@@ -79,7 +79,7 @@ export = {
     let result = ""
 
     while (index < end) {
-      if (self[index]) {
+      if (self[index] ! null) {
         result += self[index]
       }
       index += 1

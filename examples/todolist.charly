@@ -24,7 +24,7 @@ class TodoList {
 
   func toggle(id) {
     const todo = todos[id]
-    if (todo) {
+    if (todo ! null) {
       todo.toggle()
     }
   }
@@ -43,6 +43,7 @@ while (!done) {
   myList.todos.each(func(todo, index) {
 
     # Get the correct icon
+    print(todo.complete)
     let icon = "✓".colorize(32)
     if (!todo.complete) {
       icon = "✗".colorize(31)

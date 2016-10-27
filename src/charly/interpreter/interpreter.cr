@@ -1,4 +1,4 @@
-require "../syntax/ast/ast.cr"
+require "../syntax/ast.cr"
 require "./stack/stack.cr"
 require "./types.cr"
 require "./session.cr"
@@ -14,19 +14,10 @@ class Interpreter
   property program_result : BaseType
   property session : Session
 
-  def initialize(programs, stack, session)
+  def initialize(program, stack, session)
     @initial_stack = stack
     @session = session
-    @program_result = exec_programs(programs, stack)
-  end
-
-  # Execute a bunch of programs, each having access to a shared top stack
-  def exec_programs(programs, stack)
-    last_result = TNull.new
-    programs.map do |program|
-      last_result = exec_program(program, stack)
-    end
-    last_result
+    @program_result = exec_program(program, stack)
   end
 
   # Executes *program* inside *stack*
@@ -65,10 +56,6 @@ class Interpreter
   # Executes *node* inside *stack*
   def exec_expression(node, stack)
 
-    if node.is_a? Group
-      return exec_expression(node.children[0], stack)
-    end
-
     if node.is_a? VariableDeclaration
       return exec_variable_declaration(node, stack)
     end
@@ -97,8 +84,12 @@ class Interpreter
       return exec_comparison_expression(node, stack)
     end
 
-    if node.is_a? LogicalExpression
-      return exec_logical_expression(node, stack)
+    if node.is_a? And
+      return exec_and(node, stack)
+    end
+
+    if node.is_a? Or
+      return exec_or(node, stack)
     end
 
     if node.is_a? IdentifierLiteral
@@ -153,10 +144,6 @@ class Interpreter
       return exec_container_literal(node, stack)
     end
 
-    if node.is_a? NullLiteral
-      return TNull.new
-    end
-
     if node.is_a? ReturnStatement
       return exec_return_statement(node, stack)
     end
@@ -173,6 +160,10 @@ class Interpreter
       return exec_try_catch(node, stack)
     end
 
+    if node.is_a? NullLiteral
+      return TNull.new
+    end
+
     if node.is_a? NANLiteral
       return TNumeric.new(Float64::NAN)
     end
@@ -184,13 +175,7 @@ class Interpreter
   # The value is set to TNull
   def exec_variable_declaration(node, stack)
     value = TNull.new
-    identifier = node.identifier
-    if identifier.is_a?(IdentifierLiteral)
-      identifier_value = identifier.value
-      if identifier_value.is_a?(String)
-        stack.write(identifier_value, value, true)
-      end
-    end
+    stack.write(node.identifier.name, value, true)
     return value
   end
 
@@ -199,18 +184,7 @@ class Interpreter
 
     # Resolve the value
     value = exec_expression(node.expression, stack)
-
-    # Check for the identifier
-    identifier = node.identifier
-    if identifier.is_a? IdentifierLiteral
-      identifier_value = identifier.value
-      if identifier_value.is_a? String
-
-        if value.is_a? BaseType
-          stack.write(identifier_value, value, declaration: true, constant: constant)
-        end
-      end
-    end
+    stack.write(node.identifier.name, value, declaration: true, constant: constant)
     return value
   end
 
@@ -230,25 +204,20 @@ class Interpreter
       identifier = identifier.identifier
 
       # Resolve the identifier
-      identifier = exec_expression(identifier.not_nil!, stack)
+      identifier = exec_expression(identifier, stack)
 
       # Only TObjects are allowed
       unless identifier.is_a?(TObject)
         raise RunTimeError.new("#{identifier} is not an object")
       end
 
-      # Typecheck the member
-      unless member.is_a?(IdentifierLiteral)
-        raise RunTimeError.new("Member node is not an identifier. You've found a bug in the interpeter.")
-      end
-
-      identifier.stack.write(member.value.as(String), value, true, false)
+      identifier.stack.write(member.name, value, true, false)
       return value
     elsif identifier.is_a? IndexExpression
 
       # Get some values
-      member = identifier.member.not_nil!
-      identifier = identifier.identifier.not_nil!
+      member = identifier.argumentlist
+      identifier = identifier.identifier
 
       # Resolve the identifier
       identifier = exec_expression(identifier, stack)
@@ -294,19 +263,8 @@ class Interpreter
         # Execute the __member function
         return exec_function(prop, arguments, identifier)
       end
-    else
-
-      if identifier.is_a?(IdentifierLiteral)
-
-        identifier_value = identifier.value
-        if identifier_value.is_a?(String)
-
-          # Check that the value is a BaseType
-          if value.is_a? BaseType
-            stack.write(identifier_value, value)
-          end
-        end
-      end
+    elsif identifier.is_a?(IdentifierLiteral)
+      stack.write(identifier.name, value)
     end
 
     return value
@@ -314,20 +272,19 @@ class Interpreter
 
   # Extracts the value of a variable from the current stack
   def exec_identifier_literal(node, stack)
-    stack.get(node.value)
+    stack.get(node.name)
   end
 
   def exec_unary_expression(node, stack)
 
     # Resolve the right side
-    operator = node.operator
     right = exec_expression(node.right, stack)
 
     # Search for a operator overload on comparison expressions
     operator_name = case node.operator
-    when MinusOperator
+    when TokenType::Minus
       "__uminus"
-    when NotOperator
+    when TokenType::Not
       "__unot"
     else
       nil
@@ -340,14 +297,16 @@ class Interpreter
       end
     end
 
-    case operator
-    when MinusOperator
+    case node.operator
+    when TokenType::Minus
       if right.is_a? TNumeric
         return TNumeric.new(-right.value)
       end
-    when NotOperator
+    when TokenType::Not
       return TBoolean.new(!eval_bool(right, stack))
     end
+
+    puts node
 
     raise RunTimeError.new("Invalid operator or right-hand-side in unary expression")
   end
@@ -361,17 +320,17 @@ class Interpreter
 
     # Search for a operator overload on binary expressions
     operator_name = case operator
-    when PlusOperator
+    when TokenType::Plus
       "__plus"
-    when MinusOperator
+    when TokenType::Minus
       "__minus"
-    when MultOperator
+    when TokenType::Mult
       "__mult"
-    when DivdOperator
+    when TokenType::Divd
       "__divd"
-    when ModOperator
+    when TokenType::Mod
       "__mod"
-    when PowOperator
+    when TokenType::Pow
       "__pow"
     else
       nil
@@ -386,42 +345,42 @@ class Interpreter
 
     if left.is_a?(TNumeric) && right.is_a?(TNumeric)
       case operator
-      when PlusOperator
+      when TokenType::Plus
         return TNumeric.new(left.value + right.value)
-      when MinusOperator
+      when TokenType::Minus
         return TNumeric.new(left.value - right.value)
-      when MultOperator
+      when TokenType::Mult
         if left.value == 0 || right.value == 0
           return TNumeric.new(0)
         end
         return TNumeric.new(left.value * right.value)
-      when DivdOperator
+      when TokenType::Divd
         if left.value == 0 || right.value == 0
           return TNull.new
         end
         return TNumeric.new(left.value / right.value)
-      when ModOperator
+      when TokenType::Mod
         if right.value == 0
           return TNull.new
         end
         return TNumeric.new(left.value.to_i64 % right.value.to_i64)
-      when PowOperator
+      when TokenType::Pow
         return TNumeric.new(left.value ** right.value)
       end
     end
 
     if left.is_a?(TString) && right.is_a?(TString)
       case operator
-      when PlusOperator
-        return TString.new("#{left}" + "#{right}")
+      when TokenType::Plus
+        return TString.new("#{left}#{right}")
       end
     end
 
     if left.is_a?(TString) && !right.is_a?(TString)
       case operator
-      when PlusOperator
-        return TString.new("#{left}" + "#{right}")
-      when MultOperator
+      when TokenType::Plus
+        return TString.new("#{left}#{right}")
+      when TokenType::Mult
 
         # Check if the right side is a TNumeric
         if right.is_a?(TNumeric)
@@ -432,9 +391,9 @@ class Interpreter
 
     if !left.is_a?(TString) && right.is_a?(TString)
       case operator
-      when PlusOperator
+      when TokenType::Plus
         return TString.new("#{left}" + "#{right}")
-      when MultOperator
+      when TokenType::Mult
 
         # Check if the left side is a TNumeric
         if left.is_a?(TNumeric)
@@ -456,17 +415,17 @@ class Interpreter
 
     # Search for a operator overload on comparison expressions
     operator_name = case operator
-    when GreaterOperator
+    when TokenType::Greater
       "__greater"
-    when LessOperator
+    when TokenType::Less
       "__less"
-    when GreaterEqualOperator
+    when TokenType::GreaterEqual
       "__greaterequal"
-    when LessEqualOperator
+    when TokenType::LessEqual
       "__lessequal"
-    when EqualOperator
+    when TokenType::Equal
       "__equal"
-    when NotOperator
+    when TokenType::Not
       "__notequal"
     else
       nil
@@ -484,17 +443,17 @@ class Interpreter
 
       # Different types of operators
       case operator
-      when GreaterOperator
+      when TokenType::Greater
         return TBoolean.new(left.value > right.value)
-      when LessOperator
+      when TokenType::Less
         return TBoolean.new(left.value < right.value)
-      when GreaterEqualOperator
+      when TokenType::GreaterEqual
         return TBoolean.new(left.value >= right.value)
-      when LessEqualOperator
+      when TokenType::LessEqual
         return TBoolean.new(left.value <= right.value)
-      when EqualOperator
+      when TokenType::Equal
         return TBoolean.new(left.value == right.value)
-      when NotOperator
+      when TokenType::Not
         return TBoolean.new(left.value != right.value)
       end
     end
@@ -502,9 +461,9 @@ class Interpreter
     # When comparing TBools
     if left.is_a?(TBoolean) && right.is_a?(TBoolean)
       case operator
-      when EqualOperator
+      when TokenType::Equal
         return TBoolean.new(left.value == right.value)
-      when NotOperator
+      when TokenType::Not
         return TBoolean.new(left.value != right.value)
       end
     end
@@ -512,17 +471,17 @@ class Interpreter
     # When comparing strings
     if left.is_a?(TString) && right.is_a?(TString)
       case operator
-      when GreaterOperator
+      when TokenType::Greater
         return TBoolean.new(left.value.size > right.value.size)
-      when LessOperator
+      when TokenType::Less
         return TBoolean.new(left.value.size < right.value.size)
-      when GreaterEqualOperator
+      when TokenType::GreaterEqual
         return TBoolean.new(left.value.size >= right.value.size)
-      when LessEqualOperator
+      when TokenType::LessEqual
         return TBoolean.new(left.value.size <= right.value.size)
-      when EqualOperator
+      when TokenType::Equal
         return TBoolean.new(left.value == right.value)
-      when NotOperator
+      when TokenType::Not
         return TBoolean.new(left.value != right.value)
       end
     end
@@ -530,9 +489,9 @@ class Interpreter
     # When comparing TFunc
     if left.is_a?(TFunc) && right.is_a?(TFunc)
       case operator
-      when EqualOperator
+      when TokenType::Equal
         return TBoolean.new(left == right)
-      when NotOperator
+      when TokenType::Not
         return TBoolean.new(left != right)
       end
     end
@@ -540,9 +499,9 @@ class Interpreter
     # When comparing TClass
     if left.is_a?(TClass) && right.is_a?(TClass)
       case operator
-      when EqualOperator
+      when TokenType::Equal
         return TBoolean.new(left == right)
-      when NotOperator
+      when TokenType::Not
         return TBoolean.new(left != right)
       end
     end
@@ -550,38 +509,67 @@ class Interpreter
     # When comparing TObject
     if left.is_a?(TObject) && right.is_a?(TObject)
       case operator
-      when EqualOperator
+      when TokenType::Equal
         return TBoolean.new(left == right)
-      when NotOperator
+      when TokenType::Not
         return TBoolean.new(left != right)
       end
     end
 
-    # If both sides are TNull
-    if left.is_a?(TNull) && right.is_a?(TNull)
+    if left.is_a? TNull
+
       case operator
-      when EqualOperator
-        return TBoolean.new(true)
-      when NotOperator
-        return TBoolean.new(false)
+      when TokenType::Equal
+
+        if right.is_a? TBoolean
+          return TBoolean.new(!right.value)
+        end
+
+        return TBoolean.new(right.is_a? TNull)
+      when TokenType::Not
+
+        if right.is_a? TBoolean
+          return TBoolean.new(right.value)
+        end
+
+        return TBoolean.new(!right.is_a?(TNull))
+      end
+    end
+
+    if right.is_a? TNull
+      case operator
+      when TokenType::Equal
+
+        if left.is_a? TBoolean
+          return TBoolean.new(left.value)
+        end
+
+        return TBoolean.new(left.is_a? TNull)
+      when TokenType::Not
+
+        if left.is_a? TBoolean
+          return TBoolean.new(!left.value)
+        end
+
+        return TBoolean.new(!left.is_a?(TNull))
       end
     end
 
     # If the left side is bool
     if left.is_a?(TBoolean) && !right.is_a?(TBoolean)
       case operator
-      when EqualOperator
+      when TokenType::Equal
         return TBoolean.new(left.value == eval_bool(right, stack))
-      when NotOperator
+      when TokenType::Not
         return TBoolean.new(left.value != eval_bool(right, stack))
       end
     end
 
     if !left.is_a?(TBoolean) && right.is_a?(TBoolean)
       case operator
-      when EqualOperator
+      when TokenType::Equal
         return TBoolean.new(right.value == eval_bool(left, stack))
-      when NotOperator
+      when TokenType::Not
         return TBoolean.new(right.value != eval_bool(left, stack))
       end
     end
@@ -589,29 +577,26 @@ class Interpreter
     return TBoolean.new(false)
   end
 
-  def exec_logical_expression(node, stack)
-    case (op = node.operator)
-    when ANDOperator
-      left = eval_bool(exec_expression(node.left, stack), stack)
-      if left
-        return TBoolean.new(eval_bool(exec_expression(node.right, stack), stack))
-      else
-        return TBoolean.new(false)
-      end
-    when OROperator
-      left = exec_expression(node.left, stack)
-      right = exec_expression(node.right, stack)
-
-      left_bool = eval_bool(left, stack)
-      right_bool = eval_bool(right, stack)
-
-      if left_bool
-        return left
-      else
-        return right
-      end
+  def exec_and(node, stack)
+    left = eval_bool(exec_expression(node.left, stack), stack)
+    if left
+      return TBoolean.new(eval_bool(exec_expression(node.right, stack), stack))
     else
-      raise RunTimeError.new("Unknown logical operator #{op}")
+      return TBoolean.new(false)
+    end
+  end
+
+  def exec_or(node, stack)
+    left = exec_expression(node.left, stack)
+    right = exec_expression(node.right, stack)
+
+    left_bool = eval_bool(left, stack)
+    right_bool = eval_bool(right, stack)
+
+    if left_bool
+      return left
+    else
+      return right
     end
   end
 
@@ -619,27 +604,17 @@ class Interpreter
   def exec_if_statement(node, stack)
 
     # Resolve the test expression
-    test = node.test
-    if test.is_a?(ASTNode)
-      test_result = eval_bool(exec_expression(node.test, stack), stack)
-    else
-      return TNull.new
-    end
+    test_result = eval_bool(exec_expression(node.test, stack), stack)
 
     # Run the respective handler
     if test_result
-      consequent = node.consequent
-      if consequent.is_a?(Block)
-        return exec_block(consequent, Stack.new(stack))
-      end
+      return exec_block(node.consequent, Stack.new(stack))
     else
       alternate = node.alternate
-      if alternate.is_a?(ASTNode)
-        if alternate.is_a?(IfStatement)
-          return exec_if_statement(alternate, stack)
-        elsif node.alternate.is_a?(Block)
-          return exec_block(alternate, Stack.new(stack))
-        end
+      if alternate.is_a?(IfStatement)
+        return exec_if_statement(alternate, stack)
+      elsif node.alternate.is_a?(Block)
+        return exec_block(alternate, Stack.new(stack))
       end
     end
 
@@ -649,23 +624,14 @@ class Interpreter
 
   # Executes a while node
   def exec_while_statement(node, stack)
-
-    # Typecheck
-    test = node.test
-    consequent = node.consequent
-
-    if test.is_a?(ASTNode) && consequent.is_a?(ASTNode)
-      last_result = TNull.new
-      begin
-        while eval_bool(exec_expression(test, stack), stack)
-          last_result = exec_block(consequent, Stack.new(stack))
-        end
-      rescue e : Events::Break
+    last_result = TNull.new
+    begin
+      while eval_bool(exec_expression(node.test, stack), stack)
+        last_result = exec_block(node.consequent, Stack.new(stack))
       end
-      return last_result
-    else
-      return TNull.new
+    rescue e : Events::Break
     end
+    return last_result
   end
 
   # Redirect an internal method to InternalFunctions
@@ -694,11 +660,8 @@ class Interpreter
 
     # Resolve all arguments
     arguments = [] of BaseType
-    argumentlist = node.argumentlist
-    if argumentlist.is_a? ExpressionList
-      argumentlist.each do |argument|
-        arguments << exec_expression(argument, stack)
-      end
+    node.argumentlist.children.each do |argument|
+      arguments << exec_expression(argument, stack)
     end
 
     # the default context for the function
@@ -712,7 +675,11 @@ class Interpreter
     if identifier.is_a? IdentifierLiteral
 
       # Check for the "call_internal" name
-      if identifier.value == "call_internal"
+      if identifier.name == "call_internal"
+
+        unless arguments.size > 0
+          raise RunTimeError.new("call_internal expected at least 1 argumen.")
+        end
 
         name = arguments[0]
         if name.is_a? TString
@@ -753,7 +720,7 @@ class Interpreter
           raise RunTimeError.new("The first argument to call_internal has to be a string.")
         end
       else
-        target = stack.get(identifier.value)
+        target = stack.get(identifier.name)
       end
     elsif identifier.is_a? MemberExpression
 
@@ -762,19 +729,11 @@ class Interpreter
       #
       # identifier.member()
       #    ^- what we want
-      me_identifier = identifier.identifier
-      me_member = identifier.member
 
       # Resolve the identifier
-      me_identifier = exec_expression(me_identifier, stack)
+      me_identifier = exec_expression(identifier.identifier, stack)
+      target = redirect_property(me_identifier, identifier.member.name, stack)
       context = me_identifier
-
-      if me_member.is_a?(IdentifierLiteral)
-        target = redirect_property(me_identifier, me_member.value.as(String), stack)
-        context = me_identifier
-      else
-        raise RunTimeError.new("Member node is not an identifier. You've found a bug in the interpeter.")
-      end
     else
       target = exec_expression(identifier, stack)
     end
@@ -795,26 +754,14 @@ class Interpreter
   # Executes a member expression
   def exec_member_expression(node, stack)
     identifier = exec_expression(node.identifier, stack)
-    member = node.member
-
-    if member.is_a?(IdentifierLiteral)
-      return redirect_property(identifier, member.value.as(String), stack);
-    end
-
-    return TNull.new
+    return redirect_property(identifier, node.member.name, stack);
   end
 
   def exec_index_expression(node, stack)
     identifier = exec_expression(node.identifier, stack)
-    member = node.member
-
-    # Sanity check
-    unless member.is_a? ASTNode
-      raise RunTimeError.new("Member node is not an identifier. You've found a bug in the interpeter.")
-    end
 
     # Check if there is at least 1 item in the index expression
-    unless member.children.size > 0
+    unless node.argumentlist.children.size > 0
       raise RunTimeError.new("Missing expression in index expression")
     end
 
@@ -822,36 +769,38 @@ class Interpreter
     if identifier.is_a? TArray
 
       # Resolve the identifier
-      member = exec_expression(member.children[0], stack)
+      member = exec_expression(node.argumentlist.children[0], stack)
 
       # Typecheck
       if member.is_a?(TNumeric)
 
         # Check for out-of-bounds error
-        if member.value.to_i64 > identifier.value.size - 1 || member.value.to_i64 < 0
+        index_i64 = member.value.to_i64
+        if index_i64 > identifier.value.size - 1 || index_i64 < 0
           return TNull.new
         end
 
         # Return the value from the index
-        return identifier.value[member.value.to_i64]
+        return identifier.value[index_i64]
       else
         raise RunTimeError.new("Invalid type #{member.class} for array index expression")
       end
     elsif identifier.is_a? TString
 
       # Resolve the identifier
-      member = exec_expression(member.children[0], stack)
+      member = exec_expression(node.argumentlist.children[0], stack)
 
       # Typecheck
       if member.is_a?(TNumeric)
 
         # Check for out-of-bounds error
-        if member.value.to_i64 > identifier.value.size - 1 || member.value.to_i64 < 0
+        index_i64 = member.value.to_i64
+        if index_i64 > identifier.value.size - 1 || index_i64 < 0
           return TNull.new
         end
 
         # Return the value from the index
-        return TString.new(identifier.value[member.value.to_i64].to_s)
+        return TString.new(identifier.value[index_i64].to_s)
       else
         raise RunTimeError.new("Invalid type #{member.class} for string index expression")
       end
@@ -863,7 +812,7 @@ class Interpreter
 
         # Resolve all children
         arguments = [] of BaseType
-        member.children.each do |child|
+        node.argumentlist.children.each do |child|
           arguments << exec_expression(child, stack)
         end
 
@@ -916,17 +865,14 @@ class Interpreter
   # *arguments* is an actual array of RunTimeType values
   def exec_function(function : TFunc, arguments : Array(BaseType), context)
 
-    # Check if there is a parent stack
-    if (parent_stack = function.parent_stack).is_a? Stack
-      function_stack = Stack.new(parent_stack)
-    else
-      raise RunTimeError.new("Could not find a valid stack for the function to run in. You've found a bug in the interpreter.")
-    end
+    # The stack in which the function runs
+    function_stack = Stack.new(function.parent_stack)
 
     # Get the identities of the arguments that are required
-    argument_ids = function.argumentlist.map { |argument|
-      if argument.is_a? IdentifierLiteral && argument.value.is_a? String
-        result = argument.value
+    argument_ids = [] of String
+    function.argumentlist.children.map { |argument|
+      if argument.is_a? IdentifierLiteral
+        argument_ids << argument.name
       end
     }.compact
 
@@ -938,14 +884,12 @@ class Interpreter
 
       # Check for index out of bounds
       unless index < argument_ids.size
-        next
+        break
       end
 
       # Write the argument into the stack
       id = argument_ids[index]
-      if id.is_a? String
-        function_stack.write(id, arg, true)
-      end
+      function_stack.write(id, arg, true)
     end
 
     # Check if the correct amount of arguments was passed
@@ -1005,27 +949,13 @@ class Interpreter
   def exec_literal(node, stack)
     case node
     when .is_a? NumericLiteral
-      value = node.value
-      if value.is_a?(String)
-        return TNumeric.new(value.to_f)
-      end
+      return TNumeric.new(node.value)
     when .is_a? StringLiteral
-      value = node.value
-      if value.is_a?(String)
-        return TString.new(value)
-      end
+      return TString.new(node.value)
     when .is_a? BooleanLiteral
-      value = node.value
-      if value.is_a?(String)
-        return TBoolean.new(value == "true")
-      end
+      return TBoolean.new(node.value)
     when .is_a? FunctionLiteral
-      argumentlist = node.argumentlist
-      block = node.block
-
-      if argumentlist.is_a? ASTNode && block.is_a? Block
-        return TFunc.new(argumentlist.children, block, stack, !!node.anonymous)
-      end
+      return TFunc.new(node.argumentlist, node.block, stack)
     when .is_a? ArrayLiteral
 
       # Resolve all children first
@@ -1035,11 +965,7 @@ class Interpreter
       end
       return TArray.new(children)
     when .is_a? ClassLiteral
-      block = node.block
-
-      if block.is_a? Block
-        return TClass.new(block, stack)
-      end
+      return TClass.new(node.block, stack)
     when .is_a? NullLiteral
       return TNull.new
     end
@@ -1049,78 +975,46 @@ class Interpreter
 
   # Executes a container literal
   def exec_container_literal(node, stack)
-
-    # Check if there is a block
-    if (block = node.block).is_a? Block
-      classliteral = TClass.new(block, stack)
-      return exec_object_instantiation(classliteral, [] of BaseType, stack)
-    end
-
-    return TNull.new
+    classliteral = TClass.new(node.block, stack)
+    return exec_object_instantiation(classliteral, [] of BaseType, stack)
   end
 
   # Executes a block and catches any catchable exception
   def exec_try_catch(node, stack)
 
-    unless (try_block = node.try_block).is_a? ASTNode
-      raise RunTimeError.new("try_block is not a block. This is a parsing error.")
-    end
-
-    unless (catch_block = node.catch_block).is_a? ASTNode
-      raise RunTimeError.new("catch_block is not a block. This is a parsing error.")
-    end
-
     # The stack in which the catch block will be run in
     catch_stack = Stack.new(stack)
 
     begin
-      return exec_block(try_block, Stack.new(stack))
+      return exec_block(node.try_block, Stack.new(stack))
     rescue e : BaseException
-      if (name = node.exception_name).is_a? IdentifierLiteral
-
-        io = MemoryIO.new
-        e.to_s(io)
-        catch_stack.write(name.value.as(String), TString.new(io.to_s), declaration: true)
-      end
+      io = MemoryIO.new
+      e.to_s(io)
+      catch_stack.write(node.exception_name.name, TString.new(io.to_s), declaration: true)
     rescue e : Events::Throw
-      if (name = node.exception_name).is_a? IdentifierLiteral
-        catch_stack.write(name.value.as(String), e.payload, declaration: true)
-      end
+      catch_stack.write(node.exception_name.name, e.payload, declaration: true)
     end
 
-    return exec_block(catch_block, catch_stack)
+    return exec_block(node.catch_block, catch_stack)
   end
 
   # Returns the boolean representation of a value
   def eval_bool(value, stack)
-
-    bool = false
     case value
     when .is_a? TNumeric
-      bool = value.value != 0_f64
+      return value.value != 0_f64
     when .is_a? TBoolean
-      bool = value.value
-    when .is_a? TString
-      bool = true
-    when .is_a? TFunc
-      bool = true
-    when .is_a? TObject
-      bool = true
-    when .is_a? TClass
-      bool = true
-    when .is_a? TArray
-      bool = true
-    when .is_a? TNull
-      bool = false
+      return value.value
     when .is_a? Bool
-      bool = value
+      return value
+    else
+      return false
     end
-    bool
   end
 
   def exec_return_statement(node, stack)
     return_value = TNull.new
-    if (tmp = node.expression).is_a? ASTNode
+    if !(tmp = node.expression).is_a? Empty
       return_value = exec_expression(node.expression, stack)
     end
 
@@ -1128,11 +1022,7 @@ class Interpreter
   end
 
   def exec_throw_statement(node, stack)
-    throw_value = TNull.new
-    if (tmp = node.expression).is_a? ASTNode
-      throw_value = exec_expression(node.expression, stack)
-    end
-
+    throw_value = exec_expression(node.expression, stack)
     raise Events::Throw.new(throw_value)
   end
 
