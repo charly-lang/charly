@@ -71,7 +71,7 @@ __Times & While loops__
 })
 
 let i = 0
-while (i < 10) {
+while i < 10 {
   print("In a while loop")
   i += 1
 }
