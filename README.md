@@ -1,13 +1,12 @@
 [![Build Status](https://travis-ci.com/KCreate/charly-lang.svg?token=yitMwy9Lg5peiAqCZjoK&branch=master)](https://travis-ci.com/KCreate/charly-lang)
 [![Version](https://img.shields.io/badge/Version-0.0.1-green.svg)](https://github.com/KCreate/charly-lang/releases/tag/v0.0.1)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/KCreate/charly-lang/blob/master/LICENSE)
-[![Maintenacne](https://img.shields.io/maintenance/yes/2016.svg)](https://github.com/KCreate/charly-lang)
 
 <img align="right" alt="Charly" width="150" src="docs/images/charly.png" />
 
 # The Charly programming language
 
-This is my try at writing an interpreter of a dynamic language from scratch with my bare hands. It is implemented in [Crystal](https://crystal-lang.org/). It is absolutely not production-ready and is meant only for learning-purposes.
+This is my try at writing an interpreter of a dynamic language from scratch with my bare hands. It is implemented in [Crystal](https://crystal-lang.org/). It is absolutely not production-ready and is meant only for my own learning-purposes.
 
 # Syntax
 
