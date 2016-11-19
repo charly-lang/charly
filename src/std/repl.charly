@@ -20,7 +20,8 @@ while ((input = "> ".prompt()) ! ".exit") {
     (context.$.typeof() == "Numeric") ||
     (context.$.typeof() == "Boolean") ||
     (context.$.typeof() == "Object") ||
-    (context.$.typeof() == "Class")) {
+    (context.$.typeof() == "Class") ||
+    (context.$.typeof() == "PrimitiveClass")) {
     print(context.$.colorize(33))
   } else if (context.$.typeof() == "Null") {
     print(context.$.colorize(30))
