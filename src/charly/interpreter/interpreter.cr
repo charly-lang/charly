@@ -169,6 +169,11 @@ module Charly
 
         # Check if the identifier exists
         unless scope.defined(node.name)
+
+          if DISALLOWED_VARS.includes? node.name
+            raise RunTimeError.new(node, context, "#{node.name} is a reserved keyword")
+          end
+
           raise RunTimeError.new(node, context, "#{node.name} is not defined")
         end
 
