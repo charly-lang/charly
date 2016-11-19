@@ -688,6 +688,8 @@ module Charly
         node = parse_array_literal
       when TokenType::LeftCurly
         node = parse_container_literal
+      when TokenType::RightArrow
+        node = parse_arrow_function
       when TokenType::Keyword
         case @token.value
         when "func"
@@ -801,6 +803,38 @@ module Charly
       else
         FunctionLiteral.new(nil, arguments, block).at(start_location, block.location_end)
       end
+    end
+
+    private def parse_arrow_function
+      start_location = @token.location
+      expect TokenType::RightArrow
+
+      argumentlist = IdentifierList.new([] of IdentifierLiteral).at(start_location)
+      block = Block.new([] of ASTNode)
+
+      # Parse a possible argumentlist
+      if_token TokenType::LeftParen do
+        advance
+        argumentlist = parse_identifier_list(TokenType::RightParen)
+        expect TokenType::RightParen
+      end
+
+      case @token.type
+      when TokenType::LeftCurly
+        backup_return_allowed = @return_allowed
+        backup_break_allowed = @break_allowed
+        @return_allowed = true
+        @break_allowed = false
+        block = parse_block
+        @return_allowed = backup_return_allowed
+        @break_allowed = backup_break_allowed
+      else
+        expression = parse_expression
+        block << expression
+        block.at(expression)
+      end
+
+      return FunctionLiteral.new(nil, argumentlist, block).at(start_location, block.location_end)
     end
 
     private def parse_class_literal
