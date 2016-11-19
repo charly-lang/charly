@@ -73,18 +73,23 @@ module Charly
     @[AlwaysInline]
     private def unexpected_token(expected : TokenType? = nil, value : String? = nil)
 
-      if expected && value
-        error_message = "Expected #{value}, got #{@token.type}"
-      elsif value
-        error_message = "Expected #{value}, got #{@token.type}"
-      elsif expected
-        error_message = "Expected #{expected}, got #{@token.type}"
-      else
-        error_message = "Unexpected #{@token.type}"
-      end
 
-      if @token.type == TokenType::EOF
-        error_message = "Unexpected end of file"
+      unless @token.type == TokenType::EOF
+        if expected || value
+          error_message = "Expected #{value}, got #{@token.type}"
+        elsif expected
+          error_message = "Expected #{expected}, got #{@token.type}"
+        else
+          error_message = "Unexpected #{@token.type}"
+        end
+      else
+        if expected || value
+          error_message = "Unexpected end of file, expected #{value}"
+        elsif expected
+          error_message = "Unexpected end of file, expected #{expected}"
+        else
+          error_message = "Unexpected end of file"
+        end
       end
 
       raise SyntaxError.new(@token.location, error_message)
@@ -709,7 +714,7 @@ module Charly
           unexpected_token TokenType::Keyword, "func"
         end
       else
-        unexpected_token value: "Expression"
+        unexpected_token value: "an expression"
       end
 
       return node
