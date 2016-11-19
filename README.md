@@ -61,6 +61,9 @@ result # => 50
 ```
 
 __Lambda functions__
+
+> Lambda functions are just syntactic sugar for anonymous functions. They behave 100% the same. Anonymous functions are functions that don't have a name.
+
 ```javascript
 const nums = [1, 2, 3, 4, 5]
 
