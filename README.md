@@ -373,6 +373,8 @@ module Charly::Internals
 end
 ```
 
+- Recompile & reinstall the interpreter
+
 - Link against the method inside your charly program like this:
 
 ```javascript
