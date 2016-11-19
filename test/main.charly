@@ -1055,6 +1055,29 @@ let testResult = TestCase.begin(func(describe) {
       assert(myFunc()(), 25)
     })
 
+    it("sets props on function literals", func(assert) {
+      func foo() {}
+      func bar(a, b, c) {}
+      const a = func() {}
+
+      let check = "this is a check variable"
+
+      assert(foo.name, "foo")
+      assert(bar.name, "bar")
+
+      assert(foo.count, 0)
+      assert(bar.count, 3)
+
+      assert(a.name, "")
+      assert(a.count, 0)
+
+      assert(a.__scope.check, "this is a check variable")
+
+      a.__scope.check = "the check variable changed"
+
+      assert(check, "the check variable changed")
+    })
+
   })
 
   describe("Classes", func(it) {
@@ -1109,6 +1132,80 @@ let testResult = TestCase.begin(func(describe) {
       myBox.changed = true
 
       assert(changed, false)
+    })
+
+    it("calls methods from parent classes", func(assert) {
+      class Box {
+        func foo() {
+          "it works"
+        }
+      }
+
+      class SpecialBox extends Box {}
+
+      const myBox = SpecialBox();
+      assert(myBox.foo(), "it works")
+    })
+
+    it("calls methods from parent classes inside child methods", func(assert) {
+      class Box {
+        func foo() {
+          "it works"
+        }
+      }
+
+      class SpecialBox extends Box {
+        func bar() {
+          @foo()
+        }
+      }
+
+      const myBox = SpecialBox();
+      assert(myBox.bar(), "it works")
+    })
+
+    it("sets props on classes", func(assert) {
+      class A {
+        property name
+        property age
+
+        func constructor(name, age) {
+          @name = name
+          @age = age
+        }
+
+        func foo() {}
+        func bar() {}
+      }
+
+      assert(A.name, "A")
+      assert(A.propcount, 2)
+      assert(A.methodcount, 3)
+      assert(A.parentcount, 0)
+    })
+
+    it("sets props on child classes", func(assert) {
+      class A {
+        property name
+
+        func bar() {}
+      }
+
+      class B extends A {
+        property age
+
+        func constructor(name, age) {
+          @name = name
+          @age = age
+        }
+
+        func foo() {}
+      }
+
+      assert(B.name, "B")
+      assert(B.propcount, 1)
+      assert(B.methodcount, 2)
+      assert(B.parentcount, 1)
     })
 
   })
