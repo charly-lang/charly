@@ -1020,6 +1020,41 @@ let testResult = TestCase.begin(func(describe) {
       assert(foo(25), true)
     })
 
+    it("runs lambda functions", func(assert) {
+      let nums = [1, 2, 3, 4]
+      nums = nums.map(->(num) num ** 2)
+
+      assert(nums, [1, 4, 9, 16])
+    })
+
+    it("assigns lambda functions to variables", func(assert) {
+      let myFunc = ->(arg, arg2) {
+        arg + arg2
+      }
+
+      const result = myFunc(25, 100)
+
+      assert(result, 125)
+    })
+
+    it("gives lambda functions the correct self pointer", func(assert) {
+      let Box = {
+        const name = "charly"
+      }
+      Box.foo = ->@name
+
+      assert(Box.foo(), "charly")
+    })
+
+    it("correctly parses nested lambda functions", func(assert) {
+      const myFunc = ->->{
+        25
+      }
+
+      assert(myFunc().typeof(), "Function")
+      assert(myFunc()(), 25)
+    })
+
   })
 
   describe("Classes", func(it) {
