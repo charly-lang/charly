@@ -57,6 +57,22 @@ module Charly
     # Misc
     EOF
     Unknown
+
+    # :nodoc:
+    def to_s(io)
+      case self
+      when Greater
+        io << ">"
+      when Less
+        io << "<"
+      when GreaterEqual
+        io << ">="
+      when LessEqual
+        io << "<="
+      else
+        io << self
+      end
+    end
   end
 
   class Token
