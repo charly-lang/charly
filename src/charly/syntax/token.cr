@@ -70,7 +70,7 @@ module Charly
       when LessEqual
         io << "<="
       else
-        io << self
+        io << super
       end
     end
   end
