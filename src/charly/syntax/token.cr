@@ -49,6 +49,8 @@ module Charly
     Point
     Comment
     AtSign
+    RightArrow
+    LeftArrow
 
     # Whitespace
     Whitespace

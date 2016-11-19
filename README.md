@@ -11,8 +11,10 @@ This is my try at writing an interpreter of a dynamic language from scratch with
 
 # Syntax
 
+> All syntax samples are highlighted using the javascript highlighter. Because the two languages have a lot of similarities in their syntaxes, this works out most of the time.
+
 __Declaring a variable__
-```charly
+```javascript
 let number = 900
 let float = 5.5928
 let string = "Hello World"
@@ -27,7 +29,7 @@ let object = {
 ```
 
 __Declaring constants__
-```charly
+```javascript
 const PI = 3.14159265358979323846
 const E = 2.7182818284590451
 
@@ -35,7 +37,7 @@ PI = 4 # Cannot redeclare constant PI
 ```
 
 __Objects__
-```charly
+```javascript
 let Box = {
   let name = "mybox"
 }
@@ -46,7 +48,7 @@ Box.name # yourbox
 ```
 
 __Declaring a function__
-```charly
+```javascript
 func callback(value, callback) {
   callback(value)
 }
@@ -58,8 +60,23 @@ let result = callback(25, func(value) {
 result # => 50
 ```
 
+__Lambda functions__
+```javascript
+const nums = [1, 2, 3, 4, 5]
+
+nums.map(->(n) n + 50) # [51, 52, 53, 54, 55]
+
+nums.map(->25) # [25, 25, 25, 25, 25]
+
+nums.map(->Math.rand()) # [0.346, 0.803, 0.428, 0.046, 0.208, 0.150]
+
+nums.map(->{
+  foo()
+}) # ["result of foo", "result of foo", "result of foo", "result of foo", "result of foo"]
+```
+
 __Times & While loops__
-```charly
+```javascript
 5.times(func(i) {
   print("Hello")
 })
@@ -72,7 +89,7 @@ while i < 10 {
 ```
 
 __User Input__
-```charly
+```javascript
 # Strings
 let input = "> ".prompt()
 print(input)
@@ -83,7 +100,7 @@ print(input_number)
 ```
 
 __Primitive types__
-```charly
+```javascript
 25.typeof()                           # => Numeric
 25.5.typeof()                         # => Numeric
 "Charly".typeof()                     # => String
@@ -97,7 +114,7 @@ false.typeof()                        # => Boolean
 ```
 
 __Including other files__
-```charly
+```javascript
 # Include a file in the current directory
 require("foo.charly")
 require("./foo.charly")
@@ -108,7 +125,7 @@ require("math")
 ```
 
 __Working with arrays__
-```charly
+```javascript
 let array = [1, 2, 3]
 array.push(4)
 print(array) # => [1, 2, 3, 4]
@@ -116,7 +133,7 @@ print(array[1]) # => 2
 ```
 
 __Classes & Objects__
-```charly
+```javascript
 class Person {
   property name
   property age
@@ -136,11 +153,11 @@ print(leonard.age) # 16
 
 Even though semicolons are completely optional, you should use them. For example the following two examples would be evaluated the same way:
 
-```charly
+```javascript
 2 test lol 2 * 2 test ()
 ```
 
-```charly
+```javascript
 2;
 test;
 lol;
@@ -150,12 +167,12 @@ test();
 
 The parens around If and while statements are also optional:
 
-```charly
+```javascript
 if size < 100 {
   # code
 }
 
-while should_exit {
+while !should_exit {
   # code
 }
 ```
@@ -174,7 +191,7 @@ $ charly test.charly 1 2 3 -f ast
 
 Will result in:
 
-```charly
+```javascript
 ARGV          # [1, 2, 3]
 IFLAGS        # [ast]
 ENV["SHELL"]  # /bin/bash
@@ -208,7 +225,7 @@ If you need to pass arguments or flags to a REPL session you can do so via the r
 charly repl these are all arguments
 ```
 
-```charly
+```javascript
 > ARGV
 [these, are, all, arguments]
 ```
@@ -237,7 +254,7 @@ When you execute a file, let's say *foo.charly*, the layer structure looks like 
 ```
 
 Let's assume the content of *foo.charly* is the following
-```charly
+```javascript
 func foo(arg) {
   let myval = arg + 1
 }
@@ -267,7 +284,7 @@ The layer structure now looks like this:
 
 # Behaviour of *self* in methods
 The self keyword always points to the object a method was called on. Where the method currently lives is not taken into consideration. Example:
-```charly
+```javascript
 let value = 10
 
 let Box = {
@@ -293,7 +310,7 @@ Instead of writing `self.value` you can write `@value`. It is 100% the same.
 If you directly call method, the interpreter will set *self* to whatever value it was in the scope where the function was defined in. That's the reason why Box.value was set to 50. It behaves kind of like [Arrow functions in JavaScript](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Functions/Arrow_functions). This means you can _"extract"_ functions and they keep working the way you expect them to.
 
 Example:
-```charly
+```javascript
 let Box = {
   let name = "leonard"
 
@@ -356,9 +373,11 @@ module Charly::Internals
 end
 ```
 
+- Recompile & reinstall the interpreter
+
 - Link against the method inside your charly program like this:
 
-```charly
+```javascript
 const mymethod = __internal__method("mymethod")
 
 # will print "You said: Hello World"

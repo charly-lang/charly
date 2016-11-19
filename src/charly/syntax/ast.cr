@@ -189,7 +189,14 @@ module Charly::AST
     argument : ASTNode
 
   ast_node ExpressionList
-  ast_node IdentifierList
+  ast_node IdentifierList do
+    def initialize(children : Array(IdentifierLiteral))
+      @children = [] of ASTNode
+      children.each do |child|
+        @children << child
+      end
+    end
+  end
 
   ast_node ReturnStatement,
     expression : ASTNode

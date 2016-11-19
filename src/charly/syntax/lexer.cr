@@ -98,7 +98,13 @@ module Charly
       when '+'
         consume_operator_or_assignment TokenType::Plus
       when '-'
-        consume_operator_or_assignment TokenType::Minus
+        case peek_char
+        when '>'
+          read_char
+          read_char TokenType::RightArrow
+        else
+          consume_operator_or_assignment TokenType::Minus
+        end
       when '/'
         consume_operator_or_assignment TokenType::Divd
       when '*'
@@ -134,6 +140,8 @@ module Charly
         case read_char
         when '='
           read_char TokenType::LessEqual
+        when '-'
+          read_char TokenType::LeftArrow
         else
           @token.type = TokenType::Less
         end
