@@ -10,8 +10,7 @@ while ((input = "> ".prompt()) ! ".exit") {
   try {
     context.$ = io.eval(input, context)
   } catch(e) {
-    print(e)
-    context.$ = null
+    context.$ = e
   }
 
   # Different coloring based on their types
