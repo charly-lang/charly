@@ -72,14 +72,21 @@ nums.map(->25) # [25, 25, 25, 25, 25]
 
 nums.map(->Math.rand()) # [0.346, 0.803, 0.428, 0.046, 0.208, 0.150]
 
+# The above is the same as writing the following
+nums.map(func() {
+  Math.rand()
+})
+
 nums.map(->{
   foo()
 }) # ["result of foo", "result of foo", "result of foo", "result of foo", "result of foo"]
 ```
 
+Lambda functions that don't contain a block, such as `foo(->25)` behave as if the expression after the `->` was placed inside a block. E.g: `foo(->{ 25 })`
+
 __Times & While loops__
 ```javascript
-5.times(func(i) {
+5.times(->(i) {
   print("Hello")
 })
 
@@ -146,9 +153,42 @@ class Person {
   }
 }
 
+class AwesomePerson extends Person {
+  property awesome_level
+
+  func constructor(name, age, awesome_level) {
+    @name = name
+    @age = age
+    @awesome_level = awesome_level
+  }
+}
+
 let leonard = Person("Leonard", 16)
 print(leonard.name) # "Leonard"
 print(leonard.age) # 16
+```
+
+You can depend on multiple classes.
+
+```javascript
+class Meows {
+  func speak() {
+    print("Meow...")
+  }
+}
+
+class Animal {
+  property name
+
+  func constructor(name) {
+    @name = name
+  }
+}
+
+class Cat extends Animal, Meows {}
+
+const myCat = Cat("Charly")
+myCat.speak()
 ```
 
 # Semicolons & Parens
