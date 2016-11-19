@@ -46,6 +46,26 @@ Box.name = "yourbox"
 Box.name # yourbox
 ```
 
+What you see above is a container literal. A container literal is basically a IIFE whose scope is then turned into an object.
+
+Here is another example of containers
+
+```javascript
+const Box = {
+  let name = "mybox"
+  let type = "Plastic"
+  let size = {
+    let width = 100
+    let height = 80
+    let depth = 90
+  }
+}
+
+Box.name # mybox
+Box.type # Plastic
+Box.size.depth # 100
+```
+
 __Declaring a function__
 ```javascript
 func callback(value, callback) {
@@ -57,6 +77,16 @@ let result = callback(25, func(value) {
 })
 
 result # => 50
+```
+
+You can also use anonymous functions.
+
+```javascript
+let myfunc = func() {
+  25
+}
+
+myFunc() # 25
 ```
 
 __Lambda functions__
@@ -119,6 +149,7 @@ NAN.typeof()                          # => Numeric
 false.typeof()                        # => Boolean
 (class Box {}).typeof()               # => Class
 (func() {}).typeof()                  # => Function
+(->() {}).typeof()                    # => Function
 { let name = "charly" }.typeof()      # => Object
 ```
 
@@ -191,9 +222,36 @@ const myCat = Cat("Charly")
 myCat.speak()
 ```
 
+# Extending primitive types
+
+Below is a REPL session that shows how to extend primitive types.
+
+<img src="docs/images/primitive-types.png"></img>
+
 # Semicolons & Parens
 
-Even though semicolons are completely optional, you should use them. For example the following two examples would be evaluated the same way:
+Semicolons are completly optional, but the absence of one can cause undesired or unexpected behavior. A good example of this would be:
+
+```javascript
+print("hello world")
+[1, 2, 3]
+```
+
+The above is parsed as:
+
+```javascript
+print("hello world")[1, 2, 3]
+```
+
+This won't work as the return value of `print` is `null` and an index expression can only contain a single value.
+
+What you really wan't is the following:
+```javascript
+print("hello world");
+[1, 2, 3]
+```
+
+The following two examples would be evaluated the same way:
 
 ```javascript
 2 test lol 2 * 2 test ()
@@ -207,7 +265,7 @@ lol;
 test();
 ```
 
-The parens around If and while statements are also optional:
+The parens around If and while statements are optional:
 
 ```javascript
 if size < 100 {
@@ -237,7 +295,7 @@ Will result in:
 ARGV          # [1, 2, 3]
 IFLAGS        # [ast]
 ENV["SHELL"]  # /bin/bash
-ENV.SHELL     # /bin/bash
+ENV.HOME      # /Users/leonardschuetz
 ```
 
 # Using the built-in REPL
