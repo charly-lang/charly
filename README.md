@@ -58,6 +58,21 @@ let result = callback(25, func(value) {
 result # => 50
 ```
 
+__Lambda functions__
+```charly
+const nums = [1, 2, 3, 4, 5]
+
+nums.map(->(n) n + 50) # [51, 52, 53, 54, 55]
+
+nums.map(->25) # [25, 25, 25, 25, 25]
+
+nums.map(->Math.rand()) # [0.346, 0.803, 0.428, 0.046, 0.208, 0.150]
+
+nums.map(->{
+  foo()
+}) # ["result of foo", "result of foo", "result of foo", "result of foo", "result of foo"]
+```
+
 __Times & While loops__
 ```charly
 5.times(func(i) {
