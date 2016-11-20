@@ -1,6 +1,7 @@
 const length = __internal__method("length")
 const _colorize = __internal__method("colorize")
 const typeof = __internal__method("typeof")
+const instanceof = __internal__method("instanceof")
 
 export = primitive class Object {
   func length() {
@@ -17,6 +18,10 @@ export = primitive class Object {
 
   func typeof() {
     typeof(self)
+  }
+
+  func instanceof() {
+    instanceof(self)
   }
 
   # Pipes self into *other*

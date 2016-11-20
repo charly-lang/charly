@@ -1208,6 +1208,14 @@ let testResult = TestCase.begin(func(describe) {
       assert(B.parentcount, 1)
     })
 
+    it("gives back the class of an object", func(assert) {
+      class Box {}
+
+      const mybox = Box()
+
+      assert(mybox.instanceof(), Box)
+    })
+
   })
 
   describe("Objects", func(it) {
@@ -1369,6 +1377,12 @@ let testResult = TestCase.begin(func(describe) {
       Box["name"] = "it works"
 
       assert(Box["name"], "it works")
+    })
+
+    it("gives back null on container literals", func(assert) {
+      let Box = {}
+
+      assert(Box.instanceof(), null)
     })
 
   })

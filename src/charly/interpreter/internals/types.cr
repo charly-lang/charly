@@ -21,4 +21,16 @@ module Charly::Internals
     return TString.new("#{value.class}")
   end
 
+  # Returns the class of *value*
+  # null if there is no parent classe
+  charly_api "instanceof", value : TObject do
+    type = value.type
+
+    if type.is_a? TClass
+      return type
+    else
+      return TNull.new
+    end
+  end
+
 end
