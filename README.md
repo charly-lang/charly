@@ -407,7 +407,36 @@ foo(50)
 
 Instead of writing `self.value` you can write `@value`. It is 100% the same.
 
-If you directly call method, the interpreter will set *self* to whatever value it was in the scope where the function was defined in. That's the reason why Box.value was set to 50. It behaves kind of like [Arrow functions in JavaScript](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Functions/Arrow_functions). This means you can _"extract"_ functions and they keep working the way you expect them to.
+If you directly call a method, the interpreter will set *self* to whatever value it was in the scope where the function was defined in. Please note that methods defined in classes are linked with the scope the class is defined in. That's the reason why Box.value was set to 50. It behaves kind of like [Arrow functions in JavaScript](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Functions/Arrow_functions). This means you can _"extract"_ functions and they keep working the way you expect them to.
+
+Example showing how extracted class methods work
+
+```javascript
+let value = 10
+
+class Box {
+  property value
+
+  func constructor() {
+    @value = 10
+  }
+
+  func set(new) {
+    @value = new
+  }
+}
+
+const myBox = Box()
+myBox.set(20)
+
+print(value, myBox.value) # 10 20
+
+const set = myBox.set
+set(50)
+
+print(value, myBox.value) # 50 20
+
+```
 
 Example:
 ```javascript
