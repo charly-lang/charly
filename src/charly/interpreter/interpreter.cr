@@ -138,6 +138,12 @@ module Charly
         scope.write("export", TObject.new, Flag::INIT)
       end
 
+      unless scope.contains "self"
+        self_object = TObject.new
+        self_object.data = scope
+        scope.write("self", self_object, Flag::INIT | Flag::CONSTANT)
+      end
+
       context = Context.new(program, @trace)
       exec_block(program.tree, scope, context)
     end
@@ -169,11 +175,6 @@ module Charly
 
         # Check if the identifier exists
         unless scope.defined(node.name)
-
-          if DISALLOWED_VARS.includes? node.name
-            raise RunTimeError.new(node, context, "#{node.name} is a reserved keyword")
-          end
-
           raise RunTimeError.new(node, context, "#{node.name} is not defined")
         end
 
