@@ -338,7 +338,7 @@ This allows the interpreter to reuse the same object for all primitives.
 This principle applies to all language primitives. The `Array` object for example, specifies a method called `push` which inserts an element into the array.
 
 # Stack layers
-Every file, function, class, object etc. gets it's own stack layer. A stack layer is in essence just a Hashmap that has a pointer to it's parent layer. When you write `myname`, the interpreter searches the current layer for a entry for this variable. If it's not found, it searches the parent layer. If a value is not found in this structure, an exception is raised stating `myname` is not defined.
+Every file, function, class, object etc. gets it's own stack layer. A stack layer is in essence just a Hash-Map that has a pointer to it's parent layer. When you write `myname`, the interpreter searches the current layer for an entry for this variable. If it's not found, it searches the parent layer. If a value is not found in this structure, an exception is raised stating `myname` is not defined.
 
 When you execute a file, let's say *foo.charly*, the layer structure looks like this:
 ```
@@ -407,7 +407,7 @@ foo(50)
 
 Instead of writing `self.value` you can write `@value`. It is 100% the same.
 
-If you directly call a method, the interpreter will set *self* to whatever value it was in the scope where the function was defined in. Please note that methods defined in classes are linked with the scope the class is defined in. That's the reason why Box.value was set to 50. It behaves kind of like [Arrow functions in JavaScript](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Functions/Arrow_functions). This means you can _"extract"_ functions and they keep working the way you expect them to.
+If you directly call a method, the interpreter will set *self* to whatever value it was in the scope where the function was defined in. Please note that methods defined in classes are linked with the scope the class is defined in. It behaves kind of like [Arrow functions in JavaScript](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Functions/Arrow_functions). This means you can _"extract"_ functions and they keep working the way you expect them to.
 
 Example showing how extracted class methods work
 
@@ -469,7 +469,7 @@ at debug.charly:5:17:9
 Unexpected Identifier
 ```
 
-The offending piece will be highlighted red. If your terminal doesn't support colors, an arrow also points to the offensive part.
+The offending piece will be highlighted in red. If your terminal doesn't support colors, an arrow also points to the offensive part.
 
 # Native crystal extensions
 Charly currently has rudimentary support for native extensions written in crystal. The way this works is via crystal files that are compiled directly into the interpreter.
