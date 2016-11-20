@@ -1273,9 +1273,6 @@ module Charly
 
       # Run the block inside the scope
       exec_block(node.block, object_data, context)
-
-      # Remove the self keyword again
-      object_data.delete("self")
       return object
     end
 
