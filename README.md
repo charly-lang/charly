@@ -511,7 +511,8 @@ Flags:
 ```
 
 # Contributors
-- [KCreate - Leonard Schütz](https://github.com/KCreate)
+
+[Contributors](https://github.com/KCreate/charly-lang/blob/master/CONTRIBUTORS.md)
 
 # Inspired by
 - Javascript
