@@ -515,6 +515,14 @@ print(mymethod("Hello World"))
 
 - Finished!
 
+# Atom Syntax Theme
+
+Thanks to [@SpargelPlays](https://github.com/SpargelPlays) for modifying the [language-javascript](https://atom.io/packages/language-javascript) package to make it work with Charly.
+
+Github: [language-charly](https://github.com/SpargelPlays/language-charly)
+
+Atom.io: [language-charly](https://atom.io/packages/language-charly)
+
 # OS Support
 I'm developing on macOS 10.12 so it should work without any problems on that.
 The [CI Build](https://travis-ci.com/KCreate/charly-lang) runs on Ubuntu 12.04.5 LTS.
