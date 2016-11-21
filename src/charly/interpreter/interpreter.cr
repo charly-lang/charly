@@ -661,6 +661,16 @@ module Charly
         end
       end
 
+      # When comparing TPrimitiveClass
+      if left.is_a?(TPrimitiveClass) && right.is_a?(TPrimitiveClass)
+        case operator
+        when TokenType::Equal
+          return TBoolean.new(left == right)
+        when TokenType::Not
+          return TBoolean.new(left != right)
+        end
+      end
+
       # When comparing TObject
       if left.is_a?(TObject) && right.is_a?(TObject)
         case operator

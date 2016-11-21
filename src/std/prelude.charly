@@ -3,9 +3,14 @@ const require_no_prelude = __internal__method("require_no_prelude")
 const require = __internal__method("require")
 require.resolve = __internal__method("require_resolve")
 
+func assert_type(type, value) {
+  value.typeof() == type || value.instanceof() == type
+}
+
 # Primitives
 const Object = require("./primitives/object.charly")
 const Class = require("./primitives/class.charly")
+const PrimitiveClass = require("./primitives/primitive-class.charly")
 const Array = require("./primitives/array.charly")
 const String = require("./primitives/string.charly")
 const Numeric = require("./primitives/numeric.charly")
