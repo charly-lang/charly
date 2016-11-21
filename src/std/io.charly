@@ -11,12 +11,14 @@ export = {
       arguments.each(func(arg) {
         stdout_print(arg.to_s())
       })
+      null
     }
 
     func write() {
       arguments.each(func(arg) {
         stdout_write(arg.to_s())
       })
+      null
     }
   }
 
@@ -26,12 +28,14 @@ export = {
       arguments.each(func(arg) {
         stderr_print(arg.to_s())
       })
+      null
     }
 
     func write() {
       arguments.each(func(arg) {
         stderr_write(arg.to_s())
       })
+      null
     }
   }
 
