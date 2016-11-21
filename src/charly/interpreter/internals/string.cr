@@ -18,11 +18,6 @@ module Charly::Internals
     end
   end
 
-  # Trim a string
-  charly_api "trim", value : TString do
-    return TString.new(value.value.strip)
-  end
-
   # Return the codepoints of a string as an array
   charly_api "ord", value : TString do
     value = value.value
