@@ -814,7 +814,13 @@ module Charly
           value = child.node
           case value
           when .is_a? PropertyDeclaration
-            raise RunTimeError.new(value, context, "Static property declarations are not implemented yet")
+
+            # Check if the property is already defined
+            if class_scope.contains value.identifier.name
+              class_scope.write(value.identifier.name, TNull.new, Flag::None)
+            else
+              class_scope.write(value.identifier.name, TNull.new, Flag::INIT)
+            end
           when .is_a? FunctionLiteral
             method = exec_function_literal(value, class_scope, context)
 
