@@ -393,11 +393,12 @@ module Charly
     end
 
     private def parse_class_statement
+      start_location = @token.location
+
       case @token.type
       when TokenType::Keyword
         case @token.value
         when "property"
-          start_location = @token.location
           advance
 
           identifier = IdentifierLiteral.new("-")
@@ -423,6 +424,12 @@ module Charly
           end
 
           return value
+        when "static"
+          advance
+
+          value = parse_class_statement
+
+          return StaticDeclaration.new(value).at(start_location, value.location_end)
         end
       end
 
