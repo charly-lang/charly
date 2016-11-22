@@ -810,6 +810,28 @@ module Charly
           if child.name.is_a? String
             methods << child
           end
+        when .is_a? StaticDeclaration
+          value = child.node
+          case value
+          when .is_a? PropertyDeclaration
+            raise RunTimeError.new(value, context, "Static property declarations are not implemented yet")
+          when .is_a? FunctionLiteral
+            method = exec_function_literal(value, class_scope, context)
+
+            # Make sure the method has a name
+            unless (name = method.name).is_a? String
+              raise RunTimeError.new(value, context, "Missing method name")
+            end
+
+            # Check if the method is already defined
+            if class_scope.contains name
+              class_scope.write(name, method, Flag::None)
+            else
+              class_scope.write(name, method, Flag::INIT)
+            end
+          else
+            raise RunTimeError.new(child, context, "Unallowed #{value.class.name}")
+          end
         else
           raise RunTimeError.new(child, context, "Unallowed #{child.class.name}")
         end
