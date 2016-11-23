@@ -1299,7 +1299,7 @@ module Charly
 
     private def exec_try_catch_statement(node : TryCatchStatement, scope, context)
       scope = Scope.new(scope)
-      trace_position = context.trace.size - 1
+      trace_position = context.trace.size
 
       begin
         return exec_block(node.try_block, scope, context)
