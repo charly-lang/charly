@@ -1299,13 +1299,22 @@ module Charly
 
     private def exec_try_catch_statement(node : TryCatchStatement, scope, context)
       scope = Scope.new(scope)
+      trace_position = context.trace.size - 1
 
       begin
         return exec_block(node.try_block, scope, context)
       rescue e : UserException
+
+        # Reset the trace position
+        context.trace.delete_at(trace_position..-1)
+
         scope.write(node.exception_name.name, e.payload, Flag::INIT)
         return exec_block(node.catch_block, scope, context)
       rescue e : RunTimeError | SyntaxError
+
+        # Reset the trace position
+        context.trace.delete_at(trace_position..-1)
+
         scope.write(node.exception_name.name, TString.new(e.message || "Uncaught exception"), Flag::INIT)
         return exec_block(node.catch_block, scope, context)
       end
