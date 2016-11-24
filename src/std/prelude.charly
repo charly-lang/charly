@@ -32,4 +32,8 @@ class Exception {
   func constructor(message) {
     @message = message
   }
+
+  func to_s() {
+    "Uncaught " + @instanceof().name + ": " + @message
+  }
 }
