@@ -26,7 +26,7 @@ module Charly
 
     # Creates a new lexer with a String as the source
     def self.new(source : String, filename : String)
-      self.new(MemoryIO.new(source), filename)
+      self.new(IO::Memory.new(source), filename)
     end
 
     # Returns the current char
@@ -613,7 +613,7 @@ module Charly
 
       loop do
         case read_char
-        when .digit?
+        when .number?
           # Nothing to do
         when '_'
           has_underscore = true
@@ -622,11 +622,11 @@ module Charly
         end
       end
 
-      if current_char == '.' && peek_char.digit?
+      if current_char == '.' && peek_char.number?
         read_char
         loop do
           case read_char
-          when .digit?
+          when .number?
             # Nothing to do
           when '_'
             has_underscore = true
@@ -649,7 +649,7 @@ module Charly
     def consume_string(initial_row, initial_column, initial_pos)
 
       @token.type = TokenType::String
-      io = MemoryIO.new
+      io = IO::Memory.new
 
       loop do
         case char = read_char
@@ -743,12 +743,12 @@ module Charly
 
     # Returns true if *char* could be the start of an identifier
     def ident_start(char : Char)
-      char.alpha? || char == '_' || char == '$' || char.ord > 0x9F
+      char.letter? || char == '_' || char == '$' || char.ord > 0x9F
     end
 
     # Returns true if *char* could be inside an identifier
     def ident_part(char : Char)
-      ident_start(char) || char.digit? || char == '$'
+      ident_start(char) || char.number? || char == '$'
     end
 
     # Checks if the current buffer is a keyword of an identifier

@@ -1,21 +1,21 @@
 module Charly
 
-  # UTF-8 wrapper around MemoryIO and File
+  # UTF-8 wrapper around IO::Memory and File
   class Reader
-    property source : File | MemoryIO
-    property buffer : MemoryIO
+    property source : File | IO::Memory
+    property buffer : IO::Memory
     property pos : UInt32
     property current_char : Char
 
     def initialize(@source)
       @pos = 0_u32
-      @buffer = MemoryIO.new
+      @buffer = IO::Memory.new
       @current_char = read_char
     end
 
     # Initiate a new `Reader` from a string
     def self.new(source : String)
-      self.new(MemoryIO.new(source))
+      self.new(IO::Memory.new(source))
     end
 
     # Reads the next char from the source
@@ -63,7 +63,7 @@ module Charly
       self
     end
 
-    # Close File handles or clear the MemoryIO
+    # Close File handles or clear the IO::Memory
     def clear
       if (source = @source).is_a? File
         source.close
@@ -74,11 +74,11 @@ module Charly
   # Same as `Reader` but keeps a window to the buffer
   # The window can be closed and grows when new data is added to the buffer
   class FramedReader < Reader
-    property frame : MemoryIO
+    property frame : IO::Memory
     property pos_frame : UInt32
 
     def initialize(source)
-      @frame = MemoryIO.new
+      @frame = IO::Memory.new
       super
       @pos_frame = @pos
     end

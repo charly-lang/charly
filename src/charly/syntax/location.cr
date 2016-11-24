@@ -20,7 +20,7 @@ module Charly
 
     # :nodoc:
     def loc_to_s
-      io = MemoryIO.new
+      io = IO::Memory.new
       loc_to_s(io)
       io.to_s
     end

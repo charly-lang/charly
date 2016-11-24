@@ -75,7 +75,7 @@ module Charly::Internals
 
     # Parse the program
     # We have to append a whitespace because wtf
-    # This is most likely an issue with the MemoryIO type not being able to pass the end border
+    # This is most likely an issue with the IO::Memory type not being able to pass the end border
     program = Parser.create("#{source.value} ", "--virtual--file--")
 
     prelude = interpreter.prelude

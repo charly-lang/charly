@@ -39,7 +39,7 @@ module Charly
 
     # Creates a program from *source* located inside the virtual directory *basedirectory*
     def self.create(source : String, basedirectory : String, print_tokens : Bool = false)
-      self.create(MemoryIO.new(source), basedirectory + "/VM-#{Time.now.epoch}")
+      self.create(IO::Memory.new(source), basedirectory + "/VM-#{Time.now.epoch}")
     end
 
     # Creates a program from *source* called *filename*
