@@ -11,9 +11,11 @@
     }
 
     if i == 99 {
-      write(".")
-    } else {
+      write("#")
+    } else if i <= 10 {
       write(" ")
+    } else {
+      write(".")
     }
   })
 
