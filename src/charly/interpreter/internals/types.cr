@@ -7,9 +7,7 @@ module Charly::Internals
     case value
     when .is_a? TNumeric
       return value
-    when .is_a? TString
-      return TNumeric.new(value.value.size.to_f64)
-    when .is_a? TArray
+    when .is_a? TString | TArray
       return TNumeric.new(value.value.size.to_f64)
     else
       return TNumeric.new(0)
@@ -22,7 +20,7 @@ module Charly::Internals
   end
 
   # Returns the class of *value*
-  # null if there is no parent classe
+  # null if there is no parent class
   charly_api "instanceof", value : TObject do
     type = value.type
 
