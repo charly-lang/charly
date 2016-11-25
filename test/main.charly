@@ -1143,7 +1143,7 @@ let testResult = TestCase.begin(func(describe) {
 
       class SpecialBox extends Box {}
 
-      const myBox = SpecialBox();
+      const myBox = SpecialBox()
       assert(myBox.foo(), "it works")
     })
 
@@ -1160,7 +1160,7 @@ let testResult = TestCase.begin(func(describe) {
         }
       }
 
-      const myBox = SpecialBox();
+      const myBox = SpecialBox()
       assert(myBox.bar(), "it works")
     })
 
