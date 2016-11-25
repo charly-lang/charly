@@ -7,7 +7,9 @@ module Charly::Internals
     case value
     when .is_a? TNumeric
       return value
-    when .is_a? TString | TArray
+    when .is_a? TString
+      return TNumeric.new(value.value.size.to_f64)
+    when .is_a? TArray
       return TNumeric.new(value.value.size.to_f64)
     else
       return TNumeric.new(0)
