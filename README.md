@@ -349,7 +349,7 @@ When you execute a file, let's say *foo.ch*, the layer structure looks like this
         |
         |
 --------------------------
-| User file (foo.ch) | Contains all values declared within your program
+| User file (foo.ch)     | Contains all values declared within your program
 --------------------------
 ```
 
@@ -366,7 +366,7 @@ foo(value)
 The layer structure now looks like this:
 ```
 --------------------------
-| User file (foo.ch) |
+| User file (foo.ch)     |
 |                        |
 | value: 25              |
 | foo: Function          |
