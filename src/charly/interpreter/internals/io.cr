@@ -82,4 +82,13 @@ module Charly::Internals
     interpreter = Interpreter.new context.data, prelude
     return interpreter.exec_program(program, context.data)
   end
+
+  charly_api "file_get_contents", path : TString do
+
+    if File.exists?(path.value) && File.readable?(path.value)
+      return TString.new(File.read(path.value))
+    end
+
+    return TNull.new
+  end
 end
