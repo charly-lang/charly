@@ -65,11 +65,11 @@ let testResult = TestCase.begin(func(describe) {
     })
 
     it("creates constants", func(assert) {
-      const name = "leonard"
+      const name = "charly"
       const age = 16
       const weather = "sunny"
 
-      assert(name, "leonard")
+      assert(name, "charly")
       assert(age, 16)
       assert(weather, "sunny")
     })
@@ -176,7 +176,7 @@ let testResult = TestCase.begin(func(describe) {
       assert([] == true, true)
       assert([1, 2] == true, true)
       assert(null == false, true)
-      assert({ let name = "leonard" } == true, true)
+      assert({ let name = "charly" } == true, true)
       assert(func() {} == true, true)
       assert(class Test {} == true, true)
     })
@@ -196,7 +196,7 @@ let testResult = TestCase.begin(func(describe) {
       assert({ let a = 1 } == { let a = 1 }, false)
 
       let me = {
-        let name = "Leonard"
+        let name = "charly"
       }
 
       assert(me == me, true)
@@ -409,6 +409,17 @@ let testResult = TestCase.begin(func(describe) {
       })
 
       assert(got == nums, true)
+    })
+
+    it("receives the size of the original array", func(assert) {
+      let _size = 0
+      let nums = [1, 2, 3, 4]
+
+      nums.each(->(item, index, size) {
+        _size = size
+      })
+
+      assert(_size, 4)
     })
 
     it("maps over an array", func(assert) {
@@ -763,6 +774,19 @@ let testResult = TestCase.begin(func(describe) {
       assert("hello world".rstrip(-5), "hello world")
     })
 
+    it("indents a string", func(assert) {
+      let string = ""
+      string += "okay"
+      string += "\n"
+      string += "what"
+      string += "\n"
+      string += "test"
+
+      string = string.indent(2, "-")
+
+      assert(string, "--okay\n--what\n--test")
+    })
+
   })
 
   describe("Functions", func(it) {
@@ -1080,11 +1104,11 @@ let testResult = TestCase.begin(func(describe) {
         }
       }
 
-      let leonard = Person("Leonard", 16)
+      let charly = Person("charly", 16)
       let peter = Person("Peter", 20)
 
-      assert(leonard.name, "Leonard")
-      assert(leonard.age, 16)
+      assert(charly.name, "charly")
+      assert(charly.age, 16)
       assert(peter.name, "Peter")
       assert(peter.age, 20)
     })
@@ -1202,7 +1226,7 @@ let testResult = TestCase.begin(func(describe) {
   describe("Objects", func(it) {
 
     it("can override native methods", func(assert) {
-      let leonard = {
+      let charly = {
         let name
         let age
 
@@ -1210,27 +1234,27 @@ let testResult = TestCase.begin(func(describe) {
           name + " is " + age + " years old!"
         }
       }
-      leonard.name = "Leonard"
-      leonard.age = 16
+      charly.name = "charly"
+      charly.age = 16
 
-      let text = leonard.to_s()
-      assert(text, "Leonard is 16 years old!")
+      let text = charly.to_s()
+      assert(text, "charly is 16 years old!")
     })
 
     it("adds properties to objects", func(assert) {
       class Box {}
       let myBox = Box()
-      myBox.name = "Leonard"
+      myBox.name = "charly"
       myBox.age = 16
 
-      assert(myBox.name, "Leonard")
+      assert(myBox.name, "charly")
       assert(myBox.age, 16)
     })
 
     it("adds functions to objects", func(assert) {
       class Box {}
       let myBox = Box()
-      myBox.name = "Leonard"
+      myBox.name = "charly"
       myBox.age = 16
       myBox.to_s = func() {
         assert(self == myBox, true)
@@ -1241,10 +1265,10 @@ let testResult = TestCase.begin(func(describe) {
         myBox.name + " - " + myBox.age
       }
 
-      assert(myBox.name, "Leonard")
+      assert(myBox.name, "charly")
       assert(myBox.age, 16)
       assert(myBox.do_stuff, null)
-      assert(myBox.to_s(), "Leonard - 16")
+      assert(myBox.to_s(), "charly - 16")
       assert(myBox.do_stuff(), "it works!")
     })
 
@@ -1364,6 +1388,21 @@ let testResult = TestCase.begin(func(describe) {
       let Box = {}
 
       assert(Box.instanceof(), null)
+    })
+
+    it("displays objects as a string", func(assert) {
+      let Box = {
+        let name = "charly"
+        let data = {
+          let foo = "okay"
+          let hello = "world"
+        }
+      }
+
+      let render = Box.to_s()
+
+      print(render)
+      assert(render, "{\n  name: charly\n  data: {\n    foo: okay\n    hello: world\n  }\n}")
     })
 
   })
