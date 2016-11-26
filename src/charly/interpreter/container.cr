@@ -75,6 +75,21 @@ module Charly
       return collection
     end
 
+    # Exactly the same as Container#write except it deletes the key before writing
+    def replace(key : String, value : V, flags : Flag = Flag::None) : V
+
+      if flags.includes? Flag::IGNORE_PARENT
+        if contains key
+          delete key, flags
+        end
+      else
+        if defined key
+          delete key, flags
+        end
+      end
+      write key, value, flags
+    end
+
     # Writes to the container
     # Unless IGNORE_PARENT was passed as a flag,
     # this will try to write to all parent containers if the key
