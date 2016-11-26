@@ -794,10 +794,17 @@ module Charly
       end
 
       # Extract properties and methods
+      class_scope = Scope.new(scope)
       properties = [] of IdentifierLiteral
       methods = [] of FunctionLiteral
 
-      class_scope = Scope.new(scope)
+      # Extract parent methods and properties
+      parents.each do |parent|
+        parent.data.dump_values(false).each do |depth, key, value, flags|
+          class_scope.write(key, value, Flag::INIT | Flag::CONSTANT)
+        end
+      end
+
       node.block.each do |child|
         case child
         when .is_a? PropertyDeclaration
