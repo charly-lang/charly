@@ -9,6 +9,13 @@ export = primitive class String {
     _trim(self)
   }
 
+  # Returns an indented version of self
+  func indent(amount, value) {
+    @split("\n").map(->(line) {
+      (value * amount) + line
+    }).join("\n")
+  }
+
   # Remove n characters from the left
   func lstrip(n) {
     @substring(n, @length() - n)
