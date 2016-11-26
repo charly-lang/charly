@@ -75,7 +75,7 @@ module Charly
 
 
       unless @token.type == TokenType::EOF
-        if expected || value
+        if expected && value
           error_message = "Expected #{value}, got #{@token.type}"
         elsif expected
           error_message = "Expected #{expected}, got #{@token.type}"
@@ -798,9 +798,13 @@ module Charly
         advance
       end
 
-      expect TokenType::LeftParen
-      arguments = parse_identifier_list(TokenType::RightParen)
-      expect TokenType::RightParen
+      arguments = IdentifierList.new([] of ASTNode)
+
+      if_token TokenType::LeftParen do
+        advance
+        arguments = parse_identifier_list(TokenType::RightParen)
+        expect TokenType::RightParen
+      end
 
       backup_return_allowed = @return_allowed
       backup_break_allowed = @break_allowed
