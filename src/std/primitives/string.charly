@@ -9,6 +9,13 @@ export = primitive class String {
     _trim(self)
   }
 
+  # Returns an indented version of self
+  func indent(amount, value) {
+    @split("\n").map(->(line) {
+      (value * amount) + line
+    }).join("\n")
+  }
+
   # Remove n characters from the left
   func lstrip(n) {
     @substring(n, @length() - n)
@@ -107,6 +114,10 @@ export = primitive class String {
     # If the haystack still contains values append them too
     if (haystack.length() > 0) {
       result.push(haystack)
+    }
+
+    if haystack.length() == 0 {
+      result.push("")
     }
 
     # If the needle was an empty string

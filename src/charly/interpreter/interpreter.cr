@@ -759,11 +759,7 @@ module Charly
         node.block,
         scope
       ).tap do |func|
-        func.data.write("name", TString.new(node.name || ""), Flag::INIT)
-        func.data.write("count", TNumeric.new(node.argumentlist.size), Flag::INIT | Flag::CONSTANT)
-        func.data.write("__scope", TObject.new.tap { |object|
-          object.data = scope
-        }, Flag::INIT | Flag::CONSTANT)
+        func.data.replace("name", TString.new(node.name || ""), Flag::INIT)
       end
     end
 
@@ -798,10 +794,17 @@ module Charly
       end
 
       # Extract properties and methods
+      class_scope = Scope.new(scope)
       properties = [] of IdentifierLiteral
       methods = [] of FunctionLiteral
 
-      class_scope = Scope.new(scope)
+      # Extract parent methods and properties
+      parents.each do |parent|
+        parent.data.dump_values(false).each do |depth, key, value, flags|
+          class_scope.write(key, value, Flag::INIT | Flag::CONSTANT)
+        end
+      end
+
       node.block.each do |child|
         case child
         when .is_a? PropertyDeclaration
@@ -809,6 +812,34 @@ module Charly
         when .is_a? FunctionLiteral
           if child.name.is_a? String
             methods << child
+          end
+        when .is_a? StaticDeclaration
+          value = child.node
+          case value
+          when .is_a? PropertyDeclaration
+
+            # Check if the property is already defined
+            if class_scope.contains value.identifier.name
+              class_scope.write(value.identifier.name, TNull.new, Flag::None)
+            else
+              class_scope.write(value.identifier.name, TNull.new, Flag::INIT)
+            end
+          when .is_a? FunctionLiteral
+            method = exec_function_literal(value, class_scope, context)
+
+            # Make sure the method has a name
+            unless (name = method.name).is_a? String
+              raise RunTimeError.new(value, context, "Missing method name")
+            end
+
+            # Check if the method is already defined
+            if class_scope.contains name
+              class_scope.write(name, method, Flag::None)
+            else
+              class_scope.write(name, method, Flag::INIT)
+            end
+          else
+            raise RunTimeError.new(child, context, "Unallowed #{value.class.name}")
           end
         else
           raise RunTimeError.new(child, context, "Unallowed #{child.class.name}")
@@ -821,15 +852,9 @@ module Charly
         methods,
         parents,
         scope
-      ).tap { |obj|
-        obj.data = class_scope
-        obj.data.write("name", TString.new(node.name), Flag::INIT | Flag::CONSTANT)
-        obj.data.write("propcount", TNumeric.new(properties.size), Flag::INIT | Flag::CONSTANT)
-        obj.data.write("methodcount", TNumeric.new(methods.size), Flag::INIT | Flag::CONSTANT)
-        obj.data.write("parentcount", TNumeric.new(parents.size), Flag::INIT | Flag::CONSTANT)
-        obj.data.write("__scope", TObject.new.tap { |object|
-          object.data = scope
-        }, Flag::INIT | Flag::CONSTANT)
+      ).tap { |klass|
+        klass.data = class_scope
+        klass.data.replace("name", TString.new(node.name), Flag::INIT | Flag::CONSTANT | Flag::IGNORE_PARENT)
       }
     end
 
@@ -839,6 +864,7 @@ module Charly
       scope = Scope.new(scope)
 
       # Extract methods of the primitive class
+      primscope = Scope.new(scope)
       methods = [] of TFunc
 
       # Check if a class called Object is defined
@@ -853,14 +879,26 @@ module Charly
 
       # Append the primitive classes own methods
       node.block.each do |statement|
-        if statement.is_a? FunctionLiteral
+        case statement
+        when .is_a? FunctionLiteral
           methods << exec_function_literal(statement, scope, context)
+        when .is_a? PropertyDeclaration
+          raise RunTimeError.new(statement, context, "Primitive classes can't have instance properties")
+        when .is_a? StaticDeclaration
+          case stat_node = statement.node
+          when .is_a? FunctionLiteral
+            method = exec_function_literal(stat_node, scope, context)
+            primscope.write(method.name || "", method, Flag::INIT)
+          when .is_a? PropertyDeclaration
+            primscope.write(stat_node.identifier.name, TNull.new, Flag::INIT)
+          end
         end
       end
 
       # Setup the primitive class and scope
-      primscope = Scope.new(scope)
-      primclass = TPrimitiveClass.new(node.name, scope)
+      method_scope = Scope.new(scope)
+      primclass = TPrimitiveClass.new(node.name, method_scope, scope)
+      primclass.data.write("name", TString.new(node.name), Flag::INIT | Flag::CONSTANT)
       primclass.data = primscope
 
       # Reverse to use correct precedence
@@ -870,7 +908,7 @@ module Charly
       methods.each do |method|
         if (name = method.name).is_a? String
           unless primscope.contains(name)
-            primscope.write(name, method, Flag::INIT | Flag::CONSTANT)
+            method_scope.write(name, method, Flag::INIT | Flag::CONSTANT)
           end
         end
       end
@@ -1213,18 +1251,18 @@ module Charly
       if entry.is_a? TPrimitiveClass
 
         # Check if this class contains the given method
-        if entry.data.contains(methodname)
-          return entry.data.get(methodname, Flag::IGNORE_PARENT)
+        if entry.methods.contains(methodname)
+          return entry.methods.get(methodname, Flag::IGNORE_PARENT)
         end
 
         entry = scope.get("Object")
 
         # Check if this class contains the given method
-        if entry.is_a?(DataType) && entry.data.contains(methodname)
-          method = entry.data.get(methodname, Flag::IGNORE_PARENT)
+        if entry.is_a?(TPrimitiveClass) && entry.methods.contains(methodname)
+          prop = entry.methods.get(methodname, Flag::IGNORE_PARENT)
 
-          if method.is_a? TFunc
-            return method
+          if prop.is_a? BaseType
+            return prop
           end
         end
       end

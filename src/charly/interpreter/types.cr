@@ -155,8 +155,9 @@ module Charly
   class TPrimitiveClass < DataType
     property name : String
     property parent_scope : Scope
+    property methods : Scope
 
-    def initialize(@name, @parent_scope)
+    def initialize(@name, @methods, @parent_scope)
       super()
     end
 

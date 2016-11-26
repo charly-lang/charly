@@ -15,7 +15,7 @@ export = primitive class Array {
     let i = 0
     let size = _length(self)
     while i < size {
-      callback(self[i], i)
+      callback(self[i], i, size)
       i += 1
     }
     self
@@ -28,7 +28,7 @@ export = primitive class Array {
     let size = _length(self)
     let new = []
     while i < size {
-      new.push(callback(self[i], i))
+      new.push(callback(self[i], i, size))
       i += 1
     }
     new
@@ -42,7 +42,7 @@ export = primitive class Array {
     let size = _length(self)
     let result
     while i < size {
-      result = callback(self[i], i)
+      result = callback(self[i], i, size)
       if result {
         new.push(self[i])
       }
@@ -103,7 +103,7 @@ export = primitive class Array {
   }
 
   # Return a new array of a given size
-  func of_size(size, value) {
+  static func of_size(size, value) {
     array_of_size(size, value)
   }
 

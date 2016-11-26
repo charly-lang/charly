@@ -290,6 +290,9 @@ module Charly::AST
   ast_node PropertyDeclaration,
     identifier : IdentifierLiteral
 
+  ast_node StaticDeclaration,
+    node : ASTNode
+
   ast_node LeftParenLiteral
   ast_node RightParenLiteral
   ast_node LeftCurlyLiteral
