@@ -49,7 +49,7 @@ module Charly::Require
 
     # Check if it's a core-module
     if CORE_MODULES.includes? filename
-      return File.join(ENV["CHARLYDIR"], "/src/std/modules/#{filename}.charly")
+      return File.join(ENV["CHARLYDIR"], "/src/std/modules/#{filename}.ch")
     end
 
     # Relative paths

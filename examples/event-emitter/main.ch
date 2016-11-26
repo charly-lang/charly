@@ -1,5 +1,5 @@
 # Require some stuff
-const EventEmitter = require("./event-emitter.charly")
+const EventEmitter = require("./event-emitter.ch")
 const myEmitter = EventEmitter()
 
 # Register the main events

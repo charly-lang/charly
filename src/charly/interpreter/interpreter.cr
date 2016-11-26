@@ -9,7 +9,7 @@ module Charly
   include AST
 
   # The path at which the prelude is located
-  PRELUDE_PATH = File.real_path(ENV["CHARLYDIR"] + "/src/std/prelude.charly")
+  PRELUDE_PATH = File.real_path(ENV["CHARLYDIR"] + "/src/std/prelude.ch")
 
   alias Scope = Container(BaseType)
 

@@ -156,9 +156,9 @@ false.typeof()                        # => Boolean
 __Including other files__
 ```javascript
 # Include a file in the current directory
-require("foo.charly")
-require("./foo.charly")
-require("./dir/foo.charly")
+require("foo.ch")
+require("./foo.ch")
+require("./dir/foo.ch")
 
 # Include the math module from the standard library
 require("math")
@@ -286,7 +286,7 @@ Current environment variables are available via the object `ENV`.
 
 Example:
 ```
-$ charly test.charly 1 2 3 -f ast
+$ charly test.ch 1 2 3 -f ast
 ```
 
 Will result in:
@@ -340,7 +340,7 @@ This principle applies to all language primitives. The `Array` object for exampl
 # Stack layers
 Every file, function, class, object etc. gets it's own stack layer. A stack layer is in essence just a Hash-Map that has a pointer to it's parent layer. When you write `myname`, the interpreter searches the current layer for an entry for this variable. If it's not found, it searches the parent layer. If a value is not found in this structure, an exception is raised stating `myname` is not defined.
 
-When you execute a file, let's say *foo.charly*, the layer structure looks like this:
+When you execute a file, let's say *foo.ch*, the layer structure looks like this:
 ```
 --------------------  Contains bindings to stdout, stderr, stdin
 | Standard Prelude |  and various other functions and primitive classes
@@ -349,11 +349,11 @@ When you execute a file, let's say *foo.charly*, the layer structure looks like 
         |
         |
 --------------------------
-| User file (foo.charly) | Contains all values declared within your program
+| User file (foo.ch) | Contains all values declared within your program
 --------------------------
 ```
 
-Let's assume the content of *foo.charly* is the following
+Let's assume the content of *foo.ch* is the following
 ```javascript
 func foo(arg) {
   let myval = arg + 1
@@ -366,7 +366,7 @@ foo(value)
 The layer structure now looks like this:
 ```
 --------------------------
-| User file (foo.charly) |
+| User file (foo.ch) |
 |                        |
 | value: 25              |
 | foo: Function          |
@@ -458,14 +458,14 @@ This currently only works on objects. If you try to extract a method like *each*
 When the interpreter finds a syntax error, it will be nicely presented to you via the following format:
 
 ```
-test/debug.charly
+test/debug.ch
       1. const buffer = files[i].content
       2. const size = buffer.length()
       3. const offset = size - position
       4.
 ->    5. if (offset < 25 thisfails) {
       6.
-at debug.charly:5:17:9
+at debug.ch:5:17:9
 Unexpected Identifier
 ```
 

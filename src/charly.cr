@@ -69,9 +69,9 @@ module Charly
       filename = before_dash.shift
       arguments = before_dash
 
-      # If the filename is repl, expand the path to the repl.charly file
+      # If the filename is repl, expand the path to the repl.ch file
       if filename == "repl"
-        filename = ENV["CHARLYDIR"] + "/src/std/repl.charly"
+        filename = ENV["CHARLYDIR"] + "/src/std/repl.ch"
       end
     end
   end

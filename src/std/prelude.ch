@@ -8,18 +8,18 @@ func assert_type(type, value) {
 }
 
 # Primitives
-const Object = require("./primitives/object.charly")
-const Class = require("./primitives/class.charly")
-const PrimitiveClass = require("./primitives/primitive-class.charly")
-const Array = require("./primitives/array.charly")
-const String = require("./primitives/string.charly")
-const Numeric = require("./primitives/numeric.charly")
-const Function = require("./primitives/function.charly")
-const Boolean = require("./primitives/boolean.charly")
-const Null = require("./primitives/null.charly")
+const Object = require("./primitives/object.ch")
+const Class = require("./primitives/class.ch")
+const PrimitiveClass = require("./primitives/primitive-class.ch")
+const Array = require("./primitives/array.ch")
+const String = require("./primitives/string.ch")
+const Numeric = require("./primitives/numeric.ch")
+const Function = require("./primitives/function.ch")
+const Boolean = require("./primitives/boolean.ch")
+const Null = require("./primitives/null.ch")
 
 # IO related stuff
-const io = require("./io.charly")
+const io = require("./io.ch")
 const print = io.stdout.print
 const write = io.stdout.write
 const gets = io.stdin.gets

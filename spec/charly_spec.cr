@@ -25,7 +25,7 @@ describe Charly do
 
     # Run the spec
     result = Process.run("./bin/charly", [
-      "test/main.charly"
+      "test/main.ch"
     ], output: STDOUT, input: STDIN, error: STDERR)
 
     result.exit_status.should eq(0)
