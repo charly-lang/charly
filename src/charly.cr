@@ -48,6 +48,18 @@ module Charly
       puts "0.0.1"
       exit
     }
+    opts.on("--license", "Prints the license") {
+      if File.exists?(ENV["CHARLYDIR"] + "/LICENSE") && File.readable?(ENV["CHARLYDIR"] + "/LICENSE")
+        puts File.read(ENV["CHARLYDIR"] + "/LICENSE")
+      end
+      exit
+    }
+    opts.on("--contributors", "Prints the contributors") {
+      if File.exists?(ENV["CHARLYDIR"] + "/CONTRIBUTORS.md") && File.readable?(ENV["CHARLYDIR"] + "/CONTRIBUTORS.md")
+        puts File.read(ENV["CHARLYDIR"] + "/CONTRIBUTORS.md")
+      end
+      exit
+    }
     opts.invalid_option {} # Ignore
     opts.unknown_args do |before_dash|
       before_dash = before_dash.to_a
