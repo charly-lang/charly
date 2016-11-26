@@ -109,6 +109,10 @@ export = primitive class String {
       result.push(haystack)
     }
 
+    if haystack.length() == 0 {
+      result.push("")
+    }
+
     # If the needle was an empty string
     # remove the first element
     if (needle_length == 0) {
