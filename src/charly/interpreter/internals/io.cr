@@ -64,7 +64,7 @@ module Charly::Internals
     return TNumeric.new(Time.now.epoch_ms.to_f64)
   end
 
-  # Sleep for *amount* seconds
+  # Sleep for *amount* miliseconds
   charly_api "sleep", amount : TNumeric do
     sleep amount.value / 1000
     return TNull.new
