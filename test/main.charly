@@ -1221,6 +1221,78 @@ let testResult = TestCase.begin(func(describe) {
       assert(mybox.instanceof(), Box)
     })
 
+    it("creates static properties on classes", func(assert) {
+      class Box {
+        static property count
+
+        func constructor() {
+          Box.count += 1
+        }
+      }
+      Box.count = 0
+
+      Box()
+      Box()
+      Box()
+      Box()
+
+      assert(Box.count, 4)
+    })
+
+    it("creates static methods on classes", func(assert) {
+      class Box {
+        static func do_something() {
+          "static do_something"
+        }
+
+        func do_something() {
+          "instance do_something"
+        }
+      }
+
+      const myBox = Box()
+      assert(myBox.do_something(), "instance do_something")
+      assert(Box.do_something(), "static do_something")
+    })
+
+    it("inherits static methods to child classes", func(assert) {
+      class Box {
+        static func foo() {
+          "static foo"
+        }
+      }
+
+      class SubBox extends Box {}
+
+      assert(SubBox.foo(), "static foo")
+    })
+
+    it("inherits static properties to child classes", func(assert) {
+      class Box {
+        static property foo
+      }
+      Box.foo = 0
+
+      class SubBox extends Box {}
+
+      assert(SubBox.foo, 0)
+
+      Box.foo += 100
+
+      assert(Box.foo, 100)
+      assert(SubBox.foo, 0)
+    })
+
+    it("passes the class via the self identifier on static methods", func(assert) {
+      class Box {
+        static func foo() {
+          assert(self, Box)
+        }
+      }
+
+      Box.foo()
+    })
+
   })
 
   describe("Objects", func(it) {
@@ -1403,6 +1475,19 @@ let testResult = TestCase.begin(func(describe) {
 
       print(render)
       assert(render, "{\n  name: charly\n  data: {\n    foo: okay\n    hello: world\n  }\n}")
+    })
+
+    it("returns all keys of an object", func(assert) {
+      let Box = {
+        let name = "charly"
+        let data = {
+          let foo = "okay"
+          let hello = "world"
+        }
+      }
+
+      const keys = Object.keys(Box)
+      assert(keys, ["name", "data"])
     })
 
   })
