@@ -2,6 +2,7 @@ const length = __internal__method("length")
 const _colorize = __internal__method("colorize")
 const typeof = __internal__method("typeof")
 const instanceof = __internal__method("instanceof")
+const _object_keys = __internal__method("_object_keys")
 
 export = primitive class Object {
   func length() {
@@ -74,5 +75,13 @@ export = primitive class Object {
     })
 
     result
+  }
+
+  static func keys(object) {
+    if object.typeof() ! Object {
+      throw Exception("Expected object, got " + object.typeof())
+    }
+
+    _object_keys(object)
   }
 }
