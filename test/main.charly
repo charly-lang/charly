@@ -1060,22 +1060,9 @@ let testResult = TestCase.begin(func(describe) {
       func bar(a, b, c) {}
       const a = func() {}
 
-      let check = "this is a check variable"
-
       assert(foo.name, "foo")
       assert(bar.name, "bar")
-
-      assert(foo.count, 0)
-      assert(bar.count, 3)
-
       assert(a.name, "")
-      assert(a.count, 0)
-
-      assert(a.__scope.check, "this is a check variable")
-
-      a.__scope.check = "the check variable changed"
-
-      assert(check, "the check variable changed")
     })
 
   })
@@ -1179,9 +1166,6 @@ let testResult = TestCase.begin(func(describe) {
       }
 
       assert(A.name, "A")
-      assert(A.propcount, 2)
-      assert(A.methodcount, 3)
-      assert(A.parentcount, 0)
     })
 
     it("sets props on child classes", func(assert) {
@@ -1203,9 +1187,6 @@ let testResult = TestCase.begin(func(describe) {
       }
 
       assert(B.name, "B")
-      assert(B.propcount, 1)
-      assert(B.methodcount, 2)
-      assert(B.parentcount, 1)
     })
 
     it("gives back the class of an object", func(assert) {
