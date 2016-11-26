@@ -759,11 +759,7 @@ module Charly
         node.block,
         scope
       ).tap do |func|
-        func.data.write("name", TString.new(node.name || ""), Flag::INIT)
-        func.data.write("count", TNumeric.new(node.argumentlist.size), Flag::INIT | Flag::CONSTANT)
-        func.data.write("__scope", TObject.new.tap { |object|
-          object.data = scope
-        }, Flag::INIT | Flag::CONSTANT)
+        func.data.replace("name", TString.new(node.name || ""), Flag::INIT)
       end
     end
 
@@ -849,15 +845,9 @@ module Charly
         methods,
         parents,
         scope
-      ).tap { |obj|
-        obj.data = class_scope
-        obj.data.write("name", TString.new(node.name), Flag::INIT | Flag::CONSTANT)
-        obj.data.write("propcount", TNumeric.new(properties.size), Flag::INIT | Flag::CONSTANT)
-        obj.data.write("methodcount", TNumeric.new(methods.size), Flag::INIT | Flag::CONSTANT)
-        obj.data.write("parentcount", TNumeric.new(parents.size), Flag::INIT | Flag::CONSTANT)
-        obj.data.write("__scope", TObject.new.tap { |object|
-          object.data = scope
-        }, Flag::INIT | Flag::CONSTANT)
+      ).tap { |klass|
+        klass.data = class_scope
+        klass.data.replace("name", TString.new(node.name), Flag::INIT | Flag::CONSTANT | Flag::IGNORE_PARENT)
       }
     end
 
@@ -889,6 +879,7 @@ module Charly
       # Setup the primitive class and scope
       primscope = Scope.new(scope)
       primclass = TPrimitiveClass.new(node.name, scope)
+      primclass.data.write("name", TString.new(node.name), Flag::INIT | Flag::CONSTANT)
       primclass.data = primscope
 
       # Reverse to use correct precedence
