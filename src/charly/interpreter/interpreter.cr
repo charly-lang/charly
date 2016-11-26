@@ -864,6 +864,7 @@ module Charly
       scope = Scope.new(scope)
 
       # Extract methods of the primitive class
+      primscope = Scope.new(scope)
       methods = [] of TFunc
 
       # Check if a class called Object is defined
@@ -878,14 +879,25 @@ module Charly
 
       # Append the primitive classes own methods
       node.block.each do |statement|
-        if statement.is_a? FunctionLiteral
+        case statement
+        when .is_a? FunctionLiteral
           methods << exec_function_literal(statement, scope, context)
+        when .is_a? PropertyDeclaration
+          raise RunTimeError.new(statement, context, "Primitive classes can't have instance properties")
+        when .is_a? StaticDeclaration
+          case stat_node = statement.node
+          when .is_a? FunctionLiteral
+            method = exec_function_literal(stat_node, scope, context)
+            primscope.write(method.name || "", method, Flag::INIT)
+          when .is_a? PropertyDeclaration
+            primscope.write(stat_node.identifier.name, TNull.new, Flag::INIT)
+          end
         end
       end
 
       # Setup the primitive class and scope
-      primscope = Scope.new(scope)
-      primclass = TPrimitiveClass.new(node.name, scope)
+      method_scope = Scope.new(scope)
+      primclass = TPrimitiveClass.new(node.name, method_scope, scope)
       primclass.data.write("name", TString.new(node.name), Flag::INIT | Flag::CONSTANT)
       primclass.data = primscope
 
@@ -896,7 +908,7 @@ module Charly
       methods.each do |method|
         if (name = method.name).is_a? String
           unless primscope.contains(name)
-            primscope.write(name, method, Flag::INIT | Flag::CONSTANT)
+            method_scope.write(name, method, Flag::INIT | Flag::CONSTANT)
           end
         end
       end
@@ -1239,18 +1251,18 @@ module Charly
       if entry.is_a? TPrimitiveClass
 
         # Check if this class contains the given method
-        if entry.data.contains(methodname)
-          return entry.data.get(methodname, Flag::IGNORE_PARENT)
+        if entry.methods.contains(methodname)
+          return entry.methods.get(methodname, Flag::IGNORE_PARENT)
         end
 
         entry = scope.get("Object")
 
         # Check if this class contains the given method
-        if entry.is_a?(DataType) && entry.data.contains(methodname)
-          method = entry.data.get(methodname, Flag::IGNORE_PARENT)
+        if entry.is_a?(TPrimitiveClass) && entry.methods.contains(methodname)
+          prop = entry.methods.get(methodname, Flag::IGNORE_PARENT)
 
-          if method.is_a? TFunc
-            return method
+          if prop.is_a? BaseType
+            return prop
           end
         end
       end
