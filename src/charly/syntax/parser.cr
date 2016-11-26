@@ -211,25 +211,6 @@ module Charly
       body.at(start_location, end_location)
     end
 
-    private def parse_primitive_class_block
-      start_location = nil
-      end_location = nil
-
-      assert_token TokenType::LeftCurly do
-          start_location = @token.location
-          advance
-      end
-
-      body = parse_primitive_class_body
-
-      assert_token TokenType::RightCurly do
-        end_location = @token.location
-        advance
-      end
-
-      body.at(start_location, end_location)
-    end
-
     # Parses the body of a block
     private def parse_block_body(stop_on_curly = true)
       exps = [] of ASTNode
@@ -253,17 +234,6 @@ module Charly
 
       until @token.type == TokenType::RightCurly
         exps << parse_class_statement
-      end
-
-      return Block.new(exps)
-    end
-
-    # Parses the body of a primitive class
-    private def parse_primitive_class_body
-      exps = [] of ASTNode
-
-      until @token.type == TokenType::RightCurly
-        exps << parse_primitive_class_statement
       end
 
       return Block.new(exps)
@@ -434,28 +404,6 @@ module Charly
       end
 
       unexpected_token TokenType::Keyword, "property"
-    end
-
-    private def parse_primitive_class_statement
-      case @token.type
-      when TokenType::Keyword
-        case @token.value
-        when "func"
-          value = parse_func_literal
-
-          if value.name.nil?
-            raise SyntaxError.new(value, @reader.finish.buffer.to_s, @filename, "Missing function name")
-          end
-
-          if_token TokenType::Semicolon do
-            advance
-          end
-
-          return value
-        end
-      end
-
-      unexpected_token TokenType::Keyword, "func"
     end
 
     private def parse_if_statement
