@@ -19,7 +19,7 @@ module Charly
   end
 
   # :nodoc:
-  private class Entry(V)
+  class Entry(V)
     property value : V
     property flags : Flag
 
