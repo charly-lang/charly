@@ -57,6 +57,6 @@ export = ->(it) {
     &reference = 25
 
     assert(string, 25)
-    assert(container.string, 25)
+    assert(container.string.value(), 25)
   })
 }
