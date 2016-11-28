@@ -259,6 +259,11 @@ export = primitive class Array {
     equal
   }
 
+  # Same as Array#__equal but negated
+  func __not(other) {
+    !@__equal(other)
+  }
+
   # Sort an array
   func sort(sort_function) {
     let sorted = @copy()
