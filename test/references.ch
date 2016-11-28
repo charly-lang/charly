@@ -120,19 +120,6 @@ export = ->(it) {
     assert(r1 == r2, true)
   })
 
-  it("keeps a reference to a moved variable", func(assert) {
-    let num = 25
-    let container = {}
-
-    let ref = &num
-
-    container.num = num
-
-    &ref = 30
-
-    assert(container.num, 30)
-  })
-
   it("can't overwrite a constant referenced value", func(assert) {
     const num = 25
     let ref = &num
