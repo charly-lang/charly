@@ -59,4 +59,17 @@ export = ->(it) {
     assert(string, 25)
     assert(container.string.value(), 25)
   })
+
+  it("iterates over an array of references", func(assert) {
+    let n = 0
+    let r = &n
+    let nums = []
+
+    5.times(->{
+      nums.push(&r)
+      n += 1
+    })
+
+    assert(nums, [0, 1, 2, 3, 4])
+  })
 }
