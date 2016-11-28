@@ -72,4 +72,18 @@ export = ->(it) {
 
     assert(nums, [0, 1, 2, 3, 4])
   })
+
+  it("compares references", func(assert) {
+    let n1 = 1
+    let n2 = 2
+
+    let r1 = &n1
+    let r2 = &n2
+
+    assert(r1 == r2, false)
+
+    r2 = &n1
+
+    assert(r1 == r2, true)
+  })
 }
