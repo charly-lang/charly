@@ -52,7 +52,15 @@ module Charly
     end
 
     def to_s(io)
-      io << RunTimeError.new(@origin, @context, "Uncaught: #{@payload}")
+      payload = @payload
+
+      message = "Uncaught #{payload}"
+
+      if payload.is_a?(DataType) && payload.data.contains "message"
+        message += ": #{payload.data.get("message").to_s}"
+      end
+
+      io << RunTimeError.new(@origin, @context, message)
     end
   end
 
