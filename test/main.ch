@@ -1773,8 +1773,33 @@ let testResult = TestCase.begin(func(describe) {
       }
     })
 
+    it("assigns RunTimeErrors a message property", func(assert) {
+      try {
+        const a = 2
+        a = 3
+      } catch(e) {
+        assert(e.message.typeof(), "String")
+        return
+      }
+
+      assert(true, false)
+    })
+
+    it("assigns RunTimeErrors a trace property", func(assert) {
+      try {
+        const a = 2
+        a = 3
+      } catch(e) {
+        assert(e.trace.typeof(), "Array")
+        assert(e.trace.length() > 0, true)
+        return
+      }
+
+      assert(true, false)
+    })
+
   })
 
 })
 
-# exit(testResult)
+exit(testResult)
