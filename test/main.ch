@@ -587,7 +587,6 @@ let testResult = TestCase.begin(func(describe) {
         left < right
       })
 
-      print(sorted)
       assert(sorted, [-100, -29, 20, 900])
     })
 
@@ -1473,7 +1472,6 @@ let testResult = TestCase.begin(func(describe) {
 
       let render = Box.to_s()
 
-      print(render)
       assert(render, "{\n  name: charly\n  data: {\n    foo: okay\n    hello: world\n  }\n}")
     })
 
