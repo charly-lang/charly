@@ -435,7 +435,6 @@ const set = myBox.set
 set(50)
 
 print(value, myBox.value) # 50 20
-
 ```
 
 Example:
