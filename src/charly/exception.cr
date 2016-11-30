@@ -9,7 +9,6 @@ module Charly
   # The base for all exceptions in charly
   class BaseException < Exception
     def to_s(io)
-      io << "\n"
       meta(io)
       io << "#{@message}".colorize(:red)
     end
@@ -30,8 +29,9 @@ module Charly
     property location_end : Location
     property source : String
     property filename : String
+    property trace : Array(Trace)
 
-    def initialize(@location_start, @location_end, @message)
+    def initialize(@location_start, @location_end, @message, @trace = [] of Trace)
       path = @location_start.filename
 
       if path.starts_with? Dir.current
@@ -58,25 +58,30 @@ module Charly
     end
 
     def self.new(node : ASTNode, context : Context, message : String)
-
-      message = "\n#{message.colorize(:red)}"
-      context.trace.each do |entry|
-        message = "#{entry.colorize(:green)}\n#{message}"
-      end
-
-      self.new(node.location_start, node.location_end, message)
+      self.new(node.location_start, node.location_end, message, context.trace)
     end
 
     private def meta(io)
+
+      # Print the filename
       io << @filename.colorize(:yellow)
       io << "\n"
+
+      # Print the source highlight
       if (source = @source).is_a? String
+
+        # They both might be set to null, so check first
         loc_start, loc_end = @location_start, @location_end
         if loc_start.is_a?(Location) && loc_end.is_a?(Location)
           highlighter = SourceHighlight.new(loc_start, loc_end)
           highlighter.present(source, io)
           io << "at #{loc_start}\n".colorize(:green)
         end
+      end
+
+      # Print the stack trace
+      @trace.each do |entry|
+        io << "#{entry.colorize(:green)}\n"
       end
     end
   end

@@ -1358,10 +1358,23 @@ module Charly
         return exec_block(node.catch_block, scope, context)
       rescue e : RunTimeError | SyntaxError
 
+        # Extract the trace entries
+        trace_entries = [] of BaseType
+        context.trace.map { |entry|
+          trace_entries << TString.new(entry.to_s)
+        }
+
         # Reset the trace position
         context.trace.delete_at(trace_position..-1)
 
-        scope.write(node.exception_name.name, TString.new(e.message || "Uncaught exception"), Flag::INIT)
+        # Create the exception object
+        exc = TObject.new
+        exc.data = Scope.new
+        exc.data.write("message", TString.new(e.message || "RunTimeError"), Flag::INIT)
+        exc.data.write("trace", TArray.new(trace_entries), Flag::INIT)
+
+        # Insert into the catch block
+        scope.write(node.exception_name.name, exc, Flag::INIT)
         return exec_block(node.catch_block, scope, context)
       end
     end
