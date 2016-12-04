@@ -1,4 +1,5 @@
 export = primitive class Numeric {
+
   # Call the callback n times
   # The callback receives the index
   func times(callback) {
@@ -93,5 +94,9 @@ export = primitive class Numeric {
 
   func to_n() {
     self
+  }
+
+  func pretty_print() {
+    @to_s().colorize(33)
   }
 }

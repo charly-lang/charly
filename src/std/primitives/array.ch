@@ -102,6 +102,20 @@ export = primitive class Array {
     io
   }
 
+  func pretty_print() {
+    let io = "["
+    let amount = _length(self)
+    @each(func(e, i) {
+      io += e.pretty_print()
+
+      if i ! amount - 1 {
+        io += ", "
+      }
+    })
+    io += "]"
+    io
+  }
+
   # Return a new array of a given size
   static func of_size(size, value) {
     array_of_size(size, value)

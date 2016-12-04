@@ -162,4 +162,8 @@ export = primitive class String {
   func promptc() {
     io.stdin.getc()
   }
+
+  func pretty_print() {
+    ("\"" + self + "\"").colorize(32)
+  }
 }

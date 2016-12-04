@@ -4,4 +4,8 @@ export = primitive class Function {
       callback(self, arguments)
     }
   }
+
+  func pretty_print() {
+    @to_s().colorize(34)
+  }
 }

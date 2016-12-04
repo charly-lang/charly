@@ -31,6 +31,28 @@ export = primitive class Object {
     }
   }
 
+  func pretty_print() {
+    if @typeof() == "Object" {
+      let render = "{\n"
+
+      let child_render = ""
+      Object.keys(self).each(->(key, index, size) {
+        child_render += key + ": " + self[key].pretty_print()
+
+        if index < size - 1 {
+          child_render += "\n"
+        }
+      })
+
+      render += child_render.indent(2, " ")
+      render += "\n}"
+
+      return render
+    } else {
+      "" + self
+    }
+  }
+
   func colorize(code) {
     _colorize(self.to_s(), code)
   }
