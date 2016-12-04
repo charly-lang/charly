@@ -12,13 +12,6 @@ module Charly
       @main_function_collection = LLVM::FunctionCollection.new(@module)
       @builder = LLVM::Builder.new
       @named_values = {} of String => LLVM::Value
-
-      @main_function_collection.add("main", [] of LLVM::Type, LibLLVM.int8_type, false) do |function|
-        function_collection = LLVM::BasicBlockCollection.new function
-        function_collection.append("entry") do |builder|
-          @builder = builder
-        end
-      end
     end
 
     def visit(node : Block)
@@ -26,7 +19,7 @@ module Charly
         visit child
       end
 
-      return LLVM.int LLVM::Int1, 0
+      return LLVM.int LLVM::Int32, 0
     end
 
     def visit(node : VariableInitialisation)
@@ -34,10 +27,10 @@ module Charly
       when FunctionLiteral
         codegen_function_literal node.expression
       else
-        var = @builder.alloca(LLVM::Double, node.identifier.name)
+        var = @builder.alloca(LLVM::Int32, node.identifier.name)
         value = visit node.expression
         result = @builder.store value, var
-        @named_values[node.identifier.name] = var
+        @named_values[node.identifier.name] = value
         result
       end
     end
@@ -58,19 +51,23 @@ module Charly
     end
 
     def visit(node : NumericLiteral)
-      LLVM.double node.value
+      LLVM.int LLVM::Int32, node.value
     end
 
     def visit(node : BinaryExpression)
+
+      left = visit node.left
+      right = visit node.right
+
       case node.operator
       when TokenType::Plus
-        return @builder.fadd(visit(node.left), visit(node.right), "fadd")
+        return @builder.add(left, right, "add")
       when TokenType::Minus
-        return @builder.fsub(visit(node.left), visit(node.right), "fadd")
+        return @builder.sub(left, right, "sub")
       when TokenType::Mult
-        return @builder.fmul(visit(node.left), visit(node.right), "fadd")
+        return @builder.mul(left, right, "mul")
       when TokenType::Divd
-        return @builder.fdiv(visit(node.left), visit(node.right), "fadd")
+        return @builder.sdiv(left, right, "div")
       end
 
       raise Exception.new("Visiting #{node.operator} is not implemented")
@@ -79,14 +76,14 @@ module Charly
     def visit(node : IdentifierLiteral)
       if @named_values.has_key? node.name
         value = @named_values[node.name]
-        return @builder.load value, node.name
+        return value
       end
 
       raise Exception.new("Unknown variable #{node.name} during variable load")
     end
 
     def visit(node : NullLiteral)
-      LLVM.double 0_f64
+      LLVM.int LLVM::Int32, 0
     end
 
     def visit(node : ReturnStatement)
@@ -94,18 +91,58 @@ module Charly
       @builder.ret(value)
     end
 
+    def visit(node : CallExpression)
+      unless (identifier = node.identifier).is_a? IdentifierLiteral
+        raise Exception.new("Calling non-identifiers is not supported yet")
+      end
+
+      # codegen arguments
+      arguments = [] of LLVM::Value
+      node.argumentlist.each do |argument|
+        arguments << visit argument
+      end
+
+      # Check if the method exists
+      unless function = @main_function_collection[identifier.name]?
+        raise Exception.new("Unknown function #{identifier.name}")
+      end
+
+      # codegen call expression
+      @builder.call(function, arguments)
+    end
+
     def visit(node)
       raise Exception.new("Visiting #{node.class} is not implemented")
     end
 
     def codegen_function_literal(node : FunctionLiteral)
-      @main_function_collection.add(node.name.not_nil!, [] of LLVM::Type, LibLLVM.double_type, false) do |function|
+
+      arguments = [] of LLVM::Type
+      node.argumentlist.each do |arg|
+        arguments << LLVM::Int32
+      end
+
+      @main_function_collection.add(node.name.not_nil!, arguments, LLVM::Int32, false) do |function|
+        backup_named_values = @named_values
+        @named_values = {} of String => LLVM::Value
+
+        # Append arguments
+        i = 0
+        while i < function.params.size
+          function.params[i].tap do |argument|
+            if (arg = node.argumentlist[i]).is_a? IdentifierLiteral
+              argument.name = arg.name
+              @named_values[arg.name] = argument
+            end
+          end
+
+          i += 1
+        end
+
         function_collection = LLVM::BasicBlockCollection.new function
         function_collection.append("entry") do |builder|
           backup_builder = @builder
-          backup_named_values = @named_values
           @builder = builder
-          @named_values = {} of String => LLVM::Value
 
           visit(node.block)
 
@@ -114,7 +151,7 @@ module Charly
         end
       end
 
-      LLVM.double 0_f64
+      LLVM.int LLVM::Int32, 0
     end
 
     def codegen_function_literal(node)
