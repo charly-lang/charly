@@ -1,6 +1,7 @@
 require "./charly/syntax/parser.cr"
 require "./charly/interpreter/interpreter.cr"
 require "./charly/gc_warning.cr"
+require "./charly/codegen/visitor.cr"
 require "option_parser"
 
 # :nodoc:
@@ -21,6 +22,7 @@ module Charly
       ast                              Display the AST of the userfile
       tokens                           Display tokens of the userfile
       lint                             Don't execute after parsing (linting)
+      codegen                          Dump llvm-ir (experimental)
   FLAGS
 
   # Check if $CHARLYDIR is set
@@ -82,6 +84,21 @@ module Charly
   end
 
   begin
+
+    if flags.includes? "codegen"
+      program = Parser.create(File.open(filename), filename, print_tokens: flags.includes? "tokens")
+      if flags.includes? "ast"
+        puts program.tree
+      end
+
+      codegen = CodeGenVisitor.new(filename)
+      if program.tree.is_a? Block
+        codegen.visit program.tree
+      end
+      puts codegen.dump_llvm
+
+      exit 0
+    end
 
     # Create some needed scopes
     prelude_scope = Scope.new
