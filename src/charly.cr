@@ -3,6 +3,7 @@ require "./charly/interpreter/interpreter.cr"
 require "./charly/gc_warning.cr"
 require "./charly/codegen/visitor.cr"
 require "option_parser"
+require "tempfile"
 
 # :nodoc:
 def missing_file(filename)
@@ -15,6 +16,7 @@ module Charly
   arguments = [] of String
   flags = [] of String
   filename = ""
+  output_filename = ""
 
   available_flags = <<-FLAGS
 
@@ -49,6 +51,9 @@ module Charly
     opts.on("-v", "--version", "Prints the version number") {
       puts "0.0.1"
       exit
+    }
+    opts.on("-o NAME", "--output NAME", "Output filename when running with -f codegen") { |name|
+      output_filename = name
     }
     opts.on("--license", "Prints the license") {
       if File.exists?(ENV["CHARLYDIR"] + "/LICENSE") && File.readable?(ENV["CHARLYDIR"] + "/LICENSE")
@@ -92,11 +97,43 @@ module Charly
       end
 
       codegen = CodeGenVisitor.new(filename)
+
       if program.tree.is_a? Block
         codegen.visit program.tree
       end
-      puts codegen.dump_llvm
 
+      if flags.includes? "llvmdump"
+        puts codegen.dump_llvm
+        exit 0
+      end
+
+      # Create the tempfile that contains the llvm-ir
+      ir_filename = File.basename(filename, ".ch")
+      tmp_path = "#{Tempfile.dirname}/#{ir_filename}.ll"
+      File.new(tmp_path, "w").tap do |file|
+        codegen.write_bitcode tmp_path
+        file.close
+      end
+
+      if output_filename == ""
+        output_filename = "./#{ir_filename}"
+      end
+
+      # Compile the tempfile using clang
+      result = Process.run(
+        "clang",
+        [
+          tmp_path,
+          "-x", "ir",
+          "-O3",
+          "-o", File.expand_path(output_filename)
+        ],
+        output: STDOUT,
+        error: STDERR,
+        chdir: File.expand_path("./")
+      )
+
+      # Delete it again
       exit 0
     end
 
