@@ -132,7 +132,7 @@ module Charly
     end
 
     # :nodoc:
-    def render_trace(io)
+    private def render_trace(io)
       @trace.reverse.each do |entry|
         io << entry
         io << '\n'
