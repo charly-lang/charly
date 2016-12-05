@@ -3,6 +3,9 @@ require "terminal_table"
 
 module Charly
   class ContainerReferenceError < Exception
+    def to_s(io)
+      io << "ContainerReferenceError: #{@message}"
+    end
   end
 
   @[Flags]
