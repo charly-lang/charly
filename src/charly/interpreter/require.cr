@@ -77,7 +77,7 @@ module Charly::Require
       # Load the included file
       visitor = Visitor.new include_scope, prelude
       program = Parser.create(File.open(path), path)
-      visitor.exec_program(program, include_scope)
+      visitor.visit_program(program, include_scope)
       return include_scope.get("export")
     end
 

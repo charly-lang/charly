@@ -110,7 +110,7 @@ module Charly
     # Parse and run the prelude
     prelude = Parser.create(File.open(PRELUDE_PATH), PRELUDE_PATH)
     unless flags.includes? "lint"
-      visitor.exec_program prelude, prelude_scope
+      visitor.visit_program prelude, prelude_scope
     end
 
     # Parse and run the user file
@@ -120,7 +120,7 @@ module Charly
     end
 
     unless flags.includes? "lint"
-      visitor.exec_program program, user_scope
+      visitor.visit_program program, user_scope
     end
   rescue e : UserException
     puts e

@@ -140,7 +140,7 @@ module Charly
     end
 
     # Executes *program* inside *scope*
-    def exec_program(program : Program, scope : Scope = @top)
+    def visit_program(program : Program, scope : Scope = @top)
 
       # Insert *export* if not already set
       unless scope.contains "export"
@@ -154,32 +154,32 @@ module Charly
       end
 
       context = Context.new(program, @trace)
-      exec_block(program.tree, scope, context)
+      visit_block(program.tree, scope, context)
     end
 
-    private def exec_block(block : Block, scope, context)
+    private def visit_block(block : Block, scope, context)
       last_result = TNull.new
       block.each do |statement|
-        last_result = exec_expression(statement, scope, context)
+        last_result = visit_expression(statement, scope, context)
       end
       last_result
     end
 
-    private def exec_expression(node : ASTNode | BaseType, scope, context)
+    private def visit_expression(node : ASTNode | BaseType, scope, context)
 
       case node
       when .is_a? BaseType
         return node
       when .is_a?(VariableInitialisation), .is_a?(ConstantInitialisation)
-        return exec_initialisation(node, scope, context)
+        return visit_initialisation(node, scope, context)
       when .is_a? VariableAssignment
-        return exec_assignment(node, scope, context)
+        return visit_assignment(node, scope, context)
       when .is_a? UnaryExpression
-        return exec_unary_expression(node, scope, context)
+        return visit_unary_expression(node, scope, context)
       when .is_a? BinaryExpression
-        return exec_binary_expression(node, scope, context)
+        return visit_binary_expression(node, scope, context)
       when .is_a? ComparisonExpression
-        return exec_comparison_expression(node, scope, context)
+        return visit_comparison_expression(node, scope, context)
       when .is_a? IdentifierLiteral
 
         # Check if the identifier exists
@@ -195,63 +195,63 @@ module Charly
       when .is_a? BooleanLiteral
         return TBoolean.new(node.value)
       when .is_a? ArrayLiteral
-        return exec_array_literal(node, scope, context)
+        return visit_array_literal(node, scope, context)
       when .is_a? NullLiteral
         return TNull.new
       when .is_a? FunctionLiteral
-        return exec_function_literal(node, scope, context)
+        return visit_function_literal(node, scope, context)
       when .is_a? ClassLiteral
-        return exec_class_literal(node, scope, context)
+        return visit_class_literal(node, scope, context)
       when .is_a? PrimitiveClassLiteral
-        return exec_primitive_class_literal(node, scope, context)
+        return visit_primitive_class_literal(node, scope, context)
       when .is_a? ContainerLiteral
-        return exec_container_literal(node, scope, context)
+        return visit_container_literal(node, scope, context)
       when .is_a? CallExpression
-        return exec_call_expression(node, scope, context)
+        return visit_call_expression(node, scope, context)
       when .is_a? NANLiteral
         return TNumeric.new(Float64::NAN)
       when .is_a? ReturnStatement
-        expression = exec_expression(node.expression, scope, context)
+        expression = visit_expression(node.expression, scope, context)
         raise ReturnException.new(expression)
       when .is_a? BreakStatement
         raise BreakException.new
       when .is_a? IfStatement
-        return exec_if_statement(node, scope, context)
+        return visit_if_statement(node, scope, context)
       when .is_a? WhileStatement
-        return exec_while_statement(node, scope, context)
+        return visit_while_statement(node, scope, context)
       when .is_a? And
-        left = exec_get_truthyness(exec_expression(node.left, scope, context), scope, context)
+        left = visit_get_truthyness(visit_expression(node.left, scope, context), scope, context)
 
         if left
-          right = exec_get_truthyness(exec_expression(node.right, scope, context), scope, context)
+          right = visit_get_truthyness(visit_expression(node.right, scope, context), scope, context)
           return TBoolean.new(right)
         else
           return TBoolean.new(false)
         end
       when .is_a? Or
-        left_value = exec_expression(node.left, scope, context)
-        left = exec_get_truthyness(left_value, scope, context)
+        left_value = visit_expression(node.left, scope, context)
+        left = visit_get_truthyness(left_value, scope, context)
 
         if left
           return left_value
         else
-          return exec_expression(node.right, scope, context)
+          return visit_expression(node.right, scope, context)
         end
       when .is_a? MemberExpression
-        return exec_member_expression(node, scope, context)
+        return visit_member_expression(node, scope, context)
       when .is_a? IndexExpression
-        return exec_index_expression(node, scope, context)
+        return visit_index_expression(node, scope, context)
       when .is_a? TryCatchStatement
-        return exec_try_catch_statement(node, scope, context)
+        return visit_try_catch_statement(node, scope, context)
       when .is_a? ThrowStatement
-        return exec_throw_statement(node, scope, context)
+        return visit_throw_statement(node, scope, context)
       end
 
       # Catch unknown nodes
       raise RunTimeError.new(node, context, "Unexpected node #{node.class.name.split("::").last}")
     end
 
-    private def exec_initialisation(node : ASTNode, scope, context)
+    private def visit_initialisation(node : ASTNode, scope, context)
 
       # Check if this is a disallowed variable name
       if DISALLOWED_VARS.includes? node.identifier.name
@@ -264,7 +264,7 @@ module Charly
       end
 
       # Resolve the expression
-      expression = exec_expression(node.expression, scope, context)
+      expression = visit_expression(node.expression, scope, context)
 
       # If the expression is a TFunc and it doesn't have a name yet, give it a name
       if expression.is_a? TFunc
@@ -283,10 +283,10 @@ module Charly
       return expression
     end
 
-    private def exec_assignment(node : VariableAssignment, scope, context)
+    private def visit_assignment(node : VariableAssignment, scope, context)
 
       # Resolve the expression
-      expression = exec_expression(node.expression, scope, context)
+      expression = visit_expression(node.expression, scope, context)
 
       # Check the type of the assignment
       case (identifier = node.identifier)
@@ -317,7 +317,7 @@ module Charly
         identifier = identifier.identifier
 
         # Resolve the identifier
-        _identifier = exec_expression(identifier, scope, context)
+        _identifier = visit_expression(identifier, scope, context)
 
         # Write to the data field of the value
         if _identifier.is_a?(DataType)
@@ -338,10 +338,10 @@ module Charly
         identifier = identifier.identifier
 
         # Resolve the identifier
-        target = exec_expression(identifier, scope, context)
+        target = visit_expression(identifier, scope, context)
 
         # Resolve the argument
-        argument = exec_expression(argument, scope, context)
+        argument = visit_expression(argument, scope, context)
 
         case target
         when .is_a? TArray
@@ -379,11 +379,11 @@ module Charly
       end
     end
 
-    private def exec_unary_expression(node : UnaryExpression, scope, context)
+    private def visit_unary_expression(node : UnaryExpression, scope, context)
 
       # Resolve the right side
       operator = node.operator
-      right = exec_expression(node.right, scope, context)
+      right = visit_expression(node.right, scope, context)
 
       override_method_name = UNARY_OPERATOR_MAPPING[operator]
 
@@ -407,7 +407,7 @@ module Charly
           ExpressionList.new([] of ASTNode).at(node.right)
         ).at(node)
 
-        return exec_function_call(method, callex, right, scope, context)
+        return visit_function_call(method, callex, right, scope, context)
       end
 
       case node.operator
@@ -418,17 +418,17 @@ module Charly
           return TNumeric.new(-right.value)
         end
       when TokenType::Not
-        return TBoolean.new(!exec_get_truthyness(right, scope, context))
+        return TBoolean.new(!visit_get_truthyness(right, scope, context))
       end
 
       return TNull.new
     end
 
-    private def exec_binary_expression(node : BinaryExpression, scope, context)
+    private def visit_binary_expression(node : BinaryExpression, scope, context)
 
       # Resolve the left side
       operator = node.operator
-      left = exec_expression(node.left, scope, context)
+      left = visit_expression(node.left, scope, context)
 
       override_method_name = OPERATOR_MAPPING[operator]
 
@@ -454,11 +454,11 @@ module Charly
           ] of ASTNode).at(node.right)
         ).at(node)
 
-        return exec_function_call(method, callex, left, scope, context)
+        return visit_function_call(method, callex, left, scope, context)
       end
 
       # No primitive method was found
-      right = exec_expression(node.right, scope, context)
+      right = visit_expression(node.right, scope, context)
 
       if left.is_a?(TNumeric) && right.is_a?(TNumeric)
         case operator
@@ -512,7 +512,7 @@ module Charly
                 ExpressionList.new([] of ASTNode).at(node.right)
               ).at(node.right)
 
-              right_string = exec_function_call(entry, callex, right, scope, context)
+              right_string = visit_function_call(entry, callex, right, scope, context)
               return TString.new("#{left}#{right_string}")
             end
           end
@@ -546,7 +546,7 @@ module Charly
                 ExpressionList.new([] of ASTNode).at(node.right)
               ).at(node.right)
 
-              right_string = exec_function_call(entry, callex, right, scope, context)
+              right_string = visit_function_call(entry, callex, right, scope, context)
               return TString.new("#{left}#{right_string}")
             end
           end
@@ -564,11 +564,11 @@ module Charly
       return TNumeric.new(Float64::NAN)
     end
 
-    private def exec_comparison_expression(node : ComparisonExpression, scope, context)
+    private def visit_comparison_expression(node : ComparisonExpression, scope, context)
 
       # Resolve the left side
       operator = node.operator
-      left = exec_expression(node.left, scope, context)
+      left = visit_expression(node.left, scope, context)
 
       override_method_name = OPERATOR_MAPPING[operator]
 
@@ -594,11 +594,11 @@ module Charly
           ] of ASTNode).at(node.right)
         ).at(node)
 
-        return exec_function_call(method, callex, left, scope, context)
+        return visit_function_call(method, callex, left, scope, context)
       end
 
       # No primitive method was found
-      right = exec_expression(node.right, scope, context)
+      right = visit_expression(node.right, scope, context)
 
       # When comparing TNumeric's
       if left.is_a?(TNumeric) && right.is_a?(TNumeric)
@@ -735,35 +735,35 @@ module Charly
       if left.is_a?(TBoolean) && !right.is_a?(TBoolean)
         case operator
         when TokenType::Equal
-          return TBoolean.new(left.value == exec_get_truthyness(right, scope, context))
+          return TBoolean.new(left.value == visit_get_truthyness(right, scope, context))
         when TokenType::Not
-          return TBoolean.new(left.value != exec_get_truthyness(right, scope, context))
+          return TBoolean.new(left.value != visit_get_truthyness(right, scope, context))
         end
       end
 
       if !left.is_a?(TBoolean) && right.is_a?(TBoolean)
         case operator
         when TokenType::Equal
-          return TBoolean.new(right.value == exec_get_truthyness(left, scope, context))
+          return TBoolean.new(right.value == visit_get_truthyness(left, scope, context))
         when TokenType::Not
-          return TBoolean.new(right.value != exec_get_truthyness(left, scope, context))
+          return TBoolean.new(right.value != visit_get_truthyness(left, scope, context))
         end
       end
 
       return TBoolean.new(false)
     end
 
-    private def exec_array_literal(node : ArrayLiteral, scope, context)
+    private def visit_array_literal(node : ArrayLiteral, scope, context)
       content = [] of BaseType
 
       node.each do |item|
-        content << exec_expression(item, scope, context)
+        content << visit_expression(item, scope, context)
       end
 
       return TArray.new(content)
     end
 
-    private def exec_function_literal(node : FunctionLiteral, scope, context)
+    private def visit_function_literal(node : FunctionLiteral, scope, context)
       TFunc.new(
         node.name,
         node.argumentlist,
@@ -774,7 +774,7 @@ module Charly
       end
     end
 
-    private def exec_class_literal(node : ClassLiteral, scope, context)
+    private def visit_class_literal(node : ClassLiteral, scope, context)
 
       # Check if parent classes exist
       parents = [] of TClass
@@ -836,7 +836,7 @@ module Charly
               class_scope.write(value.identifier.name, TNull.new, Flag::INIT)
             end
           when .is_a? FunctionLiteral
-            method = exec_function_literal(value, class_scope, context)
+            method = visit_function_literal(value, class_scope, context)
 
             # Make sure the method has a name
             unless (name = method.name).is_a? String
@@ -869,7 +869,7 @@ module Charly
       }
     end
 
-    private def exec_primitive_class_literal(node : PrimitiveClassLiteral, scope, context)
+    private def visit_primitive_class_literal(node : PrimitiveClassLiteral, scope, context)
 
       # The scope in which we run
       scope = Scope.new(scope)
@@ -892,13 +892,13 @@ module Charly
       node.block.each do |statement|
         case statement
         when .is_a? FunctionLiteral
-          methods << exec_function_literal(statement, scope, context)
+          methods << visit_function_literal(statement, scope, context)
         when .is_a? PropertyDeclaration
           raise RunTimeError.new(statement, context, "Primitive classes can't have instance properties")
         when .is_a? StaticDeclaration
           case stat_node = statement.node
           when .is_a? FunctionLiteral
-            method = exec_function_literal(stat_node, scope, context)
+            method = visit_function_literal(stat_node, scope, context)
             primscope.write(method.name || "", method, Flag::INIT)
           when .is_a? PropertyDeclaration
             primscope.write(stat_node.identifier.name, TNull.new, Flag::INIT)
@@ -927,24 +927,24 @@ module Charly
       return primclass
     end
 
-    private def exec_call_expression(node : CallExpression, scope, context)
+    private def visit_call_expression(node : CallExpression, scope, context)
 
       # If the identifier is a IdentifierLiteral we check if it is "__internal__method"
       # Similarly if the identifier is a member expression, we need that to resolve that seperately too
       identifier = node.identifier
       case identifier
       when .is_a? MemberExpression
-        identifier, target = exec_get_member_expression_pairs(identifier, scope, context)
+        identifier, target = visit_get_member_expression_pairs(identifier, scope, context)
       when .is_a?(IdentifierLiteral)
         unless identifier.name == "__internal__method"
           identifier = nil
-          target = exec_expression(node.identifier, scope, context)
+          target = visit_expression(node.identifier, scope, context)
         else
 
           # Resolve all arguments
           arguments = [] of BaseType
           node.argumentlist.each do |expression|
-            arguments << exec_expression(expression, scope, context)
+            arguments << visit_expression(expression, scope, context)
           end
 
           # Check if at least 1 argument is given
@@ -973,20 +973,20 @@ module Charly
           raise RunTimeError.new(node, context, "Failed to extract internal function #{name.value}")
         end
       when .is_a? IndexExpression
-        identifier, target = exec_get_index_expression_pairs(identifier, scope, context)
+        identifier, target = visit_get_index_expression_pairs(identifier, scope, context)
       else
         identifier = nil
-        target = exec_expression(node.identifier, scope, context)
+        target = visit_expression(node.identifier, scope, context)
       end
 
       if target.is_a? TFunc
-        return exec_function_call(target, node, identifier, scope, context)
+        return visit_function_call(target, node, identifier, scope, context)
       elsif target.is_a? TInternalFunc
 
         # Resolve the arguments
         arguments = [] of BaseType
         node.argumentlist.each do |expression|
-          arguments << exec_expression(expression, scope, context)
+          arguments << visit_expression(expression, scope, context)
         end
 
         start = Time.now.epoch_ms
@@ -994,7 +994,7 @@ module Charly
 
         return result
       elsif target.is_a? TClass
-        return exec_class_call(target, node, scope, context)
+        return visit_class_call(target, node, scope, context)
       elsif target.is_a? TPrimitiveClass
         raise RunTimeError.new(node.identifier, context, "Can't instantiate primitive class #{target}")
       else
@@ -1002,7 +1002,7 @@ module Charly
       end
     end
 
-    private def exec_function_call(target : TFunc, node : CallExpression, identifier : BaseType?, scope, context)
+    private def visit_function_call(target : TFunc, node : CallExpression, identifier : BaseType?, scope, context)
 
       # The scope in which the function will run
       function_scope = Scope.new(target.parent_scope)
@@ -1025,7 +1025,7 @@ module Charly
       # Resolve the arguments
       arguments = [] of BaseType
       node.argumentlist.each do |arg|
-        arguments << exec_expression(arg, scope, context)
+        arguments << visit_expression(arg, scope, context)
       end
 
       # Insert the arguments
@@ -1053,7 +1053,7 @@ module Charly
       # Execute the functions block inside the function_scope
       @trace << Trace.new("#{target.name || "anonymous"}", node)
       begin
-        result = exec_block(target.block, function_scope, context)
+        result = visit_block(target.block, function_scope, context)
       rescue e : ReturnException
         result = e.payload
       end
@@ -1062,7 +1062,7 @@ module Charly
       return result
     end
 
-    private def exec_class_call(target : TClass, node : CallExpression, scope, context)
+    private def visit_class_call(target : TClass, node : CallExpression, scope, context)
 
       # Initialize an empty object
       object = TObject.new(target)
@@ -1115,7 +1115,7 @@ module Charly
 
         # Execute the constructor function inside the object_scope
         @trace << Trace.new("#{target.name}:constructor", node)
-        exec_function_call(constructor, callex, object, scope, context)
+        visit_function_call(constructor, callex, object, scope, context)
         @trace.pop
       end
 
@@ -1150,30 +1150,30 @@ module Charly
       end
 
       target.methods.each do |method|
-        methods << exec_function_literal(method, target.parent_scope, context)
+        methods << visit_function_literal(method, target.parent_scope, context)
       end
 
       methods
     end
 
-    private def exec_member_expression(node : MemberExpression, scope, context)
-      return exec_get_member_expression_pairs(node, scope, context)[1]
+    private def visit_member_expression(node : MemberExpression, scope, context)
+      return visit_get_member_expression_pairs(node, scope, context)[1]
     end
 
-    private def exec_get_member_expression_pairs(node : MemberExpression, scope, context)
+    private def visit_get_member_expression_pairs(node : MemberExpression, scope, context)
 
       # Resolve the left side
-      identifier = exec_expression(node.identifier, scope, context)
+      identifier = visit_expression(node.identifier, scope, context)
 
       # Check if the member name is allowed
       if DISALLOWED_VARS.includes? node.member.name
         raise RunTimeError.new(node.member, context, "#{node.member.name} is a reserved keyword")
       end
 
-      return exec_get_member_expression_pairs_via_name(identifier, node.member.name, scope, context)
+      return visit_get_member_expression_pairs_via_name(identifier, node.member.name, scope, context)
     end
 
-    private def exec_get_member_expression_pairs_via_name(identifier : BaseType, member : String, scope, context)
+    private def visit_get_member_expression_pairs_via_name(identifier : BaseType, member : String, scope, context)
 
       # Check if the member name is allowed
       if DISALLOWED_VARS.includes? member
@@ -1194,17 +1194,17 @@ module Charly
       return ({ identifier, TNull.new })
     end
 
-    private def exec_index_expression(node : IndexExpression, scope, context)
-      return exec_get_index_expression_pairs(node, scope, context)[1]
+    private def visit_index_expression(node : IndexExpression, scope, context)
+      return visit_get_index_expression_pairs(node, scope, context)[1]
     end
 
-    private def exec_get_index_expression_pairs(node : IndexExpression, scope, context)
+    private def visit_get_index_expression_pairs(node : IndexExpression, scope, context)
 
       # Resolve the left side
-      identifier = exec_expression(node.identifier, scope, context)
+      identifier = visit_expression(node.identifier, scope, context)
 
       # Resolve the argument
-      argument = exec_expression(node.argument, scope, context)
+      argument = visit_expression(node.argument, scope, context)
 
       # Check if the left side is an array or a string
       case identifier
@@ -1243,7 +1243,7 @@ module Charly
           raise RunTimeError.new(node.argument, context, "Expected string, got #{argument.class}")
         end
 
-        return exec_get_member_expression_pairs_via_name(identifier, argument.value, scope, context)
+        return visit_get_member_expression_pairs_via_name(identifier, argument.value, scope, context)
       else
         raise RunTimeError.new(node, context, "Expected left side to be an array or string. Got: #{identifier.class}")
       end
@@ -1281,37 +1281,37 @@ module Charly
       return TNull.new
     end
 
-    private def exec_if_statement(node : IfStatement, scope, context)
+    private def visit_if_statement(node : IfStatement, scope, context)
 
       scope = Scope.new(scope)
 
       # Resolve the expression first
-      test = exec_expression(node.test, scope, context)
-      test = exec_get_truthyness(test, scope, context)
+      test = visit_expression(node.test, scope, context)
+      test = visit_get_truthyness(test, scope, context)
 
       if test
-        return exec_block(node.consequent, scope, context)
+        return visit_block(node.consequent, scope, context)
       else
         alternate = node.alternate
         if alternate.is_a? IfStatement
-          return exec_if_statement(alternate, scope, context)
+          return visit_if_statement(alternate, scope, context)
         elsif alternate.is_a? Block
-          return exec_block(alternate, scope, context)
+          return visit_block(alternate, scope, context)
         else
           return TNull.new
         end
       end
     end
 
-    private def exec_while_statement(node : WhileStatement, scope, context)
+    private def visit_while_statement(node : WhileStatement, scope, context)
 
       scope = Scope.new(scope)
 
       # Resolve the expression first
       last_result = TNull.new
-      while exec_get_truthyness(exec_expression(node.test, scope, context), scope, context)
+      while visit_get_truthyness(visit_expression(node.test, scope, context), scope, context)
         begin
-          last_result = exec_block(node.consequent, scope, context)
+          last_result = visit_block(node.consequent, scope, context)
         rescue e : BreakException
           break
         end
@@ -1320,7 +1320,7 @@ module Charly
       return last_result
     end
 
-    private def exec_container_literal(node : ContainerLiteral, scope, context)
+    private def visit_container_literal(node : ContainerLiteral, scope, context)
 
       # Create the object
       object = TObject.new
@@ -1331,11 +1331,11 @@ module Charly
       object_data.write("self", object, Flag::INIT | Flag::CONSTANT)
 
       # Run the block inside the scope
-      exec_block(node.block, object_data, context)
+      visit_block(node.block, object_data, context)
       return object
     end
 
-    private def exec_get_truthyness(value : BaseType, scope, context)
+    private def visit_get_truthyness(value : BaseType, scope, context)
       case value
       when .is_a? TBoolean
         return value.value
@@ -1346,19 +1346,19 @@ module Charly
       end
     end
 
-    private def exec_try_catch_statement(node : TryCatchStatement, scope, context)
+    private def visit_try_catch_statement(node : TryCatchStatement, scope, context)
       scope = Scope.new(scope)
       trace_position = context.trace.size
 
       begin
-        return exec_block(node.try_block, scope, context)
+        return visit_block(node.try_block, scope, context)
       rescue e : UserException
 
         # Reset the trace position
         context.trace.delete_at(trace_position..-1)
 
         scope.write(node.exception_name.name, e.payload, Flag::INIT)
-        return exec_block(node.catch_block, scope, context)
+        return visit_block(node.catch_block, scope, context)
       rescue e : RunTimeError | SyntaxError
 
         # Extract the trace entries
@@ -1378,12 +1378,12 @@ module Charly
 
         # Insert into the catch block
         scope.write(node.exception_name.name, exc, Flag::INIT)
-        return exec_block(node.catch_block, scope, context)
+        return visit_block(node.catch_block, scope, context)
       end
     end
 
-    private def exec_throw_statement(node : ThrowStatement, scope, context)
-      expression = exec_expression(node.expression, scope, context)
+    private def visit_throw_statement(node : ThrowStatement, scope, context)
+      expression = visit_expression(node.expression, scope, context)
       raise UserException.new(expression, @trace.dup, node, context)
     end
   end

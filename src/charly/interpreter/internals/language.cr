@@ -43,7 +43,7 @@ module Charly::Internals
       end
 
       program = Parser.create(File.open(path), path)
-      visitor.exec_program(program, scope)
+      visitor.visit_program(program, scope)
       return TNull.new
     rescue e : Require::FileNotFoundException
       raise RunTimeError.new(call.argumentlist[0], "Can't load #{filename}")
