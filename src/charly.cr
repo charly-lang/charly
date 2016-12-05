@@ -1,5 +1,6 @@
 require "./charly/syntax/parser.cr"
 require "./charly/interpreter/visitor.cr"
+require "./charly/interpreter/prelude.cr"
 require "./charly/gc_warning.cr"
 require "option_parser"
 
@@ -83,44 +84,21 @@ module Charly
 
   begin
 
-    # Create some needed scopes
-    prelude_scope = Scope.new
+    # Parse the prelude and userfile
+    prelude_program = Parser.create(File.open(PRELUDE_PATH), PRELUDE_PATH)
+    user_program = Parser.create(File.open(filename), filename, print_tokens: flags.includes? "tokens")
+
+    if flags.includes? "ast"
+      puts user_program.tree
+    end
+
+    prelude_scope = PreludeLoader.load(PRELUDE_PATH, arguments, flags)
     user_scope = Scope.new(prelude_scope)
     visitor = Visitor.new(user_scope, prelude_scope)
 
-    # Insert ARGV, FLAGS and ENV
-    c_argv = [] of BaseType
-    c_iflags = [] of BaseType
-    arguments.each do |arg|
-      c_argv << TString.new arg
-    end
-    flags.each do |arg|
-      c_iflags << TString.new arg
-    end
-
-    prelude_scope.write("ARGV", TArray.new(c_argv), Flag::INIT | Flag::CONSTANT)
-    prelude_scope.write("IFLAGS", TArray.new(c_iflags), Flag::INIT | Flag::CONSTANT)
-
-    env_object = TObject.new
-    ENV.each do |key, value|
-      env_object.data.write(key, TString.new(value), Flag::INIT | Flag::CONSTANT)
-    end
-    prelude_scope.write("ENV", env_object, Flag::INIT | Flag::CONSTANT)
-
-    # Parse and run the prelude
-    prelude = Parser.create(File.open(PRELUDE_PATH), PRELUDE_PATH)
     unless flags.includes? "lint"
-      visitor.visit_program prelude, prelude_scope
-    end
-
-    # Parse and run the user file
-    program = Parser.create(File.open(filename), filename, print_tokens: flags.includes? "tokens")
-    if flags.includes? "ast"
-      puts program.tree
-    end
-
-    unless flags.includes? "lint"
-      visitor.visit_program program, user_scope
+      visitor.visit_program prelude_program, prelude_scope
+      visitor.visit_program user_program, user_scope
     end
   rescue e : UserException
     puts e
