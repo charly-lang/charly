@@ -12,6 +12,9 @@ module Charly
       @main_function_collection = LLVM::FunctionCollection.new(@module)
       @builder = LLVM::Builder.new
       @named_values = {} of String => LLVM::Value
+
+      # TODO: Dynamic target triple based on current system
+      @module.target = "x86_64-apple-macosx10.12.0"
     end
 
     def visit(node : Block)
