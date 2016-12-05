@@ -161,6 +161,10 @@ module Charly
       raise Exception.new("#{node} is not a function literal")
     end
 
+    def write_bitcode(filename)
+      @module.write_bitcode filename
+    end
+
     def dump_llvm
       @module.to_s
     end
