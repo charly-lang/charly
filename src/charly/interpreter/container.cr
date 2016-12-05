@@ -210,6 +210,14 @@ module Charly
       n
     end
 
+    # Returns the top most container in this structure
+    def top
+      if (parent = @parent).is_a? Container(V)
+        return parent.top
+      end
+      self
+    end
+
     # Checks if the current container contains *key*
     def contains(key : String, flags : Flag = Flag::None) : Bool
       @values.has_key? key
