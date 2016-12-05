@@ -33,7 +33,7 @@ module Charly
         var = @builder.alloca(LLVM::Int32, node.identifier.name)
         value = visit node.expression
         result = @builder.store value, var
-        @named_values[node.identifier.name] = value
+        @named_values[node.identifier.name] = var
         result
       end
     end
@@ -78,8 +78,14 @@ module Charly
 
     def visit(node : IdentifierLiteral)
       if @named_values.has_key? node.name
-        value = @named_values[node.name]
-        return value
+        var = @named_values[node.name]
+
+        # Check if this value is a pointer
+        if var.type == LLVM::Type.pointer(LLVM::Type.int(32))
+          return @builder.load(var, node.name)
+        else
+          return var
+        end
       end
 
       raise Exception.new("Unknown variable #{node.name} during variable load")
@@ -121,7 +127,7 @@ module Charly
     def codegen_function_literal(node : FunctionLiteral)
 
       arguments = [] of LLVM::Type
-      node.argumentlist.each do |arg|
+      node.argumentlist.size.times do
         arguments << LLVM::Int32
       end
 
