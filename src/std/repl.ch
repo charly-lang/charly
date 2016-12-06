@@ -1,6 +1,7 @@
 const context = {
   let $
   const context = self
+  const history = []
 }
 
 let input
@@ -14,6 +15,8 @@ while ((input = "> ".prompt()) ! ".exit") {
   }
 
   print(context.$.pretty_print())
+
+  context.history.push(input)
 }
 
 export = context
