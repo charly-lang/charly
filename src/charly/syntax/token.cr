@@ -1,9 +1,7 @@
 require "./location.cr"
 
 module Charly
-
   enum TokenType
-
     # Literals
     Numeric
     Identifier

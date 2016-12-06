@@ -80,7 +80,6 @@ module Charly
 
     # Exactly the same as Container#write except it deletes the key before writing
     def replace(key : String, value : V, flags : Flag = Flag::None) : V
-
       if flags.includes? Flag::IGNORE_PARENT
         if contains key
           delete key, flags
@@ -103,10 +102,8 @@ module Charly
     # - *key* is a constant
     # - *key* Is already defined
     def write(key : String, value : V, flags : Flag = Flag::None) : V
-
       # Declarations
       if flags.includes? Flag::INIT
-
         # Check if the value already exists
         if contains key
           raise ContainerReferenceError.new("#{key} is already defined")
@@ -117,7 +114,6 @@ module Charly
       end
 
       if contains key
-
         # Check if the value is a constant
         entry = @values[key]
         if !flags.includes?(Flag::OVERWRITE_CONSTANT) && entry.is_constant
@@ -254,7 +250,6 @@ module Charly
 
     # :nodoc:
     def to_s(io)
-
       table = TerminalTable.new
       table.headings = ["CID", "Key", "Value", "Flags"]
 

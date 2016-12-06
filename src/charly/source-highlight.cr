@@ -2,10 +2,9 @@ require "colorize"
 require "./syntax/location.cr"
 
 module Charly
-
   # Highlight a part of a file
   class SourceHighlight
-    LOOKBACK_ROW = 5
+    LOOKBACK_ROW    = 5
     LOOKFORWARD_ROW = 2
 
     property location_start : Location
@@ -16,7 +15,6 @@ module Charly
 
     # Write the highlighted *source* into *io*
     def present(source, io)
-
       # The range we need to color in red
       color_pos_range = @location_start.pos...(@location_end.pos + @location_end.length)
       color_range = @location_start.row..@location_end.row
@@ -37,7 +35,6 @@ module Charly
         line = line.rstrip
 
         if print_range.covers? index
-
           unless print_range.first == index
             io << "\n"
           end

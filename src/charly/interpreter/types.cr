@@ -2,7 +2,6 @@ require "./container.cr"
 require "../syntax/ast.cr"
 
 module Charly
-
   # The basetype of all types in charly
   abstract class BaseType
     abstract def name(io) : String
@@ -43,7 +42,6 @@ module Charly
 
   # Numeric
   class TNumeric < PrimitiveType(Float64)
-
     def self.new(value : Number)
       self.new(value.to_f64)
     end
@@ -193,7 +191,7 @@ module Charly
   # This is a quick and dirty workaround
   # This is currently a limitation of the language
   # See: https://github.com/crystal-lang/crystal/issues/3532
-  alias InternalFuncType =  Proc(CallExpression, Visitor, Scope, Context, Int32, Array(BaseType), BaseType)
+  alias InternalFuncType = Proc(CallExpression, Visitor, Scope, Context, Int32, Array(BaseType), BaseType)
 
   # A bound internal method
   class TInternalFunc < DataType
@@ -212,5 +210,4 @@ module Charly
       io << "Function"
     end
   end
-
 end

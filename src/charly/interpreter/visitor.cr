@@ -73,48 +73,48 @@ module Charly
     # A list of disallowed variable names
     DISALLOWED_VARS = [
       "self",
-      "__internal__method"
+      "__internal__method",
     ]
 
     # Mapping between types and their class names
     CLASS_MAPPING = {
-      TObject => "Object",
-      TClass => "Class",
+      TObject         => "Object",
+      TClass          => "Class",
       TPrimitiveClass => "Class",
-      TNumeric => "Numeric",
-      TString => "String",
-      TBoolean => "Boolean",
-      TArray => "Array",
-      TFunc => "Function",
-      TInternalFunc => "Function",
-      TNull => "Null"
+      TNumeric        => "Numeric",
+      TString         => "String",
+      TBoolean        => "Boolean",
+      TArray          => "Array",
+      TFunc           => "Function",
+      TInternalFunc   => "Function",
+      TNull           => "Null",
     }
 
     # Mapping between operators and function names you use to override them
     OPERATOR_MAPPING = {
 
       # Arithmetic
-      TokenType::Plus => "__plus",
+      TokenType::Plus  => "__plus",
       TokenType::Minus => "__minus",
-      TokenType::Mult => "__mult",
-      TokenType::Divd => "__divd",
-      TokenType::Mod => "__mod",
-      TokenType::Pow => "__pow",
+      TokenType::Mult  => "__mult",
+      TokenType::Divd  => "__divd",
+      TokenType::Mod   => "__mod",
+      TokenType::Pow   => "__pow",
 
       # Comparison
-      TokenType::Less => "__less",
-      TokenType::Greater => "__greater",
-      TokenType::LessEqual => "__lessequal",
+      TokenType::Less         => "__less",
+      TokenType::Greater      => "__greater",
+      TokenType::LessEqual    => "__lessequal",
       TokenType::GreaterEqual => "__greaterequal",
-      TokenType::Equal => "__equal",
-      TokenType::Not => "__not"
+      TokenType::Equal        => "__equal",
+      TokenType::Not          => "__not",
     }
 
     # Mapping between unary operators and function names you use to override them
     UNARY_OPERATOR_MAPPING = {
-      TokenType::Plus => "__uplus",
+      TokenType::Plus  => "__uplus",
       TokenType::Minus => "__uminus",
-      TokenType::Not => "__unot"
+      TokenType::Not   => "__unot",
     }
 
     # Creates a new Interpreter inside *top*
@@ -131,7 +131,7 @@ module Charly
       self.new(user, prelude)
     end
 
-    # :nodoc:
+    #  :nodoc:
     private def render_trace(io)
       @trace.reverse.each do |entry|
         io << entry
@@ -141,7 +141,6 @@ module Charly
 
     # Executes *program* inside *scope*
     def visit_program(program : Program, scope : Scope = @top)
-
       # Insert *export* if not already set
       unless scope.contains "export"
         scope.write("export", TObject.new, Flag::INIT)
@@ -166,7 +165,6 @@ module Charly
     end
 
     private def visit_expression(node : ASTNode | BaseType, scope, context)
-
       case node
       when .is_a? BaseType
         return node
@@ -181,7 +179,6 @@ module Charly
       when .is_a? ComparisonExpression
         return visit_comparison_expression(node, scope, context)
       when .is_a? IdentifierLiteral
-
         # Check if the identifier exists
         unless scope.defined(node.name)
           raise RunTimeError.new(node, context, "#{node.name} is not defined")
@@ -252,7 +249,6 @@ module Charly
     end
 
     private def visit_initialisation(node : ASTNode, scope, context)
-
       # Check if this is a disallowed variable name
       if DISALLOWED_VARS.includes? node.identifier.name
         raise RunTimeError.new(node.identifier, context, "#{node.identifier.name} is a reserved keyword")
@@ -284,14 +280,12 @@ module Charly
     end
 
     private def visit_assignment(node : VariableAssignment, scope, context)
-
       # Resolve the expression
       expression = visit_expression(node.expression, scope, context)
 
       # Check the type of the assignment
       case (identifier = node.identifier)
       when IdentifierLiteral
-
         # Check if the identifier name is disallowed
         if DISALLOWED_VARS.includes? identifier.name
           raise RunTimeError.new(node, context, "#{identifier.name} is a reserved keyword")
@@ -311,7 +305,6 @@ module Charly
         scope.write(identifier.name, expression, Flag::None)
         return expression
       when MemberExpression
-
         # Manually resolve the member expression
         member = identifier.member
         identifier = identifier.identifier
@@ -332,7 +325,6 @@ module Charly
 
         return expression
       when IndexExpression
-
         # Manually resolve the index expression
         argument = identifier.argument
         identifier = identifier.identifier
@@ -345,7 +337,6 @@ module Charly
 
         case target
         when .is_a? TArray
-
           # Typecheck the argument
           unless argument.is_a? TNumeric
             raise RunTimeError.new(identifier, context, "Expected number, got #{target.class}")
@@ -360,7 +351,6 @@ module Charly
           target.value[argument.value.to_i64] = expression
           return expression
         when .is_a? TObject
-
           # Typecheck the argument
           unless argument.is_a? TString
             raise RunTimeError.new(identifier, context, "Expected string, got #{target.class}")
@@ -380,7 +370,6 @@ module Charly
     end
 
     private def visit_unary_expression(node : UnaryExpression, scope, context)
-
       # Resolve the right side
       operator = node.operator
       right = visit_expression(node.right, scope, context)
@@ -397,7 +386,6 @@ module Charly
       end
 
       if method.is_a? TFunc
-
         # Create a fake call expression
         callex = CallExpression.new(
           MemberExpression.new(
@@ -425,7 +413,6 @@ module Charly
     end
 
     private def visit_binary_expression(node : BinaryExpression, scope, context)
-
       # Resolve the left side
       operator = node.operator
       left = visit_expression(node.left, scope, context)
@@ -442,7 +429,6 @@ module Charly
       end
 
       if method.is_a? TFunc
-
         # Create a fake call expression
         callex = CallExpression.new(
           MemberExpression.new(
@@ -450,7 +436,7 @@ module Charly
             IdentifierLiteral.new("#{operator}").at(node.left)
           ).at(node.left),
           ExpressionList.new([
-            node.right
+            node.right,
           ] of ASTNode).at(node.right)
         ).at(node)
 
@@ -496,13 +482,11 @@ module Charly
       if left.is_a?(TString) && !right.is_a?(TString)
         case operator
         when TokenType::Plus
-
-          # Check if the right expression has a to_s method
+          #  Check if the right expression has a to_s method
           if right.is_a?(DataType) && right.data.contains("to_s")
             entry = right.data.get("to_s")
 
             if entry.is_a? TFunc
-
               # Create a fake call expression
               callex = CallExpression.new(
                 MemberExpression.new(
@@ -519,7 +503,6 @@ module Charly
 
           return TString.new("#{left}#{right}")
         when TokenType::Mult
-
           # Check if the right side is a TNumeric
           if right.is_a?(TNumeric)
             return TString.new(left.value * right.value.to_i64)
@@ -530,13 +513,11 @@ module Charly
       if !left.is_a?(TString) && right.is_a?(TString)
         case operator
         when TokenType::Plus
-
-          # Check if the right expression has a to_s method
+          #  Check if the right expression has a to_s method
           if right.is_a?(DataType) && right.data.contains("to_s")
             entry = right.data.get("to_s")
 
             if entry.is_a? TFunc
-
               # Create a fake call expression
               callex = CallExpression.new(
                 MemberExpression.new(
@@ -553,7 +534,6 @@ module Charly
 
           return TString.new("#{left}#{right}")
         when TokenType::Mult
-
           # Check if the left side is a TNumeric
           if left.is_a?(TNumeric)
             return TString.new(right.value * left.value.to_i64)
@@ -565,7 +545,6 @@ module Charly
     end
 
     private def visit_comparison_expression(node : ComparisonExpression, scope, context)
-
       # Resolve the left side
       operator = node.operator
       left = visit_expression(node.left, scope, context)
@@ -582,7 +561,6 @@ module Charly
       end
 
       if method.is_a? TFunc
-
         # Create a fake call expression
         callex = CallExpression.new(
           MemberExpression.new(
@@ -590,7 +568,7 @@ module Charly
             IdentifierLiteral.new("#{operator}").at(node.left)
           ).at(node.left),
           ExpressionList.new([
-            node.right
+            node.right,
           ] of ASTNode).at(node.right)
         ).at(node)
 
@@ -602,7 +580,6 @@ module Charly
 
       # When comparing TNumeric's
       if left.is_a?(TNumeric) && right.is_a?(TNumeric)
-
         # Different types of operators
         case operator
         when TokenType::Greater
@@ -693,17 +670,14 @@ module Charly
       end
 
       if left.is_a? TNull
-
         case operator
         when TokenType::Equal
-
           if right.is_a? TBoolean
             return TBoolean.new(!right.value)
           end
 
           return TBoolean.new(right.is_a? TNull)
         when TokenType::Not
-
           if right.is_a? TBoolean
             return TBoolean.new(right.value)
           end
@@ -715,14 +689,12 @@ module Charly
       if right.is_a? TNull
         case operator
         when TokenType::Equal
-
           if left.is_a? TBoolean
             return TBoolean.new(left.value)
           end
 
           return TBoolean.new(left.is_a? TNull)
         when TokenType::Not
-
           if left.is_a? TBoolean
             return TBoolean.new(!left.value)
           end
@@ -775,11 +747,9 @@ module Charly
     end
 
     private def visit_class_literal(node : ClassLiteral, scope, context)
-
       # Check if parent classes exist
       parents = [] of TClass
       node.parents.each do |parent|
-
         # Sanity check
         unless parent.is_a? IdentifierLiteral
           raise RunTimeError.new(parent, context, "Node is not an identifier. You've found a bug in the interpreter.")
@@ -828,7 +798,6 @@ module Charly
           value = child.node
           case value
           when .is_a? PropertyDeclaration
-
             # Check if the property is already defined
             if class_scope.contains value.identifier.name
               class_scope.write(value.identifier.name, TNull.new, Flag::None)
@@ -870,7 +839,6 @@ module Charly
     end
 
     private def visit_primitive_class_literal(node : PrimitiveClassLiteral, scope, context)
-
       # The scope in which we run
       scope = Scope.new(scope)
 
@@ -928,7 +896,6 @@ module Charly
     end
 
     private def visit_call_expression(node : CallExpression, scope, context)
-
       # If the identifier is a IdentifierLiteral we check if it is "__internal__method"
       # Similarly if the identifier is a member expression, we need that to resolve that seperately too
       identifier = node.identifier
@@ -940,7 +907,6 @@ module Charly
           identifier = nil
           target = visit_expression(node.identifier, scope, context)
         else
-
           # Resolve all arguments
           arguments = [] of BaseType
           node.argumentlist.each do |expression|
@@ -982,7 +948,6 @@ module Charly
       if target.is_a? TFunc
         return visit_function_call(target, node, identifier, scope, context)
       elsif target.is_a? TInternalFunc
-
         # Resolve the arguments
         arguments = [] of BaseType
         node.argumentlist.each do |expression|
@@ -1003,7 +968,6 @@ module Charly
     end
 
     private def visit_function_call(target : TFunc, node : CallExpression, identifier : BaseType?, scope, context)
-
       # The scope in which the function will run
       function_scope = Scope.new(target.parent_scope)
 
@@ -1031,7 +995,6 @@ module Charly
       # Insert the arguments
       i = 0
       target.argumentlist.each do |arg|
-
         unless arg.is_a? IdentifierLiteral
           raise RunTimeError.new(arg, context, "#{arg} is not an identifier. You've found a bug in the interpreter.")
         end
@@ -1063,7 +1026,6 @@ module Charly
     end
 
     private def visit_class_call(target : TClass, node : CallExpression, scope, context)
-
       # Initialize an empty object
       object = TObject.new(target)
       object_scope = Scope.new(target.parent_scope)
@@ -1085,7 +1047,6 @@ module Charly
       # Run the first constructor we can find
       constructor = nil
       methods.each do |method|
-
         # Functions without names are filtered out when the class is set up
         # We still have to check because it could technically be nil
         name = method.name
@@ -1103,7 +1064,6 @@ module Charly
 
       # Search for a constructor function and execute
       if constructor.is_a?(TFunc)
-
         # Remove the constuctor again
         object_scope.delete("constructor", Flag::IGNORE_PARENT)
 
@@ -1161,7 +1121,6 @@ module Charly
     end
 
     private def visit_get_member_expression_pairs(node : MemberExpression, scope, context)
-
       # Resolve the left side
       identifier = visit_expression(node.identifier, scope, context)
 
@@ -1174,7 +1133,6 @@ module Charly
     end
 
     private def visit_get_member_expression_pairs_via_name(identifier : BaseType, member : String, scope, context)
-
       # Check if the member name is allowed
       if DISALLOWED_VARS.includes? member
         raise Exception.new("#{member} is not allowed as a member name. This error message doesn't have a location associated with it because of the way it is imlpemented internally")
@@ -1187,11 +1145,11 @@ module Charly
         method = get_primitive_method(identifier, member, scope, context)
 
         if method.is_a? BaseType
-          return ({ identifier, method })
+          return ({identifier, method})
         end
       end
 
-      return ({ identifier, TNull.new })
+      return ({identifier, TNull.new})
     end
 
     private def visit_index_expression(node : IndexExpression, scope, context)
@@ -1199,7 +1157,6 @@ module Charly
     end
 
     private def visit_get_index_expression_pairs(node : IndexExpression, scope, context)
-
       # Resolve the left side
       identifier = visit_expression(node.identifier, scope, context)
 
@@ -1209,7 +1166,6 @@ module Charly
       # Check if the left side is an array or a string
       case identifier
       when .is_a? TArray
-
         # Check that the first argument is a numeric
         unless argument.is_a? TNumeric
           raise RunTimeError.new(node.argument, context, "Expected numeric, got #{argument.class}")
@@ -1218,12 +1174,11 @@ module Charly
         # Check for out-of-bounds errors
         argument = argument.value.to_i64
         if argument > identifier.value.size - 1 || argument < 0
-          return ({ identifier, TNull.new })
+          return ({identifier, TNull.new})
         end
 
-        return ({ identifier, identifier.value[argument] })
+        return ({identifier, identifier.value[argument]})
       when .is_a? TString
-
         # Check that the first argument is a numeric
         unless argument.is_a? TNumeric
           raise RunTimeError.new(node.argument, context, "Expected numeric, got #{argument.class}")
@@ -1232,12 +1187,11 @@ module Charly
         # Check for out-of-bounds errors
         argument = argument.value.to_i64
         if argument > identifier.value.size - 1 || argument < 0
-          return ({ identifier, TNull.new })
+          return ({identifier, TNull.new})
         end
 
-        return ({ identifier, TString.new(identifier.value[argument].to_s) })
+        return ({identifier, TString.new(identifier.value[argument].to_s)})
       when .is_a? TObject
-
         # Check that the first argument is a string
         unless argument.is_a? TString
           raise RunTimeError.new(node.argument, context, "Expected string, got #{argument.class}")
@@ -1254,13 +1208,11 @@ module Charly
     end
 
     private def get_primitive_method(type, methodname, scope, context)
-
       # This is defined in CLASS_MAPPING
       classname = CLASS_MAPPING[type]
       entry = scope.get(classname)
 
       if entry.is_a? TPrimitiveClass
-
         # Check if this class contains the given method
         if entry.methods.contains(methodname)
           return entry.methods.get(methodname, Flag::IGNORE_PARENT)
@@ -1282,7 +1234,6 @@ module Charly
     end
 
     private def visit_if_statement(node : IfStatement, scope, context)
-
       scope = Scope.new(scope)
 
       # Resolve the expression first
@@ -1304,7 +1255,6 @@ module Charly
     end
 
     private def visit_while_statement(node : WhileStatement, scope, context)
-
       scope = Scope.new(scope)
 
       # Resolve the expression first
@@ -1321,7 +1271,6 @@ module Charly
     end
 
     private def visit_container_literal(node : ContainerLiteral, scope, context)
-
       # Create the object
       object = TObject.new
       object_data = Scope.new(scope)
@@ -1353,14 +1302,12 @@ module Charly
       begin
         return visit_block(node.try_block, scope, context)
       rescue e : UserException
-
         # Reset the trace position
         context.trace.delete_at(trace_position..-1)
 
         scope.write(node.exception_name.name, e.payload, Flag::INIT)
         return visit_block(node.catch_block, scope, context)
       rescue e : RunTimeError | SyntaxError
-
         # Extract the trace entries
         trace_entries = [] of BaseType
         context.trace.map { |entry|

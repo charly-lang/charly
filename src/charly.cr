@@ -11,7 +11,6 @@ def missing_file(filename)
 end
 
 module Charly
-
   arguments = [] of String
   flags = [] of String
   filename = ""
@@ -61,7 +60,7 @@ module Charly
       end
       exit
     }
-    opts.invalid_option {} # Ignore
+    opts.invalid_option { } # Ignore
     opts.unknown_args do |before_dash|
       before_dash = before_dash.to_a
       if before_dash.size == 0
@@ -83,7 +82,6 @@ module Charly
   end
 
   begin
-
     # Parse the prelude and userfile
     prelude_program = Parser.create(File.open(PRELUDE_PATH), PRELUDE_PATH)
     user_program = Parser.create(File.open(filename), filename, print_tokens: flags.includes? "tokens")

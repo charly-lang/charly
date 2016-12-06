@@ -1,7 +1,5 @@
 module Charly
-
   class PreludeLoader
-
     def self.load(path, arguments, flags)
       scope = Scope.new
 
@@ -35,7 +33,5 @@ module Charly
       end
       object
     end
-
   end
-
 end

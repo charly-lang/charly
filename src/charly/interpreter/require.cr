@@ -17,7 +17,7 @@ module Charly::Require
   # A list of core modules the interpreter provides
   CORE_MODULES = [
     "unit-test",
-    "math"
+    "math",
   ] of String
 
   # Loads *filename* and returns the value of the export variable
@@ -40,13 +40,12 @@ module Charly::Require
     raise FileNotFoundException.new(filename, "Can't load file (#{filename})")
   end
 
-  # Resolves *filename* to a absolute path
+  #  Resolves *filename* to a absolute path
   #
   # If *filename* is a core-module, the path to that module will be returned
-  # If the path starts with "./" or '../' it gets resolved relative to the current directory
+  #  If the path starts with "./" or '../' it gets resolved relative to the current directory
   # If the path starts with "/" it's treated as an already absolute path
   def resolve(filename, cwd)
-
     # Check if it's a core-module
     if CORE_MODULES.includes? filename
       return File.join(ENV["CHARLYDIR"], "/src/std/modules/#{filename}.ch")
@@ -67,10 +66,8 @@ module Charly::Require
 
   # Loads *path*
   private def load_as_file(path, prelude)
-
     # Check if the path is accessable
     if File.exists?(path) && File.readable?(path)
-
       # The scope in which the included file will run
       include_scope = Scope.new(prelude)
 

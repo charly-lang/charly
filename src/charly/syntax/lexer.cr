@@ -3,7 +3,6 @@ require "./reader.cr"
 require "../exception.cr"
 
 module Charly
-
   # The `Lexer` turns a sequence of chars into a list
   # of tokens
   class Lexer
@@ -674,7 +673,6 @@ module Charly
 
     # Consume a string literal
     def consume_string(initial_row, initial_column, initial_pos)
-
       @token.type = TokenType::String
       io = IO::Memory.new
 
@@ -701,7 +699,6 @@ module Charly
           when '"'
             io << "\""
           when '\0'
-
             # Create a location for the presenter to show
             loc = Location.new
             loc.filename = @filename
@@ -715,7 +712,6 @@ module Charly
         when '"'
           break
         when '\0'
-
           # Create a location for the presenter to show
           loc = Location.new
           loc.filename = @filename
@@ -792,7 +788,6 @@ module Charly
 
     # Called when an unexpected char was read
     def unexpected_char
-
       # Create a location
       loc = Location.new
       loc.filename = @filename

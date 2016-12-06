@@ -2,10 +2,9 @@ require "./spec_helper"
 
 describe Charly do
   it "runs the spec suite" do
-
     # Create the bin directory
     Process.run("mkdir", [
-      "bin"
+      "bin",
     ])
 
     # Build the interpreter
@@ -15,17 +14,17 @@ describe Charly do
       "--release",
       "--stats",
       "-o",
-      "bin/charly"
+      "bin/charly",
     ], output: STDOUT, input: STDIN, error: STDERR)
 
     # Set the environment variable for the std-lib
     Process.run("export", [
-      "CHARLYDIR=./"
+      "CHARLYDIR=./",
     ])
 
     # Run the spec
     result = Process.run("./bin/charly", [
-      "test/main.ch"
+      "test/main.ch",
     ], output: STDOUT, input: STDIN, error: STDERR)
 
     result.exit_status.should eq(0)

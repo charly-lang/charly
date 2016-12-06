@@ -2,7 +2,6 @@ require "./spec_helper.cr"
 include Charly
 
 describe Container do
-
   it "Correctly creates a new container" do
     myContainer = Container(Int32).new
 
@@ -96,5 +95,4 @@ describe Container do
     parent["myConst"].should eq 200
     child["myConst"].should eq 300
   end
-
 end

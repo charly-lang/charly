@@ -5,7 +5,6 @@ require "./ast.cr"
 require "../program.cr"
 
 module Charly
-
   # The `Parser` turns a list of tokens into a Parse Tree (AST)
   class Parser < Lexer
     include AST
@@ -14,17 +13,17 @@ module Charly
     SKIP_TOKENS = {
       TokenType::Newline,
       TokenType::Whitespace,
-      TokenType::Comment
+      TokenType::Comment,
     }
 
     # Mapping between the assignment operators and the actual operators
     OPERATOR_MAPPING = {
-      TokenType::PlusAssignment => TokenType::Plus,
+      TokenType::PlusAssignment  => TokenType::Plus,
       TokenType::MinusAssignment => TokenType::Minus,
-      TokenType::MultAssignment => TokenType::Mult,
-      TokenType::DivdAssignment => TokenType::Divd,
-      TokenType::ModAssignment => TokenType::Mod,
-      TokenType::PowAssignment => TokenType::Pow
+      TokenType::MultAssignment  => TokenType::Mult,
+      TokenType::DivdAssignment  => TokenType::Divd,
+      TokenType::ModAssignment   => TokenType::Mod,
+      TokenType::PowAssignment   => TokenType::Pow,
     }
 
     # Some properties to make the parser context aware
@@ -72,8 +71,6 @@ module Charly
     # :nodoc:
     @[AlwaysInline]
     private def unexpected_token(expected : TokenType? = nil, value : String? = nil)
-
-
       unless @token.type == TokenType::EOF
         if expected && value
           error_message = "Expected #{value}, got #{@token.type}"
@@ -178,8 +175,8 @@ module Charly
       end_location = nil
 
       assert_token TokenType::LeftCurly do
-          start_location = @token.location
-          advance
+        start_location = @token.location
+        advance
       end
 
       body = parse_block_body
@@ -197,8 +194,8 @@ module Charly
       end_location = nil
 
       assert_token TokenType::LeftCurly do
-          start_location = @token.location
-          advance
+        start_location = @token.location
+        advance
       end
 
       body = parse_class_body
@@ -309,7 +306,6 @@ module Charly
           skip TokenType::Semicolon
           return ReturnStatement.new(return_value).at(start_location, end_location)
         when "break"
-
           unless @break_allowed
             unallowed_token
           end
@@ -489,10 +485,10 @@ module Charly
           while true
             case @token.type
             when {{
-                *operators.map { |field|
-                  "TokenType::#{field.id}".id
-                }
-              }}
+                   *operators.map { |field|
+                     "TokenType::#{field.id}".id
+                   }
+                 }}
               operator = @token.type
               advance
               right = parse_{{next_operator.id}}
@@ -514,12 +510,12 @@ module Charly
       while true
         case @token.type
         when TokenType::Assignment,
-              TokenType::PlusAssignment,
-              TokenType::MinusAssignment,
-              TokenType::MultAssignment,
-              TokenType::DivdAssignment,
-              TokenType::ModAssignment,
-              TokenType::PowAssignment
+             TokenType::PlusAssignment,
+             TokenType::MinusAssignment,
+             TokenType::MultAssignment,
+             TokenType::DivdAssignment,
+             TokenType::ModAssignment,
+             TokenType::PowAssignment
           operator = @token.type
           advance
           right = parse_assignment
@@ -802,7 +798,6 @@ module Charly
     end
 
     private def parse_class_literal
-
       start_location = @token.location
       expect TokenType::Keyword, "class"
 
@@ -833,6 +828,5 @@ module Charly
 
       ClassLiteral.new(identifier, block, parents).at(start_location, block.location_end)
     end
-
   end
 end

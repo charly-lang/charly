@@ -1,5 +1,4 @@
 module Charly
-
   # UTF-8 wrapper around IO::Memory and File
   class Reader
     property source : File | IO::Memory

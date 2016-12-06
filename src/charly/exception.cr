@@ -5,7 +5,6 @@ require "./interpreter/context.cr"
 require "colorize"
 
 module Charly
-
   # The base for all exceptions in charly
   class BaseException < Exception
     def to_s(io)
@@ -62,14 +61,12 @@ module Charly
     end
 
     private def meta(io)
-
       # Print the filename
       io << @filename.colorize(:yellow)
       io << "\n"
 
       # Print the source highlight
       if (source = @source).is_a? String
-
         # They both might be set to null, so check first
         loc_start, loc_end = @location_start, @location_end
         if loc_start.is_a?(Location) && loc_end.is_a?(Location)
@@ -86,7 +83,7 @@ module Charly
     end
   end
 
-  # A `SyntaxError` describes unexpected chars or tokens in the source string
+  #  A `SyntaxError` describes unexpected chars or tokens in the source string
   class SyntaxError < LocalException
   end
 

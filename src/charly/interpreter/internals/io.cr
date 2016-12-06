@@ -2,7 +2,6 @@ require "readline"
 require "../**"
 
 module Charly::Internals
-
   charly_api "stdout_print", variadic: true do
     arguments.each do |arg|
       STDOUT.puts arg.to_s
@@ -70,9 +69,8 @@ module Charly::Internals
     return TNull.new
   end
 
-  # Evaluate a string
+  #  Evaluate a string
   charly_api "eval", source : TString, context : TObject do
-
     # Parse the program
     # We have to append a whitespace because wtf
     # This is most likely an issue with the IO::Memory type not being able to pass the end border
@@ -84,7 +82,6 @@ module Charly::Internals
   end
 
   charly_api "file_get_contents", path : TString do
-
     if File.exists?(path.value) && File.readable?(path.value)
       return TString.new(File.read(path.value))
     end

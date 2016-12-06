@@ -1,7 +1,6 @@
 require "../**"
 
 module Charly::Internals
-
   # Trim whitespace
   charly_api "trim", value : TString do
     return TString.new(value.value.strip)
@@ -33,5 +32,4 @@ module Charly::Internals
     end
     return result
   end
-
 end

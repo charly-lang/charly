@@ -3,7 +3,6 @@ require "./token.cr"
 require "./location.cr"
 
 module Charly::AST
-
   # The `AST` is the result of the parsing step, holding all variable names
   # function declarations and language constructs.
   abstract class ASTNode
@@ -89,15 +88,15 @@ module Charly::AST
         end
       {% else %}
         def initialize({{
-          *properties.map do |field|
-            "@#{field.id}".id
-          end
-        }})
+                         *properties.map do |field|
+                           "@#{field.id}".id
+                         end
+                       }})
           arg = [{{
-            *properties.map do |field|
-              field.var
-            end
-          }}] of ASTNode | TokenType | String | Nil
+                   *properties.map do |field|
+                     field.var
+                   end
+                 }}] of ASTNode | TokenType | String | Nil
 
           tmp_children = [] of ASTNode
 
@@ -130,31 +129,28 @@ module Charly::AST
   ast_node UnaryExpression,
     operator : TokenType,
     right : ASTNode do
-
-      def info
-        "#{@operator}"
-      end
+    def info
+      "#{@operator}"
     end
+  end
 
   ast_node BinaryExpression,
     operator : TokenType,
     left : ASTNode,
     right : ASTNode do
-
-      def info
-        "#{@operator}"
-      end
+    def info
+      "#{@operator}"
     end
+  end
 
   ast_node ComparisonExpression,
     operator : TokenType,
     left : ASTNode,
     right : ASTNode do
-
-      def info
-        "#{@operator}"
-      end
+    def info
+      "#{@operator}"
     end
+  end
 
   ast_node And,
     left : ASTNode,
@@ -215,58 +211,58 @@ module Charly::AST
   ast_node NANLiteral
   ast_node IdentifierLiteral,
     name : String do
-      def initialize(@name : String)
-        @children = [] of ASTNode
-      end
-
-      def info
-        "#{@name}"
-      end
+    def initialize(@name : String)
+      @children = [] of ASTNode
     end
+
+    def info
+      "#{@name}"
+    end
+  end
 
   ast_node StringLiteral,
     value : String do
-      def initialize(@value : String)
-        @children = [] of ASTNode
-      end
-
-      def info
-        "#{@value}"
-      end
+    def initialize(@value : String)
+      @children = [] of ASTNode
     end
+
+    def info
+      "#{@value}"
+    end
+  end
 
   ast_node NumericLiteral,
     value : Float64 do
-      def initialize(@value : Float64)
-        @children = [] of ASTNode
-      end
-
-      def info
-        "#{@value}"
-      end
+    def initialize(@value : Float64)
+      @children = [] of ASTNode
     end
+
+    def info
+      "#{@value}"
+    end
+  end
 
   ast_node KeywordLiteral,
     name : String do
-      def initialize(@name : String)
-        @children = [] of ASTNode
-      end
-
-      def info
-        "#{@name}"
-      end
+    def initialize(@name : String)
+      @children = [] of ASTNode
     end
+
+    def info
+      "#{@name}"
+    end
+  end
 
   ast_node BooleanLiteral,
     value : Bool do
-      def initialize(@value : Bool)
-        @children = [] of ASTNode
-      end
-
-      def info
-        "#{@value}"
-      end
+    def initialize(@value : Bool)
+      @children = [] of ASTNode
     end
+
+    def info
+      "#{@value}"
+    end
+  end
 
   ast_node ArrayLiteral
 

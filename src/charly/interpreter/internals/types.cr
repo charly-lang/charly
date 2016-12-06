@@ -1,7 +1,6 @@
 require "../**"
 
 module Charly::Internals
-
   # Returns the length of various types
   charly_api "length", value : BaseType do
     case value
@@ -32,5 +31,4 @@ module Charly::Internals
       return TNull.new
     end
   end
-
 end

@@ -1,10 +1,8 @@
 require "../**"
 
 module Charly::Internals
-
   # Inserts *item* at *index*
   charly_api "array_insert", array : TArray, item : BaseType, index : TNumeric do
-
     # Out of bounds check
     array_size = array.value.size
     index = index.value.to_i64
@@ -23,9 +21,8 @@ module Charly::Internals
     return array
   end
 
-  # Deletes the item at *inde*
+  #  Deletes the item at *inde*
   charly_api "array_delete", array : TArray, index : TNumeric do
-
     # Out of bounds check
     array_size = array.value.size
     index = index.value.to_i64
@@ -45,9 +42,8 @@ module Charly::Internals
     return array
   end
 
-  # Returns a new array filled with TNull of *size*
+  #  Returns a new array filled with TNull of *size*
   charly_api "array_of_size", size : TNumeric, value : BaseType do
     return TArray.new(Array(BaseType).new(size.value.to_i64, value))
   end
-
 end

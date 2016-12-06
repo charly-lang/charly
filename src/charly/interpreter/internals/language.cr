@@ -1,7 +1,6 @@
 require "../**"
 
 module Charly::Internals
-
   # Load a core module or a file
   charly_api "require", filename : TString do
     begin
@@ -49,5 +48,4 @@ module Charly::Internals
       raise RunTimeError.new(call.argumentlist[0], "Can't load #{filename}")
     end
   end
-
 end
