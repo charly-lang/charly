@@ -77,6 +77,10 @@ module Charly
     def is_operator?
       Visitor::OPERATOR_MAPPING.has_key? self
     end
+
+    def unary_possible?
+      Visitor::UNARY_OPERATOR_MAPPING.has_key? self
+    end
   end
 
   class Token
