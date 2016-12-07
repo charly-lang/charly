@@ -73,6 +73,10 @@ module Charly
         io << super
       end
     end
+
+    def is_operator?
+      Visitor::OPERATOR_MAPPING.has_key? self
+    end
   end
 
   class Token
