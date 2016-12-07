@@ -732,6 +732,20 @@ THE SOFTWARE.
 - ...
 ```
 
+## Built-in REPL
+
+Charly has a built-in REPL (Read Eval Print Loop) where you can quickly test out new ideas.
+
+You can invoke it by typing `charly` or `charly repl`
+
+Here you can write charly statements. Run them by pressing enter.
+
+The REPL provides a few `magic` variables which are specific to your current REPL session.
+
+- `$` This variable always contains the value of the last evaluated expression
+- `history` This is an array of all commands you have entered
+- `context` This is the top-level context of the REPL.
+
 ## Extending primitive types
 
 Primitives in Charly can be extended as if they were regular objects. A good example of this is the `Numeric#times` method. It allows you to write really expressive code like this:
