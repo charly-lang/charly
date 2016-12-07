@@ -156,6 +156,18 @@ export = func(it) {
     assert(!myBox, "unot")
   })
 
+  it("redirects unary operators with an operator as the func name", func(assert) {
+    let myBox = {
+      func +@() { "uplus" }
+      func -@() { "uminus" }
+      func !@() { "unot" }
+    }
+
+    assert(+myBox, "uplus")
+    assert(-myBox, "uminus")
+    assert(!myBox, "unot")
+  })
+
   it("assigns the correct scope to functions that are added from the outside", func(assert) {
     let Box = {
       let val = 0
