@@ -737,9 +737,26 @@ module Charly
       expect TokenType::Keyword, "func"
 
       identifier = Empty.new
-      if_token TokenType::Identifier do
+
+      case @token.type
+      when TokenType::Identifier
         identifier = IdentifierLiteral.new(@token.value).at(@token.location)
         advance
+      when .is_operator?
+        operator_token = @token.type
+        identifier = IdentifierLiteral.new(Visitor::OPERATOR_MAPPING[@token.type]).at(@token.location)
+        advance
+
+        # Check for overrideable unary operators
+        if_token TokenType::AtSign do
+          if operator_token.unary_possible?
+            identifier.name = Visitor::UNARY_OPERATOR_MAPPING[operator_token]
+            identifier.at(identifier.location_start, @token.location)
+            advance
+          else
+            unexpected_token @token.type
+          end
+        end
       end
 
       arguments = IdentifierList.new([] of ASTNode)
