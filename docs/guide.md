@@ -887,6 +887,42 @@ getc()
 exit()
 ```
 
+## Native extensions written in Crystal
+
+Charly currently has rudimentary support for native extensions written in Crystal.
+
+The way this works is via Crystal files that have to be compiled into the interpreter itself.
+
+You can add your own files like this:
+
+1. Create a file called `myfile.cr` inside `src/charly/interpreter/internals`
+
+2. Insert the following code:
+
+```crystal
+require "../**"
+
+module Chalry::Internals
+
+  charly_api "mymethod", myarg : TString do
+    return TString.new("You said: " + myarg.value)
+  end
+
+end
+```
+
+3. Recompile & reinstall the interpreter
+
+4. Link against the method inside your charly program like this:
+
+```javascript
+const mymethod = __internal__method("mymethod")
+
+print(mymethod("Hello World")) # You said: Hello World
+```
+
+5. Finished!
+
 ___
 
 __Copyright © 2016 - present Leonard Schütz__
