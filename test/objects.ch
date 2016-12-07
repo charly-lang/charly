@@ -11,9 +11,7 @@ export = func(it) {
     }
     charly.name = "charly"
     charly.age = 16
-
-    let text = charly.to_s()
-    assert(text, "charly is 16 years old!")
+    assert("" + charly, "charly is 16 years old!")
   })
 
   it("adds properties to objects", func(assert) {
@@ -100,6 +98,42 @@ export = func(it) {
       func __greaterequal(element) { "greaterequal" }
       func __equal(element) { "equal" }
       func __not(element) { "notequal" }
+    }
+
+    assert(myBox < 1, "less")
+    assert(myBox > 1, "greater")
+    assert(myBox <= 1, "lessequal")
+    assert(myBox >= 1, "greaterequal")
+    assert(myBox == 1, "equal")
+    assert(myBox ! 1, "notequal")
+  })
+
+  it("redirects arithmetic operators with an operator as the func name", func(assert) {
+    let myBox = {
+      func +(element) { "plus" }
+      func -(element) { "minus" }
+      func *(element) { "mult" }
+      func /(element) { "divd" }
+      func %(element) { "mod" }
+      func **(element) { "pow" }
+    }
+
+    assert(myBox + 1, "plus")
+    assert(myBox - 1, "minus")
+    assert(myBox * 1, "mult")
+    assert(myBox / 1, "divd")
+    assert(myBox % 1, "mod")
+    assert(myBox ** 1, "pow")
+  })
+
+  it("redirects comparison operators with an opereator as the func name", func(assert) {
+    let myBox = {
+      func <(element) { "less" }
+      func >(element) { "greater" }
+      func <=(element) { "lessequal" }
+      func >=(element) { "greaterequal" }
+      func ==(element) { "equal" }
+      func !(element) { "notequal" }
     }
 
     assert(myBox < 1, "less")
