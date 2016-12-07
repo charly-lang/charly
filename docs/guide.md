@@ -806,6 +806,40 @@ export = ->(it) {
 }
 ```
 
+## IO
+
+Charly currently has bindings to STDOUT, STDERR and STDIN. Everything IO related will be found inside the `io` global object.
+
+```javascript
+
+# Using the IO object
+io.stdout.print("hello world") # same as puts in ruby
+io.stdout.write("hello world") # same as print in ruby
+
+io.stderr.print("hello world")
+io.stderr.write("hello world")
+
+io.stdin.gets("> ", false) # uses the GNU ReadLine library to read a line from STDIN
+io.stdin.getc() # Read a single char from STDIN
+
+io.sleep(200) # sleep for 200 miliseconds
+
+io.exit(1) # exit the program with status code 1
+
+io.stackdump() # returns the current scope in a nicely formated table
+
+io.time_ms() # returns the current unix timestamp in miliseconds
+
+io.eval("2 + 2", self) # Execute "2 + 2", using self as the context. This call will return 4
+
+# The prelude contains direct bindings for the following methods:
+print()
+write()
+gets()
+getc()
+exit()
+```
+
 ___
 
 __Copyright © 2016 - present Leonard Schütz__
