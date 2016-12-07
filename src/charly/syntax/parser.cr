@@ -737,8 +737,13 @@ module Charly
       expect TokenType::Keyword, "func"
 
       identifier = Empty.new
-      if_token TokenType::Identifier do
+
+      case @token.type
+      when TokenType::Identifier
         identifier = IdentifierLiteral.new(@token.value).at(@token.location)
+        advance
+      when .is_operator?
+        identifier = IdentifierLiteral.new(Visitor::OPERATOR_MAPPING[@token.type]).at(@token.location)
         advance
       end
 
