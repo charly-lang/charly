@@ -396,7 +396,7 @@ Foo.foo = "hello world"
 Bar.foo # "test"
 ```
 
-## `self` reference
+## self reference
 
 `@test` will be rewritten to `self.test` by the parser automatically.
 
