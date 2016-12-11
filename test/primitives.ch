@@ -38,14 +38,6 @@ export = ->(it) {
     assert(5.foo, 2)
   })
 
-  it("adds methods via add_method", ->(assert) {
-    Numeric.add_method("do_something", ->(arg) {
-      "Got: " + arg
-    })
-
-    assert(5.do_something(25), "Got: 25")
-  })
-
   it("extends a primitive type", func(assert) {
     Array.methods.foo = ->"overridden"
     Boolean.methods.foo = ->"overridden"
