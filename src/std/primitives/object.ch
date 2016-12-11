@@ -6,6 +6,14 @@ const _object_keys = __internal__method("_object_keys")
 const _isolate_object = __internal__method("_isolate_object")
 
 export = primitive class Object {
+
+  # Returns a reference to self
+  #
+  # If self is already a reference, this will dereference it
+  func reference() {
+    &self
+  }
+
   func length() {
     length(self)
   }
@@ -16,7 +24,12 @@ export = primitive class Object {
 
       let child_render = ""
       Object.keys(self).each(->(key, index, size) {
-        child_render += key + ": " + self[key].to_s()
+
+        if self[key] == self {
+          child_render += key + ": " + "(circular)"
+        } else {
+          child_render += key + ": " + self[key].to_s()
+        }
 
         if index < size - 1 {
           child_render += "\n"
