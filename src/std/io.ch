@@ -45,7 +45,7 @@ export = {
     const getc = __internal__method("stdin_getc")
   }
 
-  # Sleep for some seconds
+  # Sleep for some miliseconds
   const sleep = __internal__method("sleep")
 
   # Immediately exit the program
