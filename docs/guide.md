@@ -415,7 +415,7 @@ myBox.name = "box"
 myBox.foo() # => "box"
 ```
 
-If you directly call a method (`foo()`), `self` is set to whatever it what in the context where the method is defined. Think of it like Arrow Funtions in JavaScript.
+If you directly call a method `foo()`, `self` is set to whatever it what in the context where the method is defined. Think of it like Arrow Funtions in JavaScript.
 
 ```javascript
 let Box = {
