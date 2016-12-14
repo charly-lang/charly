@@ -451,8 +451,19 @@ self.instance = 2
 
 All control expressions inside charly behave as if they were normal expressions.
 
-```javascript
+This means that altough you can't place a control expression inside a method call, it will still return a value.
 
+```javascript
+func foo(arg) {
+  if arg < 25 {
+    true
+  } else {
+    false
+  }
+}
+
+foo(10) # => true
+foo(40) # => false
 ```
 
 ### Truthy and falsey values
