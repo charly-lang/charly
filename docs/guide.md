@@ -18,7 +18,7 @@ Variables are defined via the `let` keyword. If you try to access a variable tha
 let myVar = 25
 let myOtherVariable = 50
 
-myVar + myOtherVariable # 75
+myVar + myOtherVariable # => 75
 ```
 
 ## Constants
@@ -26,9 +26,9 @@ myVar + myOtherVariable # 75
 Constants are declared the same way as variables. They can't be changed, hence the name constant. You need to initialize them in the declaration.
 
 ```javascript
-const myconst # syntax error
+const myconst # => syntax error
 const myOtherConst = 25
-myOtherConst = 30 # runtime exception
+myOtherConst = 30 # => runtime exception
 ```
 
 ## Literals
@@ -135,20 +135,20 @@ nums.push(0)
 nums.push(1)
 nums.push(2)
 
-nums # [0, 1, 2]
+nums # => [0, 1, 2]
 ```
 
 You can concat two arrays together via the `+` operator:
 
 ```javascript
-[1, 2] + [3, 4] # [1, 2, 3, 4]
+[1, 2] + [3, 4] # => [1, 2, 3, 4]
 ```
 
 You can compare two arrays using the `==` operator:
 
 ```javascript
-[1, 2, 3, 4] == [1, 2, 3, 4] # true
-[1, 2] == [3, 4] # false
+[1, 2, 3, 4] == [1, 2, 3, 4] # => true
+[1, 2] == [3, 4] # => false
 ```
 
 ### Objects
@@ -163,8 +163,8 @@ let Box = {
   let age = 200
 }
 
-Box.name # "charly"
-Box.age # 200
+Box.name # => "charly"
+Box.age # => 200
 ```
 
 This can be compared to the javascript equivalent of using `new Function()`:
@@ -186,7 +186,7 @@ let Box = {
   let name = "mybox"
 }
 
-Box["name"] # "mybox"
+Box["name"] # => "mybox"
 ```
 
 ### Functions
@@ -214,7 +214,7 @@ func foo() {
   25
 }
 
-foo() # 25
+foo() # => 25
 ```
 
 You can also do explicit returns
@@ -228,7 +228,7 @@ func foo() {
   return false
 }
 
-foo() # true
+foo() # => true
 ```
 
 If you only need the function literal, you can use anonymous function literals:
@@ -239,7 +239,7 @@ func foo(callback) {
 }
 
 foo(func(arg) {
-  print(arg) # 42
+  print(arg) # => 42
 })
 ```
 
@@ -344,7 +344,7 @@ class Box {
 }
 Box.count = 0
 
-Box.foo() # "class method"
+Box.foo() # => "class method"
 ```
 
 To inherit from other classes, you use the `extends` keyword.
@@ -369,9 +369,9 @@ class Baz extends Foo, Bar {
 }
 
 let myBaz = Baz()
-myBaz.foo() # "foo method"
-myBaz.bar() # "bar method"
-myBaz.baz() # "baz method"
+myBaz.foo() # => "foo method"
+myBaz.bar() # => "bar method"
+myBaz.baz() # => "baz method"
 ```
 
 Static properties and methods are also copied to the child classes. The values of static properties are copied by value. They are not references.
@@ -388,12 +388,12 @@ Foo.foo = "test"
 
 class Bar extends Foo {}
 
-Bar.what() # "static what"
-Bar.foo # "test"
+Bar.what() # => "static what"
+Bar.foo # => "test"
 
 Foo.foo = "hello world"
 
-Bar.foo # "test"
+Bar.foo # => "test"
 ```
 
 ## self reference
@@ -412,7 +412,7 @@ let myBox = {
 }
 
 myBox.name = "box"
-myBox.foo() # "box"
+myBox.foo() # => "box"
 ```
 
 If you directly call a method (`foo()`), `self` is set to whatever it what in the context where the method is defined. Think of it like Arrow Funtions in JavaScript.
@@ -429,7 +429,7 @@ let Box = {
 }
 
 let method = Box.foo()
-method() # "box"
+method() # => "box"
 ```
 
 ## Assignments
@@ -539,12 +539,12 @@ If a method expects to be called with 2 arguments, you have to pass two. If you 
 
 ```javascript
 func foo(a, b, c) {
-
+  return true
 }
 
-foo(1, 2, 3) # okay
-foo(1, 2, 3, 4) # also okay
-foo(1, 2) # 
+foo(1, 2, 3) # => true
+foo(1, 2, 3, 4) # => true
+foo(1, 2) # => runtime exception
 ```
 
 ### Operators
@@ -568,7 +568,7 @@ class Vector2 {
 
 v1 = Vector2(1, 2)
 v2 = Vector2(3, 4)
-v1 + v2 # Vector2(@x=4, @y=6)
+v1 + v2 # => Vector2(@x=4, @y=6)
 ```
 
 Overrideable operators are:
@@ -653,9 +653,9 @@ let external = require("./external.ch")
 external.message = "it changed"
 
 let external_second = require("./external.ch")
-print(external_second.message) # "it changed"
+print(external_second.message) # => "it changed"
 
-external == external_second # true
+external == external_second # => true
 ```
 
 __external.ch__
@@ -694,9 +694,9 @@ charly input.ch hello -f tokens world 25 25 --foo -b
 ```
 
 ```javascript
-ARGV # ["hello", "world", 25, 25, "--foo", "-b"]
-IFLAGS # ["tokens"]
-ENV["TERM"] # xterm-256color
+ARGV # => ["hello", "world", 25, 25, "--foo", "-b"]
+IFLAGS # => ["tokens"]
+ENV["TERM"] # => xterm-256color
 ```
 
 You can see the license and a list of contributors via the following commands
@@ -918,7 +918,7 @@ end
 ```javascript
 const mymethod = __internal__method("mymethod")
 
-print(mymethod("Hello World")) # You said: Hello World
+print(mymethod("Hello World")) # => You said: Hello World
 ```
 
 5. Finished!
