@@ -560,7 +560,7 @@ foo(1, 2) # => runtime exception
 
 ### Operators
 
-You can override any operator inside an object. Just define a method with the corresponding name.
+You can override any operator inside an object. Just define a method with the name set to a specific operator
 
 ```javascript
 class Vector2 {
@@ -572,34 +572,50 @@ class Vector2 {
     @y = y
   }
 
-  func __plus(other) {
-    Vector2.new(@x + other.x, @y + other.y)
+  # Override plus operator
+  func +(other) {
+    Vector2(@x + other.x, @y + other.y)
+  }
+
+  # Override minus operator
+  func -(other) {
+    Vector2(@x - other.x, @y - other.y)
+  }
+
+  # Override unary minus operator
+  func -@() {
+    Vector2(-@x, -@y)
   }
 }
 
-v1 = Vector2(1, 2)
-v2 = Vector2(3, 4)
+const v1 = Vector2(1, 2)
+const v2 = Vector2(3, 4)
 v1 + v2 # => Vector2(@x=4, @y=6)
+v1 - v2 # => Vector2(@x=-2, @y=-2)
+-v1 # => Vector2(@x=-1, @y=-2)
 ```
 
-Overrideable operators are:
+Under the hood, the operators in the method definitions get swapped out with an identifier.
 
-- `+` = `__plus`
-- `-` = `__minus`
-- `*` = `__mult`
-- `/` = `__divd`
-- `%` = `__mod`
-- `**` = `__pow`
+This is the mapping table:
 
-- `!` = `__unot`
-- `-` = `__uminus`
-
-- `<` = `__less`
-- `>` = `__greater`
-- `<=` = `__lessequal`
-- `>=` = `__greaterequal`
-- `==` = `__equal`
-- `!` = `__not`
+| Operator | Method name    |
+|----------|----------------|
+| +        | __plus         |
+| -        | __minus        |
+| *        | __mult         |
+| /        | __divd         |
+| %        | __mod          |
+| **       | __pow          |
+| <        | __less         |
+| >        | __greater      |
+| <=       | __lessequal    |
+| >=       | __greaterequal |
+| ==       | __equal        |
+| !        | __not          |
+| -@       | __uminus       |
+| +@       | __uplus        |
+| !@       | __unot         |
 
 ## Exceptions
 
@@ -626,7 +642,6 @@ test/debug.ch
       5. }
 at debug.ch:3:5:5
 at foo (debug.ch:7:1:3)
-
 Uncaught Object:Exception: arg is smaller than 10
 ```
 
