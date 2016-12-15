@@ -483,7 +483,7 @@ if (2 < 5) {
   print("Something's off...")
 }
 
-if 2 + 2 == 9 - 7 {
+if 2 + 2 == 9 - 5 {
   print("Mathematics still works!")
 } else {
   print("Somethings's off...")
@@ -542,7 +542,7 @@ When you write `5`, the interpreter actually treats it as a primitive. There are
 
 This allows the interpreter to reuse the same object for all primitives of the same type.
 
-This principle applies to all language primitives. The primitive class `Array` for example, specified a method called `push` which inserts an element into the array.
+This principle applies to all language primitives. The primitive class `Array` for example, specifies a method called `push` which inserts an element into the array.
 
 ### Method arguments
 
@@ -673,6 +673,8 @@ export = {
 
 If you call require on the same file twice, it will result the value returned by the very first call.
 
+If you call require on a file that was already required before, a cached version will be returned. The file won't be executed twice.
+
 __main.ch__
 ```javascript
 let external = require("./external.ch")
@@ -766,11 +768,12 @@ You can invoke it by typing `charly` or `charly repl`
 
 Here you can write charly statements. Run them by pressing enter.
 
-The REPL provides a few `magic` variables which are specific to your current REPL session.
+The REPL provides a few _magic_ variables which are specific to your current REPL session.
 
 - `$` This variable always contains the value of the last evaluated expression
 - `history` This is an array of all commands you have entered
 - `context` This is the top-level context of the REPL.
+- `echo` Boolean value to toggle the echo of entered expressions
 
 ## Extending primitive types
 
@@ -804,7 +807,7 @@ Let's define a `indent` method on strings which takes two arguments, the amount 
 
 ```javascript
 String.methods.indent = ->(amount, filler) {
-  @split("\n").map(->(line) {
+  @split("\n").each(->(line) {
     (value * amount) + line
   }).join("\n")
 }
