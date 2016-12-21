@@ -1055,6 +1055,10 @@ module Charly
           raise RunTimeError.new(arg, context, "#{arg} is not an identifier. You've found a bug in the interpreter.")
         end
 
+        if function_scope.contains(arg.name)
+          raise RunTimeError.new(arg, context, "Duplicate argument #{arg.name}")
+        end
+
         function_scope.write(arg.name, arguments[i], Flag::INIT)
         i += 1
       end
