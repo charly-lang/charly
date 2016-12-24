@@ -21,13 +21,18 @@ module Charly
       print_range = Math.max(0, @location_start.row - LOOKBACK_ROW)..(@location_end.row + LOOKFORWARD_ROW)
 
       # Highlight the source
-      highlighted_source = source.each_char.map_with_index { |char, index|
+      # TODO: Switch back to each_char.map_with_index once crystal-lang#3767 is fixed
+      index = 0
+      highlighted_source = ""
+      source.each_char do |char|
         if color_pos_range.covers? index
-          char.colorize(:white).back(:red)
+          highlighted_source += char.colorize(:white).back(:red).to_s
         else
-          char.colorize.mode(:dim)
+          highlighted_source += char.colorize.mode(:dim).to_s
         end
-      }.join("")
+
+        index += 1
+      end
 
       # Append line number to the beginning
       lines = highlighted_source.each_line
