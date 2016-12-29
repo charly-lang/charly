@@ -383,7 +383,6 @@ export = primitive class Array {
         right = sorted[y]
 
         if (sort_function(left, right)) {
-          const tmp = left
           sorted[i] = right
           sorted[y] = left
         }
