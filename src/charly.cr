@@ -12,17 +12,23 @@ def missing_file(filename)
 end
 
 module Charly
+
   arguments = [] of String
   flags = [] of String
   filename = ""
 
-  available_flags = <<-FLAGS
+  available_flags = String.build do |io|
+    io.puts <<-FLAGS
 
-  Flags:
-      ast                              Display the AST of the userfile
-      tokens                           Display tokens of the userfile
-      lint                             Don't execute after parsing (linting)
-  FLAGS
+    Flags:
+        ast                              Display the AST of the userfile
+        tokens                           Display tokens of the userfile
+        lint                             Don't execute after parsing (linting)
+    FLAGS
+
+    io.puts ""
+    io.puts "#{Internals::Methods::METHODS.size} internal methods are loaded"
+  end
 
   # Check if $CHARLYDIR is set
   unless ENV.has_key? "CHARLYDIR"
