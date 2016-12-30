@@ -371,13 +371,13 @@ export = primitive class Array {
    * This uses the bubble-sort algorithm
    * */
   func sort(sort_function) {
-    let sorted = @copy()
+    const sorted = @copy()
 
     let left
     let right
 
-    @length().times(func(i) {
-      (@length() - 1).times(func(y) {
+    @length().times(->(i) {
+      (@length() - 1).times(->(y) {
 
         left = sorted[i]
         right = sorted[y]
