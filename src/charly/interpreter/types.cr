@@ -224,9 +224,8 @@ module Charly
   # A bound internal method
   class TInternalFunc < DataType
     property name : String
-    property method : InternalFuncType
 
-    def initialize(@name, @method)
+    def initialize(@name)
       super()
     end
 

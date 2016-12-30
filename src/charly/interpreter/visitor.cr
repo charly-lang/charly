@@ -720,18 +720,11 @@ module Charly
           end
 
           # Check if the method exists
-          unless Internals::METHODS.has_key? name.value
+          unless Internals::Methods::METHODS.includes? name.value
             raise RunTimeError.new(node.argumentlist.children[0], context, "There is no internal method called #{name.value}")
           end
 
-          # Create the mapping between the methods
-          method = Internals::METHODS[name.value]
-
-          if method.is_a? InternalFuncType
-            return TInternalFunc.new(name.value, method)
-          end
-
-          raise RunTimeError.new(node, context, "Failed to extract internal function #{name.value}")
+          return TInternalFunc.new(name.value)
         end
       when .is_a? IndexExpression
         identifier, target = visit_get_index_expression_pairs(identifier, scope, context)
@@ -750,9 +743,18 @@ module Charly
         end
 
         start = Time.now.epoch_ms
-        result = target.method.call(node, self, scope, context, arguments.size, arguments)
 
-        return result
+        {% for method in Internals::Methods.class.methods %}
+
+          {% if method.name.stringify.starts_with?("__charly_api_") %}
+            if target.name == {{method.name.stringify.gsub(/^__charly_api_/, "")}}
+              return Internals::Methods.{{method.name}}(node, self, scope, context, arguments.size, arguments)
+            end
+          {% end %}
+
+        {% end %}
+
+        raise RunTimeError.new(node.identifier, context, "There is no internal method called #{target.name}")
       elsif target.is_a? TClass
         return visit_class_call(target, node, scope, context)
       elsif target.is_a? TPrimitiveClass
