@@ -571,7 +571,7 @@ module Charly
       # Extract parent methods and properties
       parents.each do |parent|
         parent.data.dump_values(false).each do |depth, key, value, flags|
-          class_scope.init(key, value, true)
+          class_scope.replace(key, value, Flag::INIT | Flag::IGNORE_PARENT)
         end
       end
 
@@ -588,11 +588,7 @@ module Charly
           case value
           when .is_a? PropertyDeclaration
             # Check if the property is already defined
-            if class_scope.contains value.identifier.name
-              class_scope.write(value.identifier.name, TNull.new, Flag::None)
-            else
-              class_scope.init(value.identifier.name, TNull.new)
-            end
+            class_scope.replace(value.identifier.name, TNull.new, Flag::INIT | Flag::IGNORE_PARENT)
           when .is_a? FunctionLiteral
             method = visit_function_literal(value, class_scope, context)
 
@@ -602,11 +598,7 @@ module Charly
             end
 
             # Check if the method is already defined
-            if class_scope.contains name
-              class_scope.write(name, method, Flag::None)
-            else
-              class_scope.init(name, method)
-            end
+            class_scope.replace(name, method, Flag::INIT | Flag::IGNORE_PARENT)
           else
             raise RunTimeError.new(child, context, "Unallowed #{value.class.name}")
           end

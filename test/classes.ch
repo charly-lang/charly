@@ -234,6 +234,41 @@ export = func(it) {
     assert(myBox.__class == Box, true)
   })
 
+  it("inherits properties from parent classes", func(assert) {
+    class Foo {
+      property a
+    }
+
+    class Bar {
+      property b
+    }
+
+    class Baz {
+      property c
+    }
+
+    class Qux extends Foo, Bar, Baz {}
+
+    let myqux = Qux()
+    assert(Object.keys(myqux), ["a", "b", "c", "__class"])
+  })
+
+  it("inherits methods from parent classes", func(assert) {
+    class Foo {
+      func a() { "method a" }
+    }
+
+    class Bar {
+      func b() { "method b" }
+    }
+
+    class Baz extends Foo, Bar {}
+
+    let mybaz = Baz()
+    assert(mybaz.a(), "method a")
+    assert(mybaz.b(), "method b")
+  })
+
   it("doesn't leak class properties into higher scopes", func(assert) {
     let a = 25
 
