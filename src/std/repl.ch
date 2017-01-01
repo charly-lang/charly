@@ -1,6 +1,7 @@
 const context = Object.isolate({
   let $
   let echo = true
+  let prompt = "> "
 
   const charly = require("charly")
   const Math = require("math")
@@ -14,7 +15,7 @@ print(context.charly.LICENSE)
 let input
 
 loop {
-  input = "> ".prompt()
+  input = context.prompt.prompt()
 
   if input == ".exit" {
     break
