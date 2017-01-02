@@ -24,6 +24,7 @@ module Charly
 
     Flags:
         ast                              Display the AST of the userfile
+        dotdump                          Dump dot language displaying the AST
         tokens                           Display tokens of the userfile
         lint                             Don't execute after parsing (linting)
     FLAGS
