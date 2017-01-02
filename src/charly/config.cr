@@ -4,7 +4,7 @@
 module Charly
 
   module Config
-    VERSION = "0.0.1"
+    VERSION = "0.2.0"
     COMPILE_DATE = {{ `date +'%d. %B %Y'`.stringify.chomp }}
     LICENSE = <<-LICENSETEXT
     The MIT License (MIT)

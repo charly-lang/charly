@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.com/KCreate/charly-lang.svg?token=yitMwy9Lg5peiAqCZjoK&branch=master)](https://travis-ci.com/KCreate/charly-lang)
-[![Version](https://img.shields.io/badge/Version-0.0.1-green.svg)](https://github.com/KCreate/charly-lang/releases/tag/v0.0.1)
+[![Version](https://img.shields.io/badge/Version-0.2.0-green.svg)](https://github.com/KCreate/charly-lang/releases/tag/v0.2.0)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/KCreate/charly-lang/blob/master/LICENSE)
 
 <img align="right" alt="Charly" width="150" src="res/charly.png" />
