@@ -76,10 +76,10 @@ module Charly::AST
       {% end %}
 
       def initialize({{
-          *properties.map do |field|
-            "@#{field.id}".id
-          end
-        }})
+                       *properties.map do |field|
+                         "@#{field.id}".id
+                       end
+                     }})
       end
     end
   end

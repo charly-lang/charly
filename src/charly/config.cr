@@ -2,11 +2,10 @@
 # Original: https://github.com/crystal-lang/crystal/blob/master/src/compiler/crystal/config.cr
 
 module Charly
-
   module Config
-    VERSION = "0.2.0"
+    VERSION      = "0.2.0"
     COMPILE_DATE = {{ `date +'%d. %B %Y'`.stringify.chomp }}
-    LICENSE = <<-LICENSETEXT
+    LICENSE      = <<-LICENSETEXT
     The MIT License (MIT)
 
     Copyright (c) 2016 Leonard Schuetz
@@ -68,5 +67,4 @@ module Charly
       end
     end
   end
-
 end

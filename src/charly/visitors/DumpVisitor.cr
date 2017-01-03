@@ -1,10 +1,8 @@
 require "./TreeVisitor.cr"
 
 module Charly::AST
-
   # Dump a human-readable version of the AST
   class DumpVisitor < TreeVisitor
-
     # Catch all rule
     visit ASTNode do
       io.puts name node
@@ -73,7 +71,5 @@ module Charly::AST
 
       io << "\n"
     end
-
   end
-
 end

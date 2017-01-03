@@ -1,7 +1,6 @@
 require "./TreeVisitor.cr"
 
 module Charly::AST
-
   # Dumps "dot-language" of a given ASTNode
   class DotDumpVisitor < TreeVisitor
     property next_id = 0
@@ -117,5 +116,4 @@ module Charly::AST
       @next_id += 1
     end
   end
-
 end

@@ -1,7 +1,6 @@
 require "../**"
 
 module Charly::Internals
-
   charly_api "__charly_config", name : TString do
     return case name.value
     when "LICENSE"
@@ -21,5 +20,4 @@ module Charly::Internals
       TNull.new
     end
   end
-
 end

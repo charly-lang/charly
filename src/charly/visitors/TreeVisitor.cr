@@ -1,7 +1,6 @@
 require "../syntax/ast.cr"
 
 module Charly::AST
-
   # Visits a given node and it's children
   abstract class TreeVisitor
     macro visit(type)
@@ -23,5 +22,4 @@ module Charly::AST
       node.class.name.split("::").last
     end
   end
-
 end

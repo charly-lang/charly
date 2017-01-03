@@ -14,7 +14,6 @@ def missing_file(filename)
 end
 
 module Charly
-
   arguments = [] of String
   flags = [] of String
   filename = ""

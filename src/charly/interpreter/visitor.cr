@@ -133,7 +133,6 @@ module Charly
       last_index = size - 1
       last_result = TNull.new
       while i < size
-
         statement = children.unsafe_at(i)
 
         if i == last_index

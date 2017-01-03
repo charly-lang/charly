@@ -21,10 +21,10 @@ module Charly::Internals
       def self.__charly_api_{{name.id}}(call, visitor, scope, context, argc : Int32, arguments : Array(BaseType))
         name = {{name}}
         types = [{{
-                  *types.map do |field|
-                    field.type
-                  end
-                }}] of BaseType.class
+                   *types.map do |field|
+                     field.type
+                   end
+                 }}] of BaseType.class
 
         # Argument count check
         if argc < {{types.size}}
