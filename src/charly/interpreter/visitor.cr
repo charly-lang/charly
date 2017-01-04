@@ -833,7 +833,8 @@ module Charly
       end
 
       # Run the function
-      filename = "foo"
+      # TODO: Is this the correct filename?
+      filename = File.basename target.block.location_start.filename
       location = target.block.location_start.loc_to_s
       @trace << Trace.new(target_name, filename, location)
       begin
