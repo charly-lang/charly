@@ -781,10 +781,10 @@ module Charly
         )
       end
 
-      return run_function_call(target, arguments, identifier, scope, context)
+      return run_function_call(target, arguments, identifier, scope, context, node.identifier.location_start)
     end
 
-    def run_function_call(target : TFunc, arguments : Array(BaseType), identifier : BaseType?, scope, context)
+    def run_function_call(target : TFunc, arguments : Array(BaseType), identifier : BaseType?, scope, context, call_location : Location?)
       # The scope in which the function will run in
       function_scope = Scope.new(target.parent_scope)
 
@@ -832,16 +832,27 @@ module Charly
         target_name = target.name
       end
 
+      # Append the trace entry
+      # If we have a custom calling location supplied, use that
+      # If not, use the starting location of the targets block
+      if call_location.is_a? Location
+        filename = File.basename call_location.filename
+        location = call_location.loc_to_s
+        @trace << Trace.new(target_name, filename, location)
+      else
+        filename = File.basename target.block.location_start.filename
+        location = target.block.location_start.loc_to_s
+        @trace << Trace.new(target_name, filename, location)
+      end
+
       # Run the function
-      # TODO: Is this the correct filename?
-      filename = File.basename target.block.location_start.filename
-      location = target.block.location_start.loc_to_s
-      @trace << Trace.new(target_name, filename, location)
       begin
         result = visit_block(target.block, function_scope, context)
       rescue e : ReturnException
         result = e.payload
       end
+
+      # Remove the previously added trace entry
       @trace.pop
 
       return result
