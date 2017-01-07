@@ -781,7 +781,13 @@ module Charly
         )
       end
 
-      return run_function_call(target, arguments, identifier, scope, context, node.identifier.location_start)
+      call_location = case (call_ident = node.identifier)
+                      when MemberExpression then call_ident.member.location_start
+                      else
+                        call_ident.location_start
+                      end
+
+      return run_function_call(target, arguments, identifier, scope, context, call_location)
     end
 
     def run_function_call(target : TFunc, arguments : Array(BaseType), identifier : BaseType?, scope, context, call_location : Location?)
@@ -827,7 +833,7 @@ module Charly
       function_scope.init("self", identifier, true) if identifier
 
       # The name of the function for the trace entry
-      target_name = "anonymous"
+      target_name = "anonymous (defined at #{target.block.location_start})"
       if target.name.size > 0
         target_name = target.name
       end
