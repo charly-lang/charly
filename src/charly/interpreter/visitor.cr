@@ -354,7 +354,7 @@ module Charly
 
           # Out of bounds check
           if argument.value < 0 || argument.value > target.value.size - 1
-            raise RunTimeError.new(identifier.argument, context, "Index out of bounds. Size is #{target.value.size}, index is #{argument.value}")
+            raise RunTimeError.new(identifier.argument, context, "Index out of bounds. Size is #{target.value.size}, index is #{argument.value.to_i}")
           end
 
           # Write to the index
