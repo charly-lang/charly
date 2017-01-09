@@ -26,6 +26,20 @@ export = primitive class Object {
     length(self)
   }
 
+  /*
+   * Non-recursively copies this object
+   * */
+  func copy() {
+    Object.copy(self)
+  }
+
+  /*
+   * Recusively copies this object
+   * */
+  func deep_copy() {
+    Object.deep_copy(self)
+  }
+
   func to_s() {
     if @typeof() == "Object" {
       let render = "{\n"
@@ -223,5 +237,75 @@ export = primitive class Object {
       })
     })
     target
+  }
+
+  /*
+   * Non-recursively copies a value
+   *
+   * Note: Functions, Classes, Primitive Classes cannot be copied
+   * */
+  static func copy(value) {
+    const type = value.typeof()
+
+    if type == "Function" {
+      throw Exception("Cannot copy functions")
+    }
+
+    if type == "Class" {
+      throw Exception("Cannot copy classes")
+    }
+
+    if type == "PrimitiveClass" {
+      throw Exception("Cannot copy primitive classes")
+    }
+
+    if type == "Object" {
+      return Object.assign({}, value)
+    }
+
+    if type == "Array" {
+      return value.copy()
+    }
+
+    // Every value is considered to be a primitive at this point
+    // We can safely return it back since they are passed by value anyway
+    return value
+  }
+
+  /*
+   * Recusively copies a value
+   *
+   * Note: Functions, Classes, Primitive Classes cannot be copied
+   * */
+  static func deep_copy(value) {
+    const type = value.typeof()
+
+    if type == "Function" {
+      throw Exception("Cannot deep_copy functions")
+    }
+
+    if type == "Class" {
+      throw Exception("Cannot deep_copy classes")
+    }
+
+    if type == "PrimitiveClass" {
+      throw Exception("Cannot deep_copy primitive classes")
+    }
+
+    if type == "Object" {
+      let new = {}
+      Object.keys(value).each(->(key) {
+        new[key] = value[key].deep_copy()
+      })
+      return new
+    }
+
+    if type == "Array" {
+      return value.deep_copy()
+    }
+
+    // Every value is considered to be a primitive at this point
+    // We can safely return it back since they are passed by value anyway
+    return value
   }
 }

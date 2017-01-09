@@ -408,4 +408,157 @@ export = ->(describe, it, assert) {
 
   })
 
+  describe("copy", ->{
+
+    it("copies an object", ->{
+      let test = {
+        let name = "test"
+        let foo = 25
+      }
+
+      let new_test = test.copy()
+      test.name = "it changed"
+
+      assert(new_test.name, "test")
+
+      new_test.foo = 30
+
+      assert(test.foo, 25)
+    })
+
+    it("doesn't copy sub-arrays", ->{
+      let arr = [1, 2, 3]
+      let obj = {
+        let arr = arr
+      }
+
+      let copy = obj.copy()
+
+      assert(copy.arr.length(), 3)
+
+      arr.push(4)
+
+      assert(copy.arr.length(), 4)
+    })
+
+    it("doesn't copy sub-objects", ->{
+      let obj1 = { let prop = 1 }
+      let obj2 = { let prop = obj1 }
+
+      let copy = obj2.copy()
+
+      obj1.prop = 25
+
+      assert(copy.prop.prop, 25)
+
+      obj2.prop = 200
+
+      assert(copy.prop.typeof(), "Object")
+    })
+
+    describe("throws when trying to copy uncopiable values", ->{
+
+      it("throws on functions", ->{
+        try {
+          Object.copy(func() {})
+        } catch(e) {
+          return assert(e.message, "Cannot copy functions")
+        }
+
+        assert(true, false)
+      })
+
+      it("throws on classes", ->{
+        try {
+          Object.copy(class Foo {})
+        } catch(e) {
+          return assert(e.message, "Cannot copy classes")
+        }
+
+        assert(true, false)
+      })
+
+      it("throws on primitive classes", ->{
+        primitive class Foo {}
+
+        try {
+          Object.copy(Foo)
+        } catch(e) {
+          return assert(e.message, "Cannot copy primitive classes")
+        }
+
+        assert(true, false)
+      })
+
+    })
+
+  })
+
+  describe("deep_copy", ->{
+
+    it("recursively copies an object", ->{
+      let obj1 = { let prop = 2 }
+      let obj2 = { let prop = obj1 }
+      let obj3 = { let prop = obj2 }
+
+      let copy = obj3.deep_copy()
+
+      obj1.prop = 20
+
+      assert(copy.prop.prop.prop, 2)
+
+      obj3.prop = 200
+
+      assert(copy.prop.typeof(), "Object")
+    })
+
+    it("copies sub-arrays", ->{
+      let arr = [1, 2, 3]
+      let obj = { let prop = arr }
+
+      let copy = obj.deep_copy()
+
+      arr.push(4)
+
+      assert(copy.prop.length(), 3)
+    })
+
+    describe("throws when trying to copy uncopiable values", ->{
+
+      it("throws on functions", ->{
+        try {
+          Object.deep_copy(func() {})
+        } catch(e) {
+          return assert(e.message, "Cannot deep_copy functions")
+        }
+
+        assert(true, false)
+      })
+
+      it("throws on classes", ->{
+        try {
+          Object.deep_copy(class Foo {})
+        } catch(e) {
+          return assert(e.message, "Cannot deep_copy classes")
+        }
+
+        assert(true, false)
+      })
+
+      it("throws on primitive classes", ->{
+        primitive class Foo {}
+
+        try {
+          Object.deep_copy(Foo)
+        } catch(e) {
+          return assert(e.message, "Cannot deep_copy primitive classes")
+        }
+
+        assert(true, false)
+      })
+
+    })
+
+  })
+
 }
