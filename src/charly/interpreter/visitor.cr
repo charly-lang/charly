@@ -626,7 +626,7 @@ module Charly
       # Insert the methods
       methods.each do |method|
         if (name = method.name).is_a? String
-          unless primscope.contains(name)
+          unless method_scope.contains(name)
             method_scope.init(name, method, true)
           end
         end
