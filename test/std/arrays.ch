@@ -465,7 +465,7 @@ export = ->(describe, it, assert) {
     // generate some fake numbers and check if they are being correctly
     // sorted
     it("sorts using quick-sort", ->{
-      let nums = Array.of_size(100, null)
+      let nums = Array.of_size(1000, null)
       nums = nums.map(Math.rand)
 
       nums = nums.sort()
