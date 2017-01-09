@@ -389,4 +389,23 @@ export = ->(describe, it, assert) {
 
   })
 
+  describe("assign", ->{
+
+    it("copies keys from one or more objects to another", ->{
+      let Box1 = {
+        let name = "box1"
+      }
+
+      let Box2 = {
+        let age = 20
+      }
+
+      let Box3 = Object.assign({}, Box1, Box2)
+
+      assert(Box3.name, "box1")
+      assert(Box3.age, 20)
+    })
+
+  })
+
 }

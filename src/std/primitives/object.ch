@@ -210,4 +210,18 @@ export = primitive class Object {
 
     _isolate_object(object)
   }
+
+  /*
+   * Copies all keys from sources (assign(target, ...sources)) to the target
+   * */
+  static func assign(target) {
+    const sources = arguments.range(1, arguments.length())
+    sources.each(->(object) {
+      const keys = Object.keys(object)
+      keys.each(->(key) {
+        target[key] = object[key]
+      })
+    })
+    target
+  }
 }
