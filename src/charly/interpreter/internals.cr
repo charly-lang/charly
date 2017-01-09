@@ -16,7 +16,7 @@ module Charly::Internals
   #   return TString.new("Slept for #{time} seconds")
   # end
   # ```
-  macro charly_api(name, *types, variadic = false)
+  macro charly_api(name, *types)
     class Methods
       def self.__charly_api_{{name.id}}(call, visitor, scope, context, argc : Int32, arguments : Array(BaseType))
         name = {{name}}

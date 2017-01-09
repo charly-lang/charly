@@ -2,7 +2,7 @@ require "readline"
 require "../**"
 
 module Charly::Internals
-  charly_api "stdout_print", variadic: true do
+  charly_api "stdout_print" do
     arguments.each do |arg|
       STDOUT.puts arg
       STDOUT.flush
@@ -10,7 +10,7 @@ module Charly::Internals
     return TNull.new
   end
 
-  charly_api "stdout_write", variadic: true do
+  charly_api "stdout_write" do
     arguments.each do |arg|
       STDOUT.print arg
       STDOUT.flush
@@ -18,7 +18,7 @@ module Charly::Internals
     return TNull.new
   end
 
-  charly_api "stderr_print", variadic: true do
+  charly_api "stderr_print" do
     arguments.each do |arg|
       STDERR.puts arg
       STDERR.flush
@@ -26,7 +26,7 @@ module Charly::Internals
     return TNull.new
   end
 
-  charly_api "stderr_write", variadic: true do
+  charly_api "stderr_write" do
     arguments.each do |arg|
       STDERR.print arg
       STDERR.flush
