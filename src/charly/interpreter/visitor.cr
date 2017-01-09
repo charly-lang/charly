@@ -713,7 +713,9 @@ module Charly
             raise RunTimeError.new(node.argumentlist.children[0], context, "There is no internal method called #{name.value}")
           end
 
-          return TInternalFunc.new(name.value)
+          return TInternalFunc.new(name.value).tap do |func|
+            func.data.init("name", TString.new(name.value), true)
+          end
         end
       when .is_a? IndexExpression
         identifier, target = visit_get_index_expression_pairs(identifier, scope, context)

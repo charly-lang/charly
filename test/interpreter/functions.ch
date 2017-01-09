@@ -392,4 +392,22 @@ export = ->(describe, it, assert) {
     assert(box[""].typeof(), "Null")
   })
 
+  describe("internal methods", ->{
+
+    it("loads internal methods", ->{
+      let object_keys = __internal__method("_object_keys")
+
+      assert(object_keys.typeof(), "Function")
+      assert(object_keys.name, "_object_keys")
+
+      let test_object = {
+        let hello
+        let world
+      }
+
+      assert(object_keys(test_object), ["hello", "world"])
+    })
+
+  })
+
 }
