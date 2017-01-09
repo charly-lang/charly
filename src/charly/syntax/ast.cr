@@ -183,9 +183,6 @@ module Charly::AST
   ast_node IdentifierLiteral,
     name : String
 
-  ast_node ReferenceIdentifier,
-    identifier : IdentifierLiteral
-
   ast_node StringLiteral,
     value : String
 

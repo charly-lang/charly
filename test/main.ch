@@ -20,9 +20,6 @@ const result = UnitTest(->(describe, it, assert, context) {
     ["Ternary statements",          "./interpreter/ternary.ch"],
     ["Comments",                    "./interpreter/comments.ch"],
 
-    // This is commented out because of #142
-    // ["References",                  "./interpreter/references.ch"],
-
     // Standard Library Specs
     ["Arrays",                      "./std/arrays.ch"],
     ["Numerics",                    "./std/numerics.ch"],

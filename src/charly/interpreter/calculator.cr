@@ -228,10 +228,6 @@ module Charly
         end
       end
 
-      if left.is_a?(TReference) && right.is_a?(TReference)
-        return TBoolean.new(left.value == right.value)
-      end
-
       if left.is_a?(TBoolean) && !right.is_a?(TBoolean)
         return TBoolean.new(left.value == truthyness(right))
       end
@@ -287,10 +283,6 @@ module Charly
         else
           return TBoolean.new(!left.is_a?(TNull))
         end
-      end
-
-      if left.is_a?(TReference) && right.is_a?(TReference)
-        return TBoolean.new(left.value != right.value)
       end
 
       if left.is_a?(TBoolean) && !right.is_a?(TBoolean)

@@ -8,15 +8,6 @@ const _isolate_object = __internal__method("_isolate_object")
 export = primitive class Object {
 
   /*
-   * Returns a reference to self
-   *
-   * If self is already a reference, this will dereference it
-   * */
-  func reference() {
-    &self
-  }
-
-  /*
    * Returns the length of this value
    *
    * If self is a string, the amount of characters (not bytes) is returned
