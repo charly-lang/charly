@@ -200,9 +200,12 @@ module Charly
     property argumentlist : IdentifierList
     property block : Block
     property parent_scope : Scope
+    property bound_context : BaseType?
+    property bound_arguments : Array(BaseType)
 
     def initialize(@name, @argumentlist, @block, @parent_scope)
       super()
+      @bound_arguments = [] of BaseType
     end
 
     def name(io)

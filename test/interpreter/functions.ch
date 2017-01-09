@@ -410,4 +410,99 @@ export = ->(describe, it, assert) {
 
   })
 
+  describe("bind", ->{
+
+    it("binds a context to a function", ->{
+      let context = {
+        let name = "context name"
+      }
+
+      func foo() {
+        @name
+      }
+
+      let bound_foo = foo.bind(context)
+
+      assert(foo == bound_foo, false)
+
+      assert(foo(), null)
+      assert(bound_foo(), "context name")
+    })
+
+    it("binds the context of a callback", ->{
+      func foo(context, callback) {
+        callback.bind(context)()
+      }
+
+      let context = {}
+      foo(context, ->{
+        @name = "test"
+        @prop = 25
+      })
+
+      assert(context.name, "test")
+      assert(context.prop, 25)
+    })
+
+    it("binds arguments passed after the context", ->{
+      func add(left, right) {
+        left + right
+      }
+
+      let bound_add = add.bind(self, 2, 2)
+
+      assert(bound_add(), 4)
+    })
+
+    it("partially binds arguments passed after the context", ->{
+      func add(left, right) {
+        left + right
+      }
+
+      let bound_add = add.bind(self, 2)
+
+      assert(bound_add(2), 4)
+
+      try {
+        bound_add()
+      } catch(e) {
+        assert(e.message, "Method expected 2 arguments, got 0")
+        return
+      }
+
+      assert(true, false)
+    })
+
+    it("bound context takes precedence over regular one", ->{
+      let box = {
+        let name = "box"
+
+        func foo() {
+          @name
+        }
+      }
+
+      assert(box.foo(), "box")
+
+      box.foo = box.foo.bind({
+        let name = "overridden"
+      })
+
+      assert(box.foo(), "overridden")
+    })
+
+    it("bound arguments can take over a function completly", ->{
+      func foo(a, b, c) {
+        a + b + c
+      }
+
+      assert(foo(1, 2, 3), 6)
+
+      foo = foo.bind(self, 5, 5, 5)
+
+      assert(foo(1, 2, 3), 15)
+    })
+
+  })
+
 }

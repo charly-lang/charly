@@ -725,7 +725,7 @@ module Charly
       end
 
       # Check if there are enough arguments
-      unless target.argumentlist.children.size <= arguments.size
+      unless target.argumentlist.children.size <= arguments.size + target.bound_arguments.size
         if target.argumentlist.children.size == 1
           error_message = "Method expected 1 argument, got #{arguments.size}"
         else
@@ -749,6 +749,17 @@ module Charly
     end
 
     def run_function_call(target : TFunc, arguments : Array(BaseType), identifier : BaseType?, scope, context, call_location : Location?)
+
+      # Check if this function has a bound context
+      # It takes precedence over the supplied one
+      if (bound_context = target.bound_context).is_a? BaseType
+        identifier = bound_context
+      end
+
+      # If this function has any bound arguments,
+      # prepend them to the arguments supplied via the regular way
+      arguments = target.bound_arguments + arguments
+
       # The scope in which the function will run in
       function_scope = Scope.new(target.parent_scope)
 
