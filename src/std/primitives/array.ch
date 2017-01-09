@@ -12,7 +12,15 @@ export = primitive class Array {
    * Return a copy of this array
    * */
   func copy() {
-    @map(func(e) { e })
+    @map(->(e) e)
+  }
+
+  /*
+   * Returns a recursive copy of this array
+   * (sub-arrays and objects are copied)
+   * */
+  func deep_copy() {
+    @map(->(e) e.deep_copy())
   }
 
   /*

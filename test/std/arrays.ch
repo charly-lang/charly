@@ -181,6 +181,26 @@ export = ->(describe, it, assert) {
 
   })
 
+  describe("deepcopy", ->{
+
+    it("copies childrens", ->{
+      let obj1 = { let prop = 1 }
+      let obj2 = { let prop = 2 }
+      let arr = [obj1, obj2]
+
+      let arr_copy = arr.deep_copy()
+
+      arr.push(1)
+
+      assert(arr_copy.length(), 2)
+
+      obj1.prop = 200
+
+      assert(arr_copy[0].prop, 1)
+    })
+
+  })
+
   describe("all_to_s", ->{
     let nums = [1, 2, 3, 4]
 
