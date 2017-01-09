@@ -51,37 +51,28 @@ The [CI Build](https://travis-ci.com/KCreate/charly-lang) runs on Ubuntu 12.04.5
 # Installation
 You will need a working [crystal](http://crystal-lang.org/) installation.
 
-To install the `charly` command and automatically copy it to the `/usr/bin` folder, run `install.sh`.
-You will be prompted for your admin password (used to copy to `/usr/bin`).
+To install the `charly` command and automatically copy it to the `/usr/local/bin` folder, run `install.sh`.
+You will be prompted for your admin password (used to copy to `/usr/local/bin`).
 
 # CLI options
 ```
+$ charly -v
+Charly 0.2.0 [b8533f0] (09. January 2017)
+
 $ charly -h
 Usage: charly [filename] [flags] [arguments]
     -f FLAG, --flag FLAG             Set a flag
     -h, --help                       Print this help message
     -v, --version                    Prints the version number
+    --license                        Prints the license
 
 Flags:
     ast                              Display the AST of the userfile
+    dotdump                          Dump dot language displaying the AST
     tokens                           Display tokens of the userfile
     lint                             Don't execute after parsing (linting)
+
+32 internal methods are loaded
 ```
 
-# Atom Syntax Theme
-
-Thanks to [@SpargelPlays](https://github.com/SpargelPlays) for modifying the [language-javascript](https://atom.io/packages/language-javascript) package to make it work with Charly.
-
-Github: [language-charly](https://github.com/SpargelPlays/language-charly)
-
-Atom.io: [language-charly](https://atom.io/packages/language-charly)
-
-# Contributors
-
-[Contributors](https://github.com/KCreate/charly-lang/blob/master/CONTRIBUTORS.md)
-
-# Inspired by
-- Javascript
-- Ruby
-
-[License](https://github.com/KCreate/charly-lang/blob/master/LICENSE)
+# [License](https://github.com/KCreate/charly-lang/blob/master/LICENSE)
