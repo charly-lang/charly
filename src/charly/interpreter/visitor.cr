@@ -261,12 +261,7 @@ module Charly
       end
 
       # Check if we have to assign a constant or not
-      unless constant
-        scope.init(node.identifier.name, expression)
-      else
-        scope.init(node.identifier.name, expression, true)
-      end
-
+      scope.init(node.identifier.name, expression, constant)
       return expression
     end
 
