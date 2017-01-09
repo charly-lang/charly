@@ -248,6 +248,44 @@ export = ->(describe, it, assert) {
       assert(keys, ["name", "data"])
     })
 
+    it("returns all keys of a class", ->{
+      class Foo {
+        static property lol
+
+        static func bar() {
+          "it works"
+        }
+      }
+
+      let keys = Object.keys(Foo)
+      assert(keys, ["lol", "bar", "name"])
+    })
+
+    it("returns all keys of a primitive class", ->{
+      let keys = Object.keys(Array)
+      assert(keys, [
+        "of_size",
+        "name",
+        "methods"
+      ])
+    })
+
+    it("returns all keys of a function", ->{
+      func foo() {}
+      foo.some_data = [1, 2, 3]
+
+      let keys = Object.keys(foo)
+      assert(keys, ["name", "some_data"])
+    })
+
+    it("returns all keys of internal functions", ->{
+      let method = __internal__method("_isolate_object")
+      method.foo = 25
+
+      let keys = Object.keys(method)
+      assert(keys, ["name", "foo"])
+    })
+
   })
 
   describe("tap", ->{

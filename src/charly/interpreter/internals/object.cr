@@ -8,7 +8,7 @@ module Charly::Internals
   end
 
   # Return a list of keys the object has
-  charly_api "_object_keys", object : TObject do
+  charly_api "_object_keys", object : DataType do
     keys = [] of BaseType
 
     object.data.dump_values(parents: false).each do |_, key|

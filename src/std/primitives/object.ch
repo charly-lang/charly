@@ -176,8 +176,16 @@ export = primitive class Object {
    * Returns all keys inside an object
    * */
   static func keys(object) {
-    if object.typeof() ! "Object" {
-      throw Exception("Expected object, got " + object.typeof())
+
+    const allowed_types = [
+      "Object",
+      "Function",
+      "Class",
+      "PrimitiveClass"
+    ]
+
+    if allowed_types.index_of(object.typeof()) == -1 {
+      throw Exception("Expected object, function, class or primitive class, got " + object.typeof())
     }
 
     _object_keys(object)
