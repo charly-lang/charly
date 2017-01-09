@@ -79,6 +79,6 @@ module Charly::Require
       return include_scope.get("export")
     end
 
-    return TNull.new
+    return
   end
 end

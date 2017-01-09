@@ -32,5 +32,8 @@ unless filename[0] == "/" {
   filename = ENV.PWD + "/" + filename
 }
 
-
-TestRunner(filename)
+try {
+  TestRunner(filename)
+} catch(e) {
+  print(e.message)
+}
