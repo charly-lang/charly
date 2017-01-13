@@ -184,60 +184,22 @@ module Charly
       when ':'
         read_char TokenType::Colon
       when 'b'
-        case read_char
-        when 'r'
-          case read_char
-          when 'e'
-            case read_char
-            when 'a'
-              case read_char
-              when 'k'
-                check_ident_or_keyword(TokenType::Keyword)
-              else
-                consume_ident
-              end
-            else
-              consume_ident
-            end
-          else
-            consume_ident
-          end
+        if read_char == 'r' && read_char == 'e' && read_char == 'a' && read_char == 'k'
+          check_ident_or_keyword(TokenType::Keyword)
         else
           consume_ident
         end
       when 'c'
         case read_char
         when 'a'
-          case read_char
-          when 't'
-            case read_char
-            when 'c'
-              case read_char
-              when 'h'
-                check_ident_or_keyword(TokenType::Keyword)
-              else
-                consume_ident
-              end
-            else
-              consume_ident
-            end
+          if read_char == 't' && read_char == 'c' && read_char == 'h'
+            check_ident_or_keyword(TokenType::Keyword)
           else
             consume_ident
           end
         when 'l'
-          case read_char
-          when 'a'
-            case read_char
-            when 's'
-              case read_char
-              when 's'
-                check_ident_or_keyword(TokenType::Keyword)
-              else
-                consume_ident
-              end
-            else
-              consume_ident
-            end
+          if read_char == 'a' && read_char == 's' && read_char == 's'
+            check_ident_or_keyword(TokenType::Keyword)
           else
             consume_ident
           end
@@ -253,24 +215,8 @@ module Charly
                 consume_ident
               end
             when 't'
-              case read_char
-              when 'i'
-                case read_char
-                when 'n'
-                  case read_char
-                  when 'u'
-                    case read_char
-                    when 'e'
-                      check_ident_or_keyword(TokenType::Keyword)
-                    else
-                      consume_ident
-                    end
-                  else
-                    consume_ident
-                  end
-                else
-                  consume_ident
-                end
+              if read_char == 'i' && read_char == 'n' && read_char == 'u' && read_char == 'e'
+                check_ident_or_keyword(TokenType::Keyword)
               else
                 consume_ident
               end
@@ -286,41 +232,14 @@ module Charly
       when 'e'
         case read_char
         when 'l'
-          case read_char
-          when 's'
-            case read_char
-            when 'e'
-              check_ident_or_keyword(TokenType::Keyword)
-            else
-              consume_ident
-            end
+          if read_char == 's' && read_char == 'e'
+            check_ident_or_keyword(TokenType::Keyword)
           else
             consume_ident
           end
         when 'x'
-          case read_char
-          when 't'
-            case read_char
-            when 'e'
-              case read_char
-              when 'n'
-                case read_char
-                when 'd'
-                  case read_char
-                  when 's'
-                    check_ident_or_keyword(TokenType::Keyword)
-                  else
-                    consume_ident
-                  end
-                else
-                  consume_ident
-                end
-              else
-                consume_ident
-              end
-            else
-              consume_ident
-            end
+          if read_char == 't' && read_char == 'e' && read_char == 'n' && read_char == 'd' && read_char == 's'
+            check_ident_or_keyword(TokenType::Keyword)
           else
             consume_ident
           end
@@ -330,31 +249,14 @@ module Charly
       when 'f'
         case read_char
         when 'u'
-          case read_char
-          when 'n'
-            case read_char
-            when 'c'
-              check_ident_or_keyword(TokenType::Keyword)
-            else
-              consume_ident
-            end
+          if read_char == 'n' && read_char == 'c'
+            check_ident_or_keyword(TokenType::Keyword)
           else
             consume_ident
           end
         when 'a'
-          case read_char
-          when 'l'
-            case read_char
-            when 's'
-              case read_char
-              when 'e'
-                check_ident_or_keyword(TokenType::Boolean)
-              else
-                consume_ident
-              end
-            else
-              consume_ident
-            end
+          if read_char == 'l' && read_char == 's' && read_char == 'e'
+            check_ident_or_keyword(TokenType::Boolean)
           else
             consume_ident
           end
@@ -378,10 +280,38 @@ module Charly
             consume_ident
           end
         when 'o'
+          if read_char == 'o' && read_char == 'p'
+            check_ident_or_keyword(TokenType::Keyword)
+          else
+            consume_ident
+          end
+        else
+          consume_ident
+        end
+      when 'n'
+        if read_char == 'u' && read_char == 'l' && read_char == 'l'
+          check_ident_or_keyword(TokenType::Null)
+        else
+          consume_ident
+        end
+      when 'N'
+        if read_char == 'A' && read_char == 'N'
+          check_ident_or_keyword(TokenType::NAN)
+        else
+          consume_ident
+        end
+      when 'p'
+        case read_char
+        when 'r'
           case read_char
           when 'o'
-            case read_char
-            when 'p'
+            if read_char == 'p' && read_char == 'e' && read_char == 'r' && read_char == 't' && read_char == 'y'
+              check_ident_or_keyword(TokenType::Keyword)
+            else
+              consume_ident
+            end
+          when 'i'
+            if read_char == 'm' && read_char == 'i' && read_char == 't' && read_char == 'i' && read_char == 'v' && read_char == 'e'
               check_ident_or_keyword(TokenType::Keyword)
             else
               consume_ident
@@ -392,147 +322,17 @@ module Charly
         else
           consume_ident
         end
-      when 'n'
-        case read_char
-        when 'u'
-          case read_char
-          when 'l'
-            case read_char
-            when 'l'
-              check_ident_or_keyword(TokenType::Null)
-            else
-              consume_ident
-            end
-          else
-            consume_ident
-          end
-        else
-          consume_ident
-        end
-      when 'N'
-        case read_char
-        when 'A'
-          case read_char
-          when 'N'
-            check_ident_or_keyword(TokenType::NAN)
-          else
-            consume_ident
-          end
-        else
-          consume_ident
-        end
-      when 'p'
-        case read_char
-        when 'r'
-          case read_char
-          when 'o'
-            case read_char
-            when 'p'
-              case read_char
-              when 'e'
-                case read_char
-                when 'r'
-                  case read_char
-                  when 't'
-                    case read_char
-                    when 'y'
-                      check_ident_or_keyword(TokenType::Keyword)
-                    else
-                      consume_ident
-                    end
-                  else
-                    consume_ident
-                  end
-                else
-                  consume_ident
-                end
-              else
-                consume_ident
-              end
-            else
-              consume_ident
-            end
-          when 'i'
-            case read_char
-            when 'm'
-              case read_char
-              when 'i'
-                case read_char
-                when 't'
-                  case read_char
-                  when 'i'
-                    case read_char
-                    when 'v'
-                      case read_char
-                      when 'e'
-                        check_ident_or_keyword(TokenType::Keyword)
-                      else
-                        consume_ident
-                      end
-                    else
-                      consume_ident
-                    end
-                  else
-                    consume_ident
-                  end
-                else
-                  consume_ident
-                end
-              else
-                consume_ident
-              end
-            else
-              consume_ident
-            end
-          else
-            consume_ident
-          end
-        else
-          consume_ident
-        end
       when 'r'
-        case read_char
-        when 'e'
-          case read_char
-          when 't'
-            case read_char
-            when 'u'
-              case read_char
-              when 'r'
-                case read_char
-                when 'n'
-                  check_ident_or_keyword(TokenType::Keyword)
-                else
-                  consume_ident
-                end
-              else
-                consume_ident
-              end
-            else
-              consume_ident
-            end
-          else
-            consume_ident
-          end
+        if read_char == 'e' && read_char == 't' && read_char == 'u' && read_char == 'r' && read_char == 'n'
+          check_ident_or_keyword(TokenType::Keyword)
         else
           consume_ident
         end
       when 't'
         case read_char
         when 'h'
-          case read_char
-          when 'r'
-            case read_char
-            when 'o'
-              case read_char
-              when 'w'
-                check_ident_or_keyword(TokenType::Keyword)
-              else
-                consume_ident
-              end
-            else
-              consume_ident
-            end
+          if read_char == 'r' && read_char == 'o' && read_char == 'w'
+            check_ident_or_keyword(TokenType::Keyword)
           else
             consume_ident
           end
@@ -554,51 +354,14 @@ module Charly
           consume_ident
         end
       when 'w'
-        case read_char
-        when 'h'
-          case read_char
-          when 'i'
-            case read_char
-            when 'l'
-              case read_char
-              when 'e'
-                check_ident_or_keyword(TokenType::Keyword)
-              else
-                consume_ident
-              end
-            else
-              consume_ident
-            end
-          else
-            consume_ident
-          end
+        if read_char == 'h' && read_char == 'i' && read_char == 'l' && read_char == 'e'
+          check_ident_or_keyword(TokenType::Keyword)
         else
           consume_ident
         end
       when 's'
-        case read_char
-        when 't'
-          case read_char
-          when 'a'
-            case read_char
-            when 't'
-              case read_char
-              when 'i'
-                case read_char
-                when 'c'
-                  check_ident_or_keyword(TokenType::Keyword)
-                else
-                  consume_ident
-                end
-              else
-                consume_ident
-              end
-            else
-              consume_ident
-            end
-          else
-            consume_ident
-          end
+        if read_char == 't' && read_char == 'a' && read_char == 't' && read_char == 'i' && read_char == 'c'
+          check_ident_or_keyword(TokenType::Keyword)
         else
           consume_ident
         end
@@ -607,96 +370,34 @@ module Charly
         when '_'
           case read_char
           when 'F'
-            case read_char
-            when 'I'
-              case read_char
-              when 'L'
-                case read_char
-                when 'E'
-                  case read_char
-                  when '_'
-                    case read_char
-                    when '_'
-                      if ident_start(peek_char)
-                      else
-                        read_char
-                        @token.type = TokenType::String
-                        @token.value = File.basename @filename
-                      end
-                    else
-                      consume_ident
-                    end
-                  else
-                    consume_ident
-                  end
-                else
-                  consume_ident
-                end
-              else
+            if read_char == 'I' && read_char == 'L' && read_char == 'E' && read_char == '_' && read_char == '_'
+              if ident_start(read_char)
                 consume_ident
+              else
+                @token.type = TokenType::String
+                @token.value = File.basename @filename
               end
             else
               consume_ident
             end
           when 'D'
-            case read_char
-            when 'I'
-              case read_char
-              when 'R'
-                case read_char
-                when '_'
-                  case read_char
-                  when '_'
-                    if ident_start(peek_char)
-                      read_char
-                      consume_ident
-                    else
-                      read_char
-                      @token.type = TokenType::String
-                      @token.value = File.dirname @filename
-                    end
-                  else
-                    consume_ident
-                  end
-                else
-                  consume_ident
-                end
-              else
+            if read_char == 'I' && read_char == 'R' && read_char == '_' && read_char == '_'
+              if ident_start(read_char)
                 consume_ident
+              else
+                @token.type = TokenType::String
+                @token.value = File.dirname @filename
               end
             else
               consume_ident
             end
           when 'L'
-            case read_char
-            when 'I'
-              case read_char
-              when 'N'
-                case read_char
-                when 'E'
-                  case read_char
-                  when '_'
-                    case read_char
-                    when '_'
-                      if ident_part(peek_char)
-                        read_char
-                        consume_ident
-                      else
-                        read_char
-                        @token.type = TokenType::Numeric
-                        @token.value = "#{@row + 1}"
-                      end
-                    else
-                      consume_ident
-                    end
-                  else
-                    consume_ident
-                  end
-                else
-                  consume_ident
-                end
-              else
+            if read_char == 'I' && read_char == 'N' && read_char == 'E' && read_char == '_' && read_char == '_'
+              if ident_part(read_char)
                 consume_ident
+              else
+                @token.type = TokenType::Numeric
+                @token.value = "#{@row + 1}"
               end
             else
               consume_ident
@@ -712,31 +413,14 @@ module Charly
         when 'n'
           case read_char
           when 'l'
-            case read_char
-            when 'e'
-              case read_char
-              when 's'
-                case read_char
-                when 's'
-                  check_ident_or_keyword(TokenType::Keyword)
-                else
-                  consume_ident
-                end
-              else
-                consume_ident
-              end
+            if read_char == 'e' && read_char == 's' && read_char == 's'
+              check_ident_or_keyword(TokenType::Keyword)
             else
               consume_ident
             end
           when 't'
-            case read_char
-            when 'i'
-              case read_char
-              when 'l'
-                check_ident_or_keyword(TokenType::Keyword)
-              else
-                consume_ident
-              end
+            if read_char == 'i' && read_char == 'l'
+              check_ident_or_keyword(TokenType::Keyword)
             else
               consume_ident
             end
@@ -747,24 +431,8 @@ module Charly
           consume_ident
         end
       when 'g'
-        case read_char
-        when 'u'
-          case read_char
-          when 'a'
-            case read_char
-            when 'r'
-              case read_char
-              when 'd'
-                check_ident_or_keyword(TokenType::Keyword)
-              else
-                consume_ident
-              end
-            else
-              consume_ident
-            end
-          else
-            consume_ident
-          end
+        if read_char == 'u' && read_char == 'a' && read_char == 'r' && read_char == 'd'
+          check_ident_or_keyword(TokenType::Keyword)
         else
           consume_ident
         end
