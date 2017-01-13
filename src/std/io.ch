@@ -64,9 +64,6 @@ export = {
   // Immediately exit the program
   const exit = __internal__method("exit")
 
-  // Returns the current scope visualized as a table
-  const stackdump = __internal__method("stackdump")
-
   // Get the current timestamp in miliseconds
   const time_ms = __internal__method("time_ms");
 

@@ -1,5 +1,4 @@
 require "../exception.cr"
-require "terminal_table"
 
 module Charly
   class ContainerReferenceError < Exception
@@ -245,18 +244,6 @@ module Charly
     # :nodoc:
     def clear
       @values.clear
-    end
-
-    # :nodoc:
-    def to_s(io)
-      table = TerminalTable.new
-      table.headings = ["CID", "Key", "Value", "Flags"]
-
-      each do |depth, key, value, flags|
-        table << ["#{depth}", "#{key}", "#{value}", "#{flags}"]
-      end
-
-      io << table.render
     end
   end
 end
