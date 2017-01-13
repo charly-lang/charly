@@ -49,10 +49,28 @@ I'm developing on macOS 10.12 so it should work without any problems on that.
 The [CI Build](https://travis-ci.com/KCreate/charly-lang) runs on Ubuntu 12.04.5 LTS.
 
 # Installation
-You will need a working [crystal](http://crystal-lang.org/) installation.
+1. Install [Crystal](https://crystal-lang.org)
+2. Clone this repo (`git clone https://github.com/KCreate/charly-lang`)
 
-To install the `charly` command and automatically copy it to the `/usr/local/bin` folder, run `install.sh`.
+3. Run `install.sh`
+
 You will be prompted for your admin password (used to copy to `/usr/local/bin`).
+
+After that you need to set the `CHARLYDIR` environment variable. Just add the following line to your
+`.bashrc`, `.zshrc`, etc. Replace the path with the path to the Charly source code (e.g The path to the git repo).
+
+```bash
+export CHARLYDIR=~/GitHub/KCreate/charly-lang
+```
+
+You can also build the interpreter via the following command:
+
+```bash
+mkdir bin
+crystal build src/charly.cr --release -o bin/charly
+```
+
+This will place the executable in the `bin` folder.
 
 # CLI options
 ```
