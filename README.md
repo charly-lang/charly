@@ -36,7 +36,7 @@ null
 
 If you need to pass arguments or flags to a REPL session you can do so via the repl command
 ```
-charly repl these are all arguments
+$ charly repl these are all arguments
 ```
 
 ```javascript
@@ -66,8 +66,8 @@ export CHARLYDIR=~/GitHub/KCreate/charly-lang
 You can also build the interpreter via the following command:
 
 ```bash
-mkdir bin
-crystal build src/charly.cr --release -o bin/charly
+$ mkdir bin
+$ crystal build src/charly.cr --release -o bin/charly
 ```
 
 This will place the executable in the `bin` folder.
@@ -75,7 +75,7 @@ This will place the executable in the `bin` folder.
 # CLI options
 ```
 $ charly -v
-Charly 0.2.0 [b8533f0] (09. January 2017)
+Charly 0.2.0 [bc45b96] (16. January 2017)
 
 $ charly -h
 Usage: charly [filename] [flags] [arguments]
@@ -90,7 +90,7 @@ Flags:
     tokens                           Display tokens of the userfile
     lint                             Don't execute after parsing (linting)
 
-32 internal methods are loaded
+30 internal methods are loaded
 ```
 
 # [License](https://github.com/KCreate/charly-lang/blob/master/LICENSE)
