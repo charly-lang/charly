@@ -503,6 +503,52 @@ export = ->(describe, it, assert) {
       assert(foo(1, 2, 3), 15)
     })
 
+    it("doesn't modify the original function", ->{
+      func foo(a, b) {
+        a + b
+      }
+
+      let bar = foo.bind(self, 1, 2)
+
+      assert(foo(5, 5), 10)
+      assert(bar(5, 5), 3)
+    })
+
+    it("can append new arguments to an already bound function", ->{
+      func foo(a, b, c) {
+        a + b + c
+      }
+
+      let b1 = foo.bind(self, 50)
+      let b2 = b1.bind(self, 50)
+      let b3 = b2.bind(self, 50)
+
+      assert(foo(1, 1, 1), 3)
+      assert(b1(1, 1, 1), 52)
+      assert(b2(1, 1, 1), 101)
+      assert(b3(1, 1, 1), 150)
+    })
+
+    it("doesn't clone already bound arguments on rebind", ->{
+      func foo(a) { a }
+
+      let arr = [1, 2]
+
+      let b1 = foo.bind(self, arr)
+      let b2 = b1.bind(self)
+
+      let r1 = b1()
+      let r2 = b2()
+
+      assert(r1, [1, 2])
+      assert(r2, [1, 2])
+
+      r1.push(3)
+
+      assert(r1, [1, 2, 3])
+      assert(r2, [1, 2, 3])
+    })
+
   })
 
 }
