@@ -1,7 +1,6 @@
 const length = __internal__method("length")
 const _colorize = __internal__method("colorize")
 const typeof = __internal__method("typeof")
-const instanceof = __internal__method("instanceof")
 const _object_keys = __internal__method("_object_keys")
 const _isolate_object = __internal__method("_isolate_object")
 const _object_id = __internal__method("_object_id")
@@ -160,14 +159,6 @@ export = primitive class Object {
    * */
   func typeof() {
     typeof(self)
-  }
-
-  /*
-   * If self is an object, this returns the class it was constructed from
-   * If self wasn't created from a class (via a container literal for example), null is returned
-   * */
-  func instanceof() {
-    instanceof(self)
   }
 
   /*

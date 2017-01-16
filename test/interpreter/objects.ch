@@ -205,16 +205,6 @@ export = ->(describe, it, assert) {
 
   })
 
-  describe("instanceof", ->{
-
-    it("gives back null on container literals", ->{
-      let Box = {}
-
-      assert(Box.instanceof(), null)
-    })
-
-  })
-
   describe("pretty_printing", ->{
 
     it("displays objects as a string", ->{

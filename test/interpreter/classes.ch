@@ -131,14 +131,6 @@ export = ->(describe, it, assert) {
 
   })
 
-  it("gives back the class of an object", ->{
-    class Box {}
-
-    const mybox = Box()
-
-    assert(mybox.instanceof(), Box)
-  })
-
   describe("static", ->{
 
     describe("properties", ->{
