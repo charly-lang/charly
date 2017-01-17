@@ -104,7 +104,7 @@ module Charly
           error_message = "Unexpected #{@token.type}"
         end
       else
-        if expected || value
+        if value
           error_message = "Unexpected end of file, expected #{value}"
         elsif expected
           error_message = "Unexpected end of file, expected #{expected}"
