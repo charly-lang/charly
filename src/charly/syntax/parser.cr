@@ -358,7 +358,6 @@ module Charly
           value = parse_expression
           end_location = value.location_end
           skip TokenType::Semicolon
-          advance_to_token TokenType::RightCurly
           return ThrowStatement.new(value).at(start_location, end_location)
         when "func", "class", "primitive"
           node = parse_expression
