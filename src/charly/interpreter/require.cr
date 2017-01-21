@@ -11,9 +11,6 @@ module Charly::Require
     end
   end
 
-  # Cache previous require calls
-  @@cache = {} of String => BaseType
-
   # A list of core modules the interpreter provides
   CORE_MODULES = [
     "unit-test",
@@ -26,15 +23,15 @@ module Charly::Require
     path = resolve(filename, cwd)
 
     # Check the cache for an entry
-    if @@cache.has_key? path
-      return @@cache[path]
+    if context.cached_files.has_key? path
+      return context.cached_files[path]
     end
 
     # Try to load as a file
     could_include_as_file = load_as_file(path, prelude, context)
 
     if could_include_as_file
-      @@cache[path] = could_include_as_file
+      context.cached_files[path] = could_include_as_file
       return could_include_as_file
     end
 
