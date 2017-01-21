@@ -19,7 +19,7 @@ module Charly::Require
   ] of String
 
   # Loads *filename* and returns the value of the export variable
-  def load(filename, cwd, prelude, context)
+  def load(filename, cwd, visitor, context)
     path = resolve(filename, cwd)
 
     # Check the cache for an entry
@@ -28,7 +28,7 @@ module Charly::Require
     end
 
     # Try to load as a file
-    could_include_as_file = load_as_file(path, prelude, context)
+    could_include_as_file = load_as_file(path, visitor, context)
 
     if could_include_as_file
       context.cached_files[path] = could_include_as_file
@@ -36,6 +36,22 @@ module Charly::Require
     end
 
     raise FileNotFoundException.new(filename, "Can't load file (#{filename})")
+  end
+
+  # Loads *path*
+  private def load_as_file(path, visitor, context)
+    # Check if the path is accessable
+    if File.exists?(path) && File.readable?(path)
+      # The scope in which the included file will run
+      scope = Scope.new(visitor.prelude)
+
+      # Parse the input file
+      program = Parser.create(File.open(path), path)
+      visitor.visit_program(program, scope, context)
+      return scope.get("export")
+    end
+
+    return nil
   end
 
   #  Resolves *filename* to a absolute path
@@ -60,22 +76,5 @@ module Charly::Require
     end
 
     raise FileNotFoundException.new(filename, "Can't load file (#{filename})")
-  end
-
-  # Loads *path*
-  private def load_as_file(path, prelude, context)
-    # Check if the path is accessable
-    if File.exists?(path) && File.readable?(path)
-      # The scope in which the included file will run
-      include_scope = Scope.new(prelude)
-
-      # Load the included file
-      visitor = Visitor.new include_scope, prelude
-      program = Parser.create(File.open(path), path)
-      visitor.visit_program(program, include_scope, context)
-      return include_scope.get("export")
-    end
-
-    return
   end
 end

@@ -65,19 +65,22 @@ module Charly::Internals
   end
 
   #  Evaluate a string
-  charly_api "eval", source : TString, context : TObject do
+  charly_api "eval", source : TString, environment : TObject do
+
     # Parse the program
-    # We have to append a whitespace because wtf
-    # This is most likely an issue with the IO::Memory type not being able to pass the end border
-    program = Parser.create("#{source.value} ", "--virtual--file--")
+    # A newline is appended to make sure we don't
+    # have any conflicts in the lexer
+    program = Parser.create("#{source.value}\n", "--virtual--file--")
 
-    prelude = visitor.prelude
-    visitor = Visitor.new context.data, prelude
+    # Switch the parent to the prelude
+    b_parent = environment.data.parent
+    environment.data.parent = visitor.prelude
 
-    backup_parent = context.data.parent
-    context.data.parent = prelude
-    result = visitor.visit_program(program, context.data)
-    context.data.parent = backup_parent
+    result = visitor.visit_program(program, environment.data, context)
+
+    # Restore old parent
+    environment.data.parent = b_parent
+
     return result
   end
 

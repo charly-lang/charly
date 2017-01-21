@@ -5,7 +5,7 @@ module Charly::Internals
   charly_api "require", filename : TString do
     begin
       cwd = File.dirname(call.location_start.filename)
-      return Require.load(filename.value, cwd, visitor.prelude, context)
+      return Require.load(filename.value, cwd, visitor, context)
     rescue e : Require::FileNotFoundException
       raise RunTimeError.new(call.argumentlist.children[0], "Can't load #{filename}")
     end
