@@ -12,25 +12,26 @@ const context = Object.isolate({
 
 print(context.charly.LICENSE)
 
-let input
-
 loop {
-  input = context.prompt.prompt()
+  let input = context.prompt.prompt()
+  let value
 
   if input == ".exit" {
     break
   }
 
   try {
-    context.$ = io.eval(input, context)
+    value = io.eval(input, context)
   } catch(e) {
-    context.$ = e
+    value = e
   }
 
   if context.echo {
-    Object.pretty_print(context.$).tap(print)
-    context.history.push(input)
+    Object.pretty_print(value).tap(print)
   }
+
+  context.$ = value
+  context.history.push(input)
 }
 
 export = context
