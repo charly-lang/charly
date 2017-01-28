@@ -152,6 +152,55 @@ export = ->(describe, it, assert) {
 
   })
 
+  describe("iterate", ->{
+
+    it("iterates over an array", ->{
+      let nums = [1, 2, 3, 4]
+      let got = []
+
+      nums.iterate(->(read) {
+        got.push(read())
+      })
+
+      assert(got, [1, 2, 3, 4])
+    })
+
+    it("can returns multiple values per iteration", ->{
+      let nums = [1, 2, 3, 4, 5, 6]
+      let got = []
+
+      let times_run = 0
+
+      nums.iterate(->(read) {
+        got.push(read())
+        got.push(read())
+
+        times_run += 1
+      })
+
+      assert(times_run, 3)
+      assert(got, [1, 2, 3, 4, 5, 6])
+    })
+
+    it("returns null if the end of the array is reached", ->{
+      let nums = [1, 2, 3, 4, 5]
+      let got = []
+
+      let times_run = 0
+
+      nums.iterate(->(read) {
+        got.push(read())
+        got.push(read())
+
+        times_run += 1
+      })
+
+      assert(times_run, 3)
+      assert(got, [1, 2, 3, 4, 5, null])
+    })
+
+  })
+
   describe("copy", ->{
 
     it("leaves the original untouched", ->{

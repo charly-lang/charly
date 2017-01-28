@@ -80,6 +80,24 @@ export = primitive class Array {
   }
 
   /*
+   * Passes a function to the callback which returns the next item
+   * The callback is called as long as there are values inside self
+   * */
+  func iterate(callback) {
+    let i = 0
+
+    func read() {
+      self[i].tap(->{ i += 1  })
+    }
+
+    while i < @length() {
+      callback(read)
+    }
+
+    self
+  }
+
+  /*
    * Returns true if this array is empty (length is 0)
    * */
   func empty() {
