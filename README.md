@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.com/KCreate/charly-lang.svg?token=yitMwy9Lg5peiAqCZjoK&branch=master)](https://travis-ci.com/KCreate/charly-lang)
-[![Version](https://img.shields.io/badge/Version-0.2.0-green.svg)](https://github.com/KCreate/charly-lang/releases/tag/v0.2.0)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/KCreate/charly-lang/blob/master/LICENSE)
+[![Build Status](https://travis-ci.org/charly-lang/charly.svg?branch=master)](https://travis-ci.org/charly-lang/charly)
+[![Version](https://img.shields.io/badge/Version-0.2.0-green.svg)](https://github.com/charly-lang/charly/releases/tag/v0.2.0)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/charly-lang/charly/blob/master/LICENSE)
 
 <img align="right" alt="Charly" width="150" src="res/charly.png" />
 
@@ -10,7 +10,7 @@ This is my try at writing an interpreter of a dynamic language from scratch with
 
 # Syntax and language guide
 
-Take a look at the [official website](https://kcreate.github.io/charly-lang/) for an introduction to the language.
+Take a look at the [official website](https://charly-lang.github.io/charly/) for an introduction to the language.
 
 # Using the built-in REPL
 
@@ -46,11 +46,11 @@ $ charly repl these are all arguments
 
 # OS Support
 I'm developing on macOS 10.12 so it should work without any problems on that.
-The [CI Build](https://travis-ci.com/KCreate/charly-lang) runs on Ubuntu 12.04.5 LTS.
+The [CI Build](https://travis-ci.com/charly-lang/charly) runs on Ubuntu 12.04.5 LTS.
 
 # Installation
 1. Install [Crystal](https://crystal-lang.org)
-2. Clone this repo (`git clone https://github.com/KCreate/charly-lang`)
+2. Clone this repo (`git clone https://github.com/charly-lang/charly`)
 
 3. Run `install.sh`
 
@@ -60,7 +60,7 @@ After that you need to set the `CHARLYDIR` environment variable. Just add the fo
 `.bashrc`, `.zshrc`, etc. Replace the path with the path to the Charly source code (e.g The path to the git repo).
 
 ```bash
-export CHARLYDIR=~/GitHub/KCreate/charly-lang
+export CHARLYDIR=~/GitHub/charly-lang/charly
 ```
 
 You can also build the interpreter via the following command:
@@ -93,4 +93,4 @@ Flags:
 30 internal methods are loaded
 ```
 
-# [License](https://github.com/KCreate/charly-lang/blob/master/LICENSE)
+# [License](https://github.com/charly-lang/charly/blob/master/LICENSE)
