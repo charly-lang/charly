@@ -75,7 +75,7 @@ This will place the executable in the `bin` folder.
 # CLI options
 ```
 $ charly -v
-Charly 0.3.0 [bc45b96] (16. January 2017)
+Charly 0.3.0 [ee05bdf] (11. February 2017)
 
 $ charly -h
 Usage: charly [filename] [flags] [arguments]
@@ -90,7 +90,7 @@ Flags:
     tokens                           Display tokens of the userfile
     lint                             Don't execute after parsing (linting)
 
-30 internal methods are loaded
+29 internal methods are loaded
 ```
 
 # [License](https://github.com/charly-lang/charly/blob/master/LICENSE)
