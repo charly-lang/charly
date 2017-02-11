@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/charly-lang/charly.svg?branch=master)](https://travis-ci.org/charly-lang/charly)
-[![Version](https://img.shields.io/badge/Version-0.2.0-green.svg)](https://github.com/charly-lang/charly/releases/tag/v0.2.0)
+[![Version](https://img.shields.io/badge/Version-0.3.0-green.svg)](https://github.com/charly-lang/charly/releases/tag/v0.3.0)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/charly-lang/charly/blob/master/LICENSE)
 
 <img align="right" alt="Charly" width="150" src="res/charly.png" />
@@ -75,7 +75,7 @@ This will place the executable in the `bin` folder.
 # CLI options
 ```
 $ charly -v
-Charly 0.2.0 [bc45b96] (16. January 2017)
+Charly 0.3.0 [bc45b96] (16. January 2017)
 
 $ charly -h
 Usage: charly [filename] [flags] [arguments]
