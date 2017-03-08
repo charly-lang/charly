@@ -69,8 +69,7 @@ The [CI Build](https://travis-ci.org/charly-lang/charly) runs on Ubuntu 12.04.5 
 
 ```
 $ charly -v
-Charly 0.3.0 [ee05bdf] (11. February 2017)
-
+Charly 0.3.0 [8a5abb0] (08. March 2017)
 $ charly -h
 Usage: charly [filename] [flags] [arguments]
     -f FLAG, --flag FLAG             Set a flag
@@ -84,7 +83,7 @@ Flags:
     tokens                           Display tokens of the userfile
     lint                             Don't execute after parsing (linting)
 
-29 internal methods are loaded
+53 internal methods are loaded
 ```
 
 # Using the built-in REPL
