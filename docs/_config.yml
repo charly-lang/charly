@@ -2,7 +2,7 @@ title: Charly-lang
 description: 🐈 The Charly Interpreter
 google_analytics: 
 show_downloads: true
-theme: jekyll-theme-cayman
+theme: jekyll-theme-midnight
 
 gems:
   - jekyll-mentions
