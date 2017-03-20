@@ -20,7 +20,7 @@ module Charly::Internals
       function,
       arguments.value,
       nil,
-      scope,
+      function.parent_scope,
       context,
       call.location_start
     )
@@ -31,7 +31,7 @@ module Charly::Internals
       function,
       arguments.value,
       ctx,
-      scope,
+      function.parent_scope,
       context,
       call.location_start
     )
