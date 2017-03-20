@@ -1,0 +1,5 @@
+class Response {
+
+}
+
+export = Response

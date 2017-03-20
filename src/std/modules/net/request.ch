@@ -1,0 +1,5 @@
+class Request {
+
+}
+
+export = Request
