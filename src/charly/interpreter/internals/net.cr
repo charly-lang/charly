@@ -49,6 +49,10 @@ module Charly::Internals
       @server.listen
     end
 
+    def close
+      @server.close
+    end
+
     private def wrap_request(req : HTTP::Request)
       TObject.new do |data|
         data.init "body",           TString.new  req.body.to_s
@@ -142,6 +146,19 @@ module Charly::Internals
     if server
       server.on_listen.try &.call
       server.listen
+    end
+
+    TNull.new
+  end
+
+  charly_api "net_close", TNumeric do |id|
+    id = id.value.to_u64
+
+    server = HTTP_SERVERS[id]?
+
+    if server
+      server.close
+      server.on_close.try &.call
     end
 
     TNull.new

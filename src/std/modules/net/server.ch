@@ -1,5 +1,6 @@
 const net_create = __internal__method("net_create")
 const net_listen = __internal__method("net_listen")
+const net_close = __internal__method("net_close")
 
 const Request = require("./request.ch")
 const Response = require("./response.ch")
@@ -19,6 +20,10 @@ class Server {
 
   func listen() {
     net_listen(@id)
+  }
+
+  func close() {
+    net_close(@id)
   }
 
   func on(name, callback) {

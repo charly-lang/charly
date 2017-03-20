@@ -6,6 +6,10 @@ let count = 0
 server.on("request", ->(req, res) {
   res.body = "" + count
   count += 1
+
+  if count > 10 {
+    server.close()
+  }
 })
 
 server.on("listen", ->{
