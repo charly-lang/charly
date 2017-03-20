@@ -15,6 +15,28 @@ module Charly::Internals
     return function
   end
 
+  charly_api "function_run", TFunc, TArray do |function, arguments|
+    return visitor.run_function_call(
+      function,
+      arguments.value,
+      nil,
+      scope,
+      context,
+      call.location_start
+    )
+  end
+
+  charly_api "function_run_with_context", TFunc, BaseType, TArray do |function, ctx, arguments|
+    return visitor.run_function_call(
+      function,
+      arguments.value,
+      ctx,
+      scope,
+      context,
+      call.location_start
+    )
+  end
+
   charly_api "is_internal", BaseType do |function|
     return TBoolean.new function.is_a?(TInternalFunc)
   end
