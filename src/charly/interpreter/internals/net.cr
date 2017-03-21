@@ -6,9 +6,12 @@ module Charly::Internals
 
   # Pool of all current open servers
   HTTP_SERVERS = {} of UInt64 => Server
+  HTTP_RESPONSES = {} of UInt64 => HTTP::Server::Response
 
   class Server
-    @@next_server_id = 1_u64 # TODO: Put this at a more suitable place
+    # TODO: Put these at a more suitable place
+    @@next_server_id = 1_u64
+    @@next_response_id = 1_u64
 
     def self.next_server_id
       @@next_server_id
@@ -16,6 +19,14 @@ module Charly::Internals
 
     def self.next_server_id=(value)
       @@next_server_id = value
+    end
+
+    def self.next_response_id
+      @@next_response_id
+    end
+
+    def self.next_response_id=(value)
+      @@next_response_id = value
     end
 
     property server : HTTP::Server
@@ -26,8 +37,15 @@ module Charly::Internals
 
     def initialize(@handler, address, port)
       @server = HTTP::Server.new(address, port) do |context|
+
+        # Registers this response in the global response table
+        response_id = Server.next_response_id
+        HTTP_RESPONSES[Server.next_response_id] = context.response
+        Server.next_response_id += 1
+
+        # Wraps request and response objects to be passed to charly space
         wrapped_request = wrap_request context.request
-        wrapped_response = wrap_response context.response
+        wrapped_response = wrap_response context.response, response_id
         @on_request.try &.call wrapped_request, wrapped_response
         copy_to_response wrapped_response, context.response
       end
@@ -100,8 +118,9 @@ module Charly::Internals
     end
 
     # Creates a TObject from a HTTP::Server::Response
-    private def wrap_response(res : HTTP::Server::Response)
+    private def wrap_response(res : HTTP::Server::Response, response_id : UInt64)
       TObject.new do |data|
+        data.init "__response_id",  TNumeric.new response_id
         data.init "body",           TString.new ""
         data.init "status_code",    TNumeric.new 200
       end

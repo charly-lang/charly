@@ -37,6 +37,12 @@ class Server {
     const handler = @events[name]
 
     if typeof handler == "Function" {
+
+      if name == "request" {
+        arguments[0] = Request(arguments[0])
+        arguments[1] = Response(arguments[1])
+      }
+
       return handler.run(arguments)
     }
   }
