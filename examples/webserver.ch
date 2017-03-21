@@ -1,15 +1,8 @@
 const http = require("net")
 const server = http.create_server("localhost", 8080)
 
-let count = 0
-
 server.on("request", ->(req, res) {
-  res.body = "" + count
-  count += 1
-
-  if count > 10 {
-    server.close()
-  }
+  res.body = req.to_s()
 })
 
 server.on("listen", ->{

@@ -53,6 +53,7 @@ module Charly::Internals
       @server.close
     end
 
+    # Creates a TObject from a HTTP::Request
     private def wrap_request(req : HTTP::Request)
       TObject.new do |data|
         data.init "body",           TString.new  req.body.to_s
@@ -65,9 +66,40 @@ module Charly::Internals
         data.init "query",          TString.new  req.query || ""
         data.init "resource",       TString.new  req.resource
         data.init "version",        TString.new  req.version
+
+        data.init "query_params", TObject.new { |data|
+          req.query_params.each do |(name, value)|
+            data.init name, TString.new value
+          end
+        }
+
+        data.init "headers", TObject.new { |data|
+          req.headers.each do |(name, value)|
+            values = TArray.new value.map { |field| TString.new(field).as(BaseType) }
+            data.init name, values
+          end
+        }
+
+        data.init "cookies", TObject.new { |data|
+          req.cookies.each do |cookie|
+            data.init cookie.name, TObject.new { |data|
+              data.init "value",      TString.new cookie.value
+              data.init "path",       TString.new cookie.path
+              data.init "secure",     TBoolean.new cookie.secure
+              data.init "http_only",  TBoolean.new cookie.http_only
+
+              expires, domain, extension = cookie.expires, cookie.domain, cookie.extension
+
+              data.init "expires", TNumeric.new expires.epoch if expires
+              data.init "domain", TString.new domain if domain
+              data.init "extension", TString.new extension if extension
+            }
+          end
+        }
       end
     end
 
+    # Creates a TObject from a HTTP::Server::Response
     private def wrap_response(res : HTTP::Server::Response)
       TObject.new do |data|
         data.init "body",           TString.new ""
@@ -75,6 +107,7 @@ module Charly::Internals
       end
     end
 
+    # Copies values from a TObject into a HTTP::Server::Response object
     private def copy_to_response(source : TObject, res : HTTP::Server::Response)
       res.output.print source.data.get("body").as(TString).value rescue ""
       res.status_code = source.data.get("status_code").as(TNumeric).value.to_i32 rescue 200
