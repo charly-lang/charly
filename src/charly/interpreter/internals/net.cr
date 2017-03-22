@@ -40,7 +40,7 @@ module Charly::Internals
 
         # Registers this response in the global response table
         response_id = Server.next_response_id
-        HTTP_RESPONSES[Server.next_response_id] = context.response
+        HTTP_RESPONSES[response_id] = context.response
         Server.next_response_id += 1
 
         # Wraps request and response objects to be passed to charly space
@@ -48,6 +48,8 @@ module Charly::Internals
         wrapped_response = wrap_response context.response, response_id
         @on_request.try &.call wrapped_request, wrapped_response
         copy_to_response wrapped_response, context.response
+
+        HTTP_RESPONSES.delete response_id
       end
     end
 
@@ -121,15 +123,46 @@ module Charly::Internals
     private def wrap_response(res : HTTP::Server::Response, response_id : UInt64)
       TObject.new do |data|
         data.init "__response_id",  TNumeric.new response_id
-        data.init "body",           TString.new ""
         data.init "status_code",    TNumeric.new 200
+
+        data.init "headers", TObject.new { |data|
+          res.headers.each do |(name, value)|
+            values = TArray.new value.map { |field| TString.new(field).as(BaseType) }
+            data.init name, values
+          end
+        }
+
+        res.headers.clear
       end
     end
 
     # Copies values from a TObject into a HTTP::Server::Response object
     private def copy_to_response(source : TObject, res : HTTP::Server::Response)
-      res.output.print source.data.get("body").as(TString).value rescue ""
-      res.status_code = source.data.get("status_code").as(TNumeric).value.to_i32 rescue 200
+      if source.data.contains "status_code"
+        status_code = source.data["status_code"]
+
+        if status_code.is_a? TNumeric
+          res.status_code = status_code.value.to_i32
+        end
+      end
+
+      if source.data.contains "headers"
+        headers = source.data["headers"]
+
+        if headers.is_a? TObject
+          headers.data.dump_values(false).each do |(_, key, value, _)|
+
+            if value.is_a? TArray
+              value.value.each do |field|
+
+                if field.is_a? TString
+                  res.headers.add key, field.value
+                end
+              end
+            end
+          end
+        end
+      end
     end
   end
 
@@ -212,6 +245,62 @@ module Charly::Internals
       server.close
       server.on_close.try &.call
     end
+
+    TNull.new
+  end
+
+  charly_api "net_response_flush", TNumeric do |rid|
+    response = HTTP_RESPONSES[rid.value.to_i32]?
+
+    unless response
+      raise RunTimeError.new(call, context, "No response with id #{rid}")
+    end
+
+    response.flush
+
+    TNull.new
+  end
+
+  charly_api "net_response_close", TNumeric do |rid|
+    response = HTTP_RESPONSES[rid.value.to_i32]?
+
+    unless response
+      raise RunTimeError.new(call, context, "No response with id #{rid}")
+    end
+
+    response.close
+
+    TNull.new
+  end
+
+  charly_api "net_response_write", TNumeric, TString do |rid, data|
+    response = HTTP_RESPONSES[rid.value.to_i32]?
+
+    unless response
+      raise RunTimeError.new(call, context, "No response with id #{rid}")
+    end
+
+    data = data.value
+    response.output.print data
+
+    TNull.new
+  end
+
+  charly_api "net_response_write_file", TNumeric, TString do |rid, path|
+    response = HTTP_RESPONSES[rid.value.to_i32]?
+
+    unless response
+      raise RunTimeError.new(call, context, "No response with id #{rid}")
+    end
+
+    path = path.value
+    path = File.expand_path path
+
+    unless File.readable? path
+      raise RunTimeError.new(call, context, "Can't open file at #{path}")
+    end
+
+    response.output.print File.read path
 
     TNull.new
   end
