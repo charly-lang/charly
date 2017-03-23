@@ -47,7 +47,10 @@ module Charly::Internals
         wrapped_request = wrap_request context.request
         wrapped_response = wrap_response context.response, response_id
         @on_request.try &.call wrapped_request, wrapped_response
-        copy_to_response wrapped_response, context.response
+
+        unless context.response.output.closed?
+          copy_to_response wrapped_response, context.response
+        end
 
         HTTP_RESPONSES.delete response_id
       end
@@ -124,6 +127,7 @@ module Charly::Internals
       TObject.new do |data|
         data.init "__response_id",  TNumeric.new response_id
         data.init "status_code",    TNumeric.new 200
+        data.init "body",           TString.new ""
 
         data.init "headers", TObject.new { |data|
           res.headers.each do |(name, value)|
@@ -144,6 +148,12 @@ module Charly::Internals
         if status_code.is_a? TNumeric
           res.status_code = status_code.value.to_i32
         end
+      end
+
+      if source.data.contains "body"
+        body = source.data["body"]
+        body = "#{body}"
+        res.output.print body
       end
 
       if source.data.contains "headers"
@@ -249,18 +259,6 @@ module Charly::Internals
     TNull.new
   end
 
-  charly_api "net_response_flush", TNumeric do |rid|
-    response = HTTP_RESPONSES[rid.value.to_i32]?
-
-    unless response
-      raise RunTimeError.new(call, context, "No response with id #{rid}")
-    end
-
-    response.flush
-
-    TNull.new
-  end
-
   charly_api "net_response_close", TNumeric do |rid|
     response = HTTP_RESPONSES[rid.value.to_i32]?
 
@@ -272,37 +270,4 @@ module Charly::Internals
 
     TNull.new
   end
-
-  charly_api "net_response_write", TNumeric, TString do |rid, data|
-    response = HTTP_RESPONSES[rid.value.to_i32]?
-
-    unless response
-      raise RunTimeError.new(call, context, "No response with id #{rid}")
-    end
-
-    data = data.value
-    response.output.print data
-
-    TNull.new
-  end
-
-  charly_api "net_response_write_file", TNumeric, TString do |rid, path|
-    response = HTTP_RESPONSES[rid.value.to_i32]?
-
-    unless response
-      raise RunTimeError.new(call, context, "No response with id #{rid}")
-    end
-
-    path = path.value
-    path = File.expand_path path
-
-    unless File.readable? path
-      raise RunTimeError.new(call, context, "Can't open file at #{path}")
-    end
-
-    response.output.print File.read path
-
-    TNull.new
-  end
-
 end

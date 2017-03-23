@@ -39,11 +39,27 @@ class Server {
     if typeof handler == "Function" {
 
       if name == "request" {
-        arguments[0] = Request(arguments[0])
-        arguments[1] = Response(arguments[1])
-      }
+        const request = arguments[0]
+        const response = arguments[1]
 
-      return handler.run(arguments)
+        // Both request and response are wrapped in their own
+        // objects so we can have methods on them
+        const wrapped_request = arguments[0] = Request(arguments[0])
+        const wrapped_response = arguments[1] = Response(arguments[1])
+
+        const result = handler.run(arguments)
+
+        // Copies over all keys from the wrapped response
+        // to the original response object provided by
+        // the native functions
+        Object.keys(wrapped_response).each(->(key) {
+          response[key] = wrapped_response[key]
+        })
+
+        return result
+      } else {
+        return handler.run(arguments)
+      }
     }
   }
 }
