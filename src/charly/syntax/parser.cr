@@ -314,6 +314,19 @@ module Charly
         end
       end
 
+      if exps.size > 1
+        index = 0
+        exps.select! { |element|
+          index += 1
+
+          if index == exps.size
+            next true
+          end
+
+          next !(AST.is_primitive(element))
+        }
+      end
+
       return Block.new(exps)
     end
 
