@@ -369,7 +369,7 @@ export = ->(describe, it, assert) {
 
       it("returns the contents of a directory", ->{
         const entries = fs.readdir(DIR_READDIR)
-        assert(entries, [".", "..", "bar", "baz", "foo"])
+        assert(entries, [".", "..", "foo", "baz", "bar"])
       })
 
     })
@@ -380,11 +380,11 @@ export = ->(describe, it, assert) {
         const file = fs.open(DIR_READDIR + "/unlinkme.txt", "w+", "utf8")
         file.close()
 
-        assert(fs.readdir(DIR_READDIR), [".", "..", "bar", "baz", "foo", "unlinkme.txt"])
+        assert(fs.readdir(DIR_READDIR), [".", "..", "unlinkme.txt", "foo", "baz", "bar"])
 
         fs.unlink(DIR_READDIR + "/unlinkme.txt")
 
-        assert(fs.readdir(DIR_READDIR), [".", "..", "bar", "baz", "foo"])
+        assert(fs.readdir(DIR_READDIR), [".", "..", "foo", "baz", "bar"])
       })
 
     })
