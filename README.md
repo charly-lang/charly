@@ -4,6 +4,10 @@
 
 <img align="right" alt="Charly" width="150" src="res/charly.png" />
 
+---
+### Warning: This project is no longer being actively maintained. You can find the new project at [KCreate/charly-vm](https://github.com/KCreate/charly-vm)
+---
+
 # The Charly programming language
 
 Charly is a dynamic, weakly-typed multi-paradigm programming language.
